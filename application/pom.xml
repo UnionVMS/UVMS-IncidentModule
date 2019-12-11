@@ -28,6 +28,26 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>eu.europa.ec.fisheries.uvms.movement</groupId>
+            <artifactId>movement-client</artifactId>
+            <version>${movement.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.fisheries.uvms.asset</groupId>
+            <artifactId>asset-client</artifactId>
+            <version>${asset.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.fisheries.uvms.movement-rules</groupId>
+            <artifactId>movement-rules-model</artifactId>
+            <version>${movement.rules.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.fisheries.uvms.commons</groupId>
+            <artifactId>uvms-commons-message</artifactId>
+            <version>${uvms.common.version}</version>
+        </dependency>
     	<dependency>
 			<groupId>fish.focus.uvms.maven</groupId>
 			<artifactId>uvms-pom-gis-deps</artifactId>
@@ -45,6 +65,11 @@
 			<type>pom</type>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
