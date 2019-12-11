@@ -32,7 +32,7 @@
                 <db.user>incident</db.user>
                 <db.passwd>incident</db.passwd>
                 <db.defaultSchema>incident</db.defaultSchema>
-                <db.changeLogFile>changelog/db-changelog-master-postgres.xml</db.changeLogFile>
+                <db.changeLogFile>changelog/db-changelog-master.xml</db.changeLogFile>
                 <db.outputFile>changelog/generatedChangelog.xml</db.outputFile>
                 <driver.groupId>org.postgresql</driver.groupId>
                 <driver.artifactId>postgresql</driver.artifactId>
