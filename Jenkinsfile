@@ -9,7 +9,9 @@ pipeline {
   }
   stages {
     stage ('Echo properties') {
-      echo "$isAwesome"
+      steps {
+        echo "$isAwesome"
+      }
     }
     stage ('Build') {
       steps {
