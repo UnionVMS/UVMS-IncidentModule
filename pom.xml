@@ -117,9 +117,6 @@
                     <releaseDeploymentRepository>focus-releases::default::http://nexus.focus.fish/nexus/content/repositories/releases/::false</releaseDeploymentRepository>
                     <stageDeploymentRepository>focus-stages::default::https://nexus.focus.fish/nexus/content/repositories/stages/::false</stageDeploymentRepository>
                     <snapshotDeploymentRepository>focus-snapshots::default::https://nexus.focus.fish/nexus/content/repositories/snapshots/::false</snapshotDeploymentRepository>
-                    <gitFlowConfig>
-                        <developmentBranch>dev</developmentBranch>
-                    </gitFlowConfig>
                 </configuration>
                 <extensions>true</extensions>
                 <executions>
