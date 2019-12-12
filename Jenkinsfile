@@ -1,7 +1,7 @@
 pipeline {
   agent any
-  environment{
-    VERSION = readMavenPom().getVersion()
+  environment {
+    VERSION = sh script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true
   }
   parameters {
     booleanParam(defaultValue: false, name: 'release-start')
