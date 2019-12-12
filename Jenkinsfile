@@ -1,5 +1,8 @@
 pipeline {
   agent any
+  environment{
+    VERSION = readMavenPom().getVersion()
+  }
   parameters {
     booleanParam(defaultValue: false, name: 'release-start')
     booleanParam(defaultValue: false, name: 'release-finish')
@@ -13,8 +16,7 @@ pipeline {
       steps {
         echo "$isAwesome"
         sh 'printenv'
-        def version = sh script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true
-        echo "$version"
+        echo "$VERSION"
       }
     }
     stage ('Build') {
