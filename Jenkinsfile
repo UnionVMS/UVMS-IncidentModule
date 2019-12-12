@@ -7,7 +7,7 @@ pipeline {
   parameters {
     booleanParam(defaultValue: false, name: 'release-start')
     booleanParam(defaultValue: false, name: 'release-finish')
-    string(defaultValue: "$NEXT_VERSION", name: 'release')
+    string(defaultValue: "${NEXT_VERSION}", name: 'release')
   }
   tools {
     maven 'Maven3'
@@ -16,8 +16,8 @@ pipeline {
   stages {
     stage ('Echo properties') {
       steps {
-        echo "$VERSION"
-        echo "$VERSION2"
+        echo "$PROJECT_VERSION"
+        echo "$NEXT_VERSION"
       }
     }
     stage ('Build') {
