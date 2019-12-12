@@ -52,6 +52,7 @@ pipeline {
           case 'Major':
             digit = 0
             break
+        }
         //sh 'mvn -B gitflow:release'
         echo "$RELEASE"
         echo "$RELEASE_TYPE"
