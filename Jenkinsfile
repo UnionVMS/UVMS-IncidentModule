@@ -1,3 +1,5 @@
+def digit
+
 pipeline {
   agent any
   parameters {
@@ -9,7 +11,7 @@ pipeline {
     jdk 'JDK11'
   }
   stages {
-    stage ('Build') {
+    stage('Build') {
       when {
         expression { !params.RELEASE }
       }
@@ -40,9 +42,20 @@ pipeline {
         }
       }
       steps {
+        switch (params.RELEASE_TYPE) {
+          case 'Incremental':
+            digit = 2
+            break
+          case 'Minor':
+            digit = 1
+            break
+          case 'Major':
+            digit = 0
+            break
         //sh 'mvn -B gitflow:release'
         echo "$RELEASE"
         echo "$RELEASE_TYPE"
+        echo "$digit"
       }
     }
   }
