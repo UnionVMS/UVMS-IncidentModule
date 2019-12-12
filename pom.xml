@@ -84,23 +84,41 @@
 		</dependencies>
 	</dependencyManagement>
 
-	<distributionManagement>
-		<repository>
-			<id>focus-releases</id>
-			<name>UnionVms Repository</name>
-			<url>http://nexus.focus.fish/nexus/content/repositories/releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>focus-snapshots</id>
-			<name>UnionVms Snapshot Repository</name>
-			<url>http://nexus.focus.fish/nexus/content/repositories/snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
-
 	<scm>
 		<connection>scm:git:https://github.com/UnionVMS/UVMS-IncidentModule.git</connection>
 		<tag>HEAD</tag>
 	</scm>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.amashchenko.maven.plugin</groupId>
+                <artifactId>gitflow-maven-plugin</artifactId>
+                <version>1.12.0</version>
+            </plugin>
+            <plugin>
+                <groupId>com.e-gineering</groupId>
+                <artifactId>gitflow-helper-maven-plugin</artifactId>
+                <version>2.2.0</version>
+                <configuration>
+                    <releaseDeploymentRepository>http://nexus.focus.fish/nexus/content/repositories/releases/</releaseDeploymentRepository>
+                    <stageDeploymentRepository>https://nexus.focus.fish/nexus/content/repositories/stages/</stageDeploymentRepository>
+                    <snapshotDeploymentRepository>https://nexus.focus.fish/nexus/content/repositories/snapshots/</snapshotDeploymentRepository>
+                </configuration>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>enforce-versions</goal>
+                            <goal>retarget-deploy</goal>
+                            <goal>update-stage-dependencies</goal>
+                            <goal>promote-master</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 	<modules>
 		<module>LIQUIBASE</module>
