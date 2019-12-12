@@ -42,16 +42,18 @@ pipeline {
         }
       }
       steps {
-        switch (params.RELEASE_TYPE) {
-          case 'Incremental':
-            digit = 2
-            break
-          case 'Minor':
-            digit = 1
-            break
-          case 'Major':
-            digit = 0
-            break
+        script {
+          switch (params.RELEASE_TYPE) {
+            case 'Incremental':
+              digit = 2
+              break
+            case 'Minor':
+              digit = 1
+              break
+            case 'Major':
+              digit = 0
+              break
+          }
         }
         //sh 'mvn -B gitflow:release'
         echo "$RELEASE"
