@@ -35,7 +35,7 @@ pipeline {
     stage('Release') {
       when {
         allOf {
-          branch 'develop'
+          //branch 'develop'
           expression { params.RELEASE }
         }
       }
