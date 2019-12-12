@@ -11,25 +11,12 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
  */
 package eu.europa.ec.fisheries.uvms.incident.rest;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+class Constants {
+    static final String ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
 
-@Path("hello")
-@Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
-public class TestResource {
+    static final String ACCESS_CONTROL_ALLOW_METHODS = "Access-Control-Allow-Methods";
+    static final String ACCESS_CONTROL_ALLOWED_METHODS = "GET, POST, DELETE, PUT, OPTIONS";
 
-    private static final Logger LOG = LoggerFactory.getLogger(TestResource.class);
-    
-    @GET
-    public Response test() {
-        LOG.info("Rest method called");
-        return Response.ok("hello").build();
-    }
+    static final String ACCESS_CONTROL_ALLOW_HEADERS = "Access-Control-Allow-Headers";
+    static final String ACCESS_CONTROL_ALLOW_HEADERS_ALL = "Content-Type, X-Requested-With, Authorization, Cache-Control";
 }
