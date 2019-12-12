@@ -14,8 +14,6 @@ pipeline {
   stages {
     stage ('Echo properties') {
       steps {
-        echo "$isAwesome"
-        sh 'printenv'
         echo "$VERSION"
       }
     }
