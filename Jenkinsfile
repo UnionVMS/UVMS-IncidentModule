@@ -1,5 +1,8 @@
 pipeline {
   agent any
+  parameters {
+    booleanParam(defaultValue: true, name: 'isAwesome')
+  }
   tools {
     maven 'Maven3'
     jdk 'JDK11'
