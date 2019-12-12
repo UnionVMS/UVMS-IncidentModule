@@ -1,12 +1,13 @@
 pipeline {
   agent any
   environment {
-    VERSION = sh script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true
-    VERSION2 = VERSION.replace("-SNAPSHOT","")
+    PROJECT_VERSION = sh script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true
+    NEXT_VERSION = PROJECT_VERSION.replace("-SNAPSHOT","")
   }
   parameters {
     booleanParam(defaultValue: false, name: 'release-start')
     booleanParam(defaultValue: false, name: 'release-finish')
+    string(defaultValue: "$NEXT_VERSION", name: 'release')
   }
   tools {
     maven 'Maven3'
