@@ -38,11 +38,11 @@ pipeline {
           branch 'develop'
           expression { params.RELEASE }
         }
-        steps {
-          //sh 'mvn -B gitflow:release'
-          echo "$RELEASE"
-          echo "$RELEASE_TYPE"
-        }
+      }
+      steps {
+        //sh 'mvn -B gitflow:release'
+        echo "$RELEASE"
+        echo "$RELEASE_TYPE"
       }
     }
   }
