@@ -101,9 +101,9 @@
                 <artifactId>gitflow-helper-maven-plugin</artifactId>
                 <version>2.2.0</version>
                 <configuration>
-                    <releaseDeploymentRepository>http://nexus.focus.fish/nexus/content/repositories/releases/</releaseDeploymentRepository>
-                    <stageDeploymentRepository>https://nexus.focus.fish/nexus/content/repositories/stages/</stageDeploymentRepository>
-                    <snapshotDeploymentRepository>https://nexus.focus.fish/nexus/content/repositories/snapshots/</snapshotDeploymentRepository>
+                    <releaseDeploymentRepository>focus.releases::default::http://nexus.focus.fish/nexus/content/repositories/releases/::false</releaseDeploymentRepository>
+                    <stageDeploymentRepository>focus.stages::default::https://nexus.focus.fish/nexus/content/repositories/stages/::false</stageDeploymentRepository>
+                    <snapshotDeploymentRepository>focus.snapshots::default::https://nexus.focus.fish/nexus/content/repositories/snapshots/::false</snapshotDeploymentRepository>
                 </configuration>
                 <extensions>true</extensions>
                 <executions>
