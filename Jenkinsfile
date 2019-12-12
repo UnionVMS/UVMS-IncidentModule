@@ -55,7 +55,7 @@ pipeline {
               break
           }
         }
-        sh 'mvn -B gitflow:release -DversionDigitToIncrement=${digit}'
+        sh "mvn -B gitflow:release -DversionDigitToIncrement=${digit}"
       }
     }
   }
