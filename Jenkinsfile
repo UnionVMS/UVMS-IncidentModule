@@ -1,26 +1,20 @@
 pipeline {
   agent any
-  environment {
-    PROJECT_VERSION = sh script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true
-    NEXT_VERSION = PROJECT_VERSION.replace("-SNAPSHOT","")
-  }
   parameters {
-    booleanParam(defaultValue: false, name: 'release-start')
-    booleanParam(defaultValue: false, name: 'release-finish')
-    string(defaultValue: "${NEXT_VERSION}", name: 'release')
+    booleanParam(defaultValue: false, name: 'RELEASE',
+      description: 'Create a release (This will only work from develop branch)')
+    choice(choices: ['Incremental', 'Minor', 'Major'], name: 'RELEASE_TYPE', 
+      description: 'Type of release')
   }
   tools {
     maven 'Maven3'
     jdk 'JDK11'
   }
   stages {
-    stage ('Echo properties') {
-      steps {
-        echo "$PROJECT_VERSION"
-        echo "$NEXT_VERSION"
-      }
-    }
     stage ('Build') {
+      when {
+        expression { !params.RELEASE }
+      }
       steps {
         lock('Docker') {
           sh 'mvn clean deploy -Pjacoco,postgres,publish-sql -U -DskipTests' 
@@ -29,11 +23,27 @@ pipeline {
     }
     stage('SonarQube analysis') {
       when {
-        not { branch 'master' }
+        allOf {
+          not { branch 'master' }
+          expression { !params.RELEASE }
+        }
       }
       steps{ 
         withSonarQubeEnv('Sonarqube.com') {
           sh 'mvn $SONAR_MAVEN_GOAL -Dsonar.dynamicAnalysis=reuseReports -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_AUTH_TOKEN $SONAR_EXTRA_PROPS'
+        }
+      }
+    }
+    stage('Release') {
+      when {
+        allOf {
+          branch 'develop'
+          expression { params.RELEASE }
+        }
+        steps {
+          //sh 'mvn -B gitflow:release'
+          echo "$RELEASE"
+          echo "$RELEASE_TYPE"
         }
       }
     }
