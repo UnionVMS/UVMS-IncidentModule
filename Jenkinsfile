@@ -6,9 +6,28 @@ pipeline {
   }
   stages {
     stage ('Build') {
+      when {
+        allOf {
+          not { branch 'master' }
+          not { branch 'dev' }
+        }
+      }
       steps {
         lock('Docker') {
-          sh 'mvn clean install -Pdocker,jacoco,postgres,publish-sql -U -DskipTests' 
+          sh 'mvn clean install -Pdocker,jacoco -U -DskipTests' 
+        }
+      }
+    }
+    stage ('Build & Deploy') {
+      when {
+        anyOf {
+          branch 'dev'
+          branch 'master'
+        }
+      }
+      steps {
+        lock('Docker') {
+          sh 'mvn clean deploy -Pdocker,jacoco,postgres,publish-sql -U -DskipTests' 
         }
       }
     }
