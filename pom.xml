@@ -115,8 +115,8 @@
                 <version>2.2.0</version>
                 <configuration>
                     <releaseDeploymentRepository>focus-releases::default::http://nexus.focus.fish/nexus/content/repositories/releases/::false</releaseDeploymentRepository>
-                    <stageDeploymentRepository>focus-stages::default::https://nexus.focus.fish/nexus/content/repositories/stages/::false</stageDeploymentRepository>
-                    <snapshotDeploymentRepository>focus-snapshots::default::https://nexus.focus.fish/nexus/content/repositories/snapshots/::false</snapshotDeploymentRepository>
+                    <stageDeploymentRepository>focus-stages::default::http://nexus.focus.fish/nexus/content/repositories/stages/::false</stageDeploymentRepository>
+                    <snapshotDeploymentRepository>focus-snapshots::default::http://nexus.focus.fish/nexus/content/repositories/snapshots/::false</snapshotDeploymentRepository>
                 </configuration>
                 <extensions>true</extensions>
                 <executions>
