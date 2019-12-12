@@ -8,6 +8,9 @@ pipeline {
     jdk 'JDK11'
   }
   stages {
+    stage ('Echo properties') {
+      echo "$isAwesome"
+    }
     stage ('Build') {
       steps {
         lock('Docker') {
