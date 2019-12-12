@@ -11,7 +11,11 @@
 	
 	<assembly-descriptor>
 		<interceptor-binding>
-			<ejb-name>TestResource</ejb-name>
+			<ejb-name>IncidentServiceBean</ejb-name>
+			<interceptor-class>net.bull.javamelody.MonitoringInterceptor</interceptor-class>
+		</interceptor-binding>
+		<interceptor-binding>
+			<ejb-name>IncidentLogServiceBean</ejb-name>
 			<interceptor-class>net.bull.javamelody.MonitoringInterceptor</interceptor-class>
 		</interceptor-binding>
 	</assembly-descriptor>
