@@ -32,7 +32,6 @@
         <asset.version>6.4.0</asset.version>
 
         <jackson.version>2.10.0</jackson.version>
-
     </properties>
 
     <dependencies>
