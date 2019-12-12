@@ -2,6 +2,7 @@ pipeline {
   agent any
   environment {
     VERSION = sh script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true
+    VERSION2 = VERSION.replace("-SNAPSHOT","")
   }
   parameters {
     booleanParam(defaultValue: false, name: 'release-start')
@@ -15,6 +16,7 @@ pipeline {
     stage ('Echo properties') {
       steps {
         echo "$VERSION"
+        echo "$VERSION2"
       }
     }
     stage ('Build') {
