@@ -1,10 +1,8 @@
 pipeline {
   agent any
   parameters {
-    booleanParam(defaultValue: false, name: 'RELEASE',
-      description: 'Create a release (This will only work from develop branch)')
-    choice(choices: ['Incremental', 'Minor', 'Major'], name: 'RELEASE_TYPE', 
-      description: 'Type of release')
+    booleanParam(defaultValue: false, name: 'RELEASE', description: 'Create a release (This will only work from develop branch)')
+    choice(choices: ['Incremental', 'Minor', 'Major'], name: 'RELEASE_TYPE', description: 'Type of release')
   }
   tools {
     maven 'Maven3'
