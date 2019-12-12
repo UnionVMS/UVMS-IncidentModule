@@ -13,8 +13,8 @@ pipeline {
       steps {
         echo "$isAwesome"
         sh 'printenv'
-        pom = readMavenPom file: 'pom.xml'
-        echo "$pom.version"
+        def version = sh script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true
+        echo "$version"
       }
     }
     stage ('Build') {
