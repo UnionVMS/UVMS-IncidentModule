@@ -11,6 +11,7 @@ pipeline {
     stage ('Echo properties') {
       steps {
         echo "$isAwesome"
+        sh 'printenv'
       }
     }
     stage ('Build') {
