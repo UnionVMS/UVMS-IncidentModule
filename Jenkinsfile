@@ -37,7 +37,7 @@ pipeline {
     stage('Release') {
       when {
         allOf {
-          //branch 'develop'
+          branch 'develop'
           expression { params.RELEASE }
         }
       }
@@ -55,16 +55,13 @@ pipeline {
               break
           }
         }
-        //sh 'mvn -B gitflow:release'
-        echo "$RELEASE"
-        echo "$RELEASE_TYPE"
-        echo "$digit"
+        sh 'mvn -B gitflow:release -DversionDigitToIncrement=$digit'
       }
     }
   }
   post {
     always {
-      archiveArtifacts artifacts: '**/target/*.war'
+      // archiveArtifacts artifacts: '**/target/*.war'
       // junit '**/target/surefire-reports/*.xml'
     }
   }
