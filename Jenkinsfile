@@ -61,7 +61,7 @@ pipeline {
   }
   post {
     always {
-      // archiveArtifacts artifacts: '**/target/*.war'
+      archiveArtifacts artifacts: '**/target/*.war'
       // junit '**/target/surefire-reports/*.xml'
     }
   }
