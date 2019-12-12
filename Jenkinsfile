@@ -8,7 +8,7 @@ pipeline {
     stage ('Build') {
       steps {
         lock('Docker') {
-          sh 'mvn clean install -Pgenerate-rest-doc,docker,jacoco,postgres,publish-sql -U' 
+          sh 'mvn clean install -Pdocker,jacoco,postgres,publish-sql -U -DskipTests' 
         }
       }
     }
