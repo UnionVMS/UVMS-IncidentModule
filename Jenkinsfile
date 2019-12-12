@@ -1,7 +1,8 @@
 pipeline {
   agent any
   parameters {
-    booleanParam(defaultValue: true, name: 'isAwesome')
+    booleanParam(defaultValue: false, name: 'release-start')
+    booleanParam(defaultValue: false, name: 'release-finish')
   }
   tools {
     maven 'Maven3'
@@ -12,6 +13,8 @@ pipeline {
       steps {
         echo "$isAwesome"
         sh 'printenv'
+        pom = readMavenPom file: 'pom.xml'
+        echo "$pom.version"
       }
     }
     stage ('Build') {
