@@ -55,7 +55,7 @@ pipeline {
               break
           }
         }
-        git branch: 'master', url: "$GIT_URL"
+        git branch: 'master', url: "$GIT_URL", credentialsId: 'bae67ea8-994c-429a-8a03-49b6ca0d3392'
         sh "mvn -B gitflow:release -DfetchRemote=false -DskipTestProject -DversionDigitToIncrement=${digit}"
       }
     }
