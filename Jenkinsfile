@@ -56,8 +56,8 @@ pipeline {
           }
         }
         withCredentials([usernamePassword(credentialsId: 'github_uvmsci_user', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-          sh "git config user.name $GIT_USERNAME"
-          sh "git config user.password $GIT_PASSWORD"
+          sh "git config credential.username $GIT_USERNAME"
+          sh "git config credential.helper "!echo password=$GIT_PASSWORD; echo"
         }
         git branch: 'master', url: "$GIT_URL"
         sh "mvn -B gitflow:release -DfetchRemote=false -DskipTestProject -DversionDigitToIncrement=${digit}"
