@@ -66,7 +66,8 @@ pipeline {
   }
   post {
     always {
-      archiveArtifacts artifacts: '**/target/*.war'
+      deleteDir()
+      //archiveArtifacts artifacts: '**/target/*.war'
       // junit '**/target/surefire-reports/*.xml'
     }
   }
