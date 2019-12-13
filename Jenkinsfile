@@ -55,7 +55,7 @@ pipeline {
               break
           }
         }
-        sh "mvn -B gitflow:release -DfetchRemote=false -DversionDigitToIncrement=${digit}"
+        sh "mvn -B gitflow:release -DfetchRemote=false -DskipTestProject -DversionDigitToIncrement=${digit}"
       }
     }
   }
