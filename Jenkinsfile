@@ -55,13 +55,20 @@ pipeline {
               break
           }
         }
-        sh "mvn -B gitflow:release -DversionDigitToIncrement=${digit}"
+        withCredentials([usernamePassword(credentialsId: 'github_uvmsci_user', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+          sh "git config credential.username $GIT_USERNAME"
+          sh 'git config credential.helper "!echo password=$GIT_PASSWORD; echo"'
+        }
+        git branch: 'master', url: "$GIT_URL"
+        git branch: 'develop', url: "$GIT_URL"
+        sh "mvn -B gitflow:release -DskipTestProject -DversionDigitToIncrement=${digit}"
       }
     }
   }
   post {
     always {
-      archiveArtifacts artifacts: '**/target/*.war'
+      deleteDir()
+      //archiveArtifacts artifacts: '**/target/*.war'
       // junit '**/target/surefire-reports/*.xml'
     }
   }
