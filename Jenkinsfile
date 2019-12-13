@@ -55,7 +55,11 @@ pipeline {
               break
           }
         }
-        git branch: 'master', url: "$GIT_URL", credentialsId: 'bae67ea8-994c-429a-8a03-49b6ca0d3392'
+        withCredentials([usernamePassword(credentialsId: 'github_uvmsci_user', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+          sh "git config user.name $GIT_USERNAME"
+          sh "git config user.password $GIT_PASSWORD"
+        }
+        git branch: 'master', url: "$GIT_URL"
         sh "mvn -B gitflow:release -DfetchRemote=false -DskipTestProject -DversionDigitToIncrement=${digit}"
       }
     }
