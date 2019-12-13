@@ -1,10 +1,10 @@
-def digit
+def NEXT_VERSION = readMavenPom().getVersion().replace('-SNAPSHOT','')
 
 pipeline {
   agent any
   parameters {
     booleanParam(defaultValue: false, name: 'RELEASE', description: 'Create a release (This will only work from develop branch)')
-    choice(choices: ['Incremental', 'Minor', 'Major'], name: 'RELEASE_TYPE', description: 'Type of release')
+    string(defaultValue: "$NEXT_VERSION", name: 'VERSION', description: 'Release version'
   }
   tools {
     maven 'Maven3'
@@ -42,20 +42,8 @@ pipeline {
         }
       }
       steps {
-        script {
-          switch (params.RELEASE_TYPE) {
-            case 'Incremental':
-              digit = 2
-              break
-            case 'Minor':
-              digit = 1
-              break
-            case 'Major':
-              digit = 0
-              break
-          }
-        }
-        sh 'mvn -B gitflow:release -DversionDigitToIncrement=$digit'
+        echo "$RELEASE"
+        echo "$VERSION"
       }
     }
   }
