@@ -42,6 +42,7 @@ pipeline {
         }
       }
       steps {
+        sh "git checkout master"
         echo "$RELEASE"
         echo "$VERSION"
       }
