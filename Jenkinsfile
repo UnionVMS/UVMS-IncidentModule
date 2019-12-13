@@ -55,6 +55,7 @@ pipeline {
               break
           }
         }
+        git branch: 'master', url: "$GIT_URL"
         sh "mvn -B gitflow:release -DfetchRemote=false -DskipTestProject -DversionDigitToIncrement=${digit}"
       }
     }
