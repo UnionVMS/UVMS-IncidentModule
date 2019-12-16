@@ -59,8 +59,8 @@ pipeline {
           sh "git config credential.username $GIT_USERNAME"
           sh 'git config credential.helper "!echo password=$GIT_PASSWORD; echo"'
         }
-        //git branch: 'master', url: "$GIT_URL"
-        //git branch: 'develop', url: "$GIT_URL"
+        git branch: 'master', url: "$GIT_URL"
+        git branch: 'develop', url: "$GIT_URL"
         sh "mvn -B gitflow:release -DskipTestProject -DversionDigitToIncrement=${digit}"
       }
     }
