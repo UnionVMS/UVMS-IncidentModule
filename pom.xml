@@ -11,7 +11,7 @@
 
     <groupId>eu.europa.ec.fisheries.uvms.incident</groupId>
     <artifactId>incident</artifactId>
-    <version>0.0.9</version>
+    <version>0.0.10</version>
     <packaging>pom</packaging>
     <description>Incident handling module</description>
 
@@ -109,26 +109,6 @@
                 <groupId>com.amashchenko.maven.plugin</groupId>
                 <artifactId>gitflow-maven-plugin</artifactId>
                 <version>1.14.0</version>
-            </plugin>
-            <plugin>
-                <groupId>com.e-gineering</groupId>
-                <artifactId>gitflow-helper-maven-plugin</artifactId>
-                <version>2.2.0</version>
-                <configuration>
-                    <releaseDeploymentRepository>focus-releases::default::http://nexus.focus.fish/nexus/content/repositories/releases/::false</releaseDeploymentRepository>
-                    <stageDeploymentRepository>focus-stages::default::http://nexus.focus.fish/nexus/content/repositories/stages/::false</stageDeploymentRepository>
-                    <snapshotDeploymentRepository>focus-snapshots::default::http://nexus.focus.fish/nexus/content/repositories/snapshots/::true</snapshotDeploymentRepository>
-                </configuration>
-                <extensions>true</extensions>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>enforce-versions</goal>
-                            <goal>retarget-deploy</goal>
-                            <goal>update-stage-dependencies</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
