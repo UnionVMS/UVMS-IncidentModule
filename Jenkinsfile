@@ -8,7 +8,7 @@ pipeline {
   }
   tools {
     maven 'Maven3'
-    jdk 'JDK11'
+    jdk 'JDK8'
   }
   stages {
     stage('Build') {
@@ -17,7 +17,7 @@ pipeline {
       }
       steps {
         lock('Docker') {
-          sh 'mvn clean deploy -Pjacoco,postgres,publish-sql -U -DskipTests' 
+          sh 'mvn clean deploy -Pdocker,jacoco,postgres,publish-sql -U'
         }
       }
     }
