@@ -1,7 +1,8 @@
 package eu.europa.ec.fisheries.uvms.incident.rest;
 
-import eu.europa.ec.fisheries.uvms.incident.TransactionalTests;
+import eu.europa.ec.fisheries.uvms.incident.BuildIncidentTestDeployment;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.dto.IncidentDto;
+import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,7 +14,7 @@ import java.util.List;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(Arquillian.class)
-public class IncidentResourceTest extends TransactionalTests {
+public class IncidentResourceTest extends BuildIncidentTestDeployment {
 
     @Test
     public void assetNotSendingTest() {
