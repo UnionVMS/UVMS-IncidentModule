@@ -17,7 +17,7 @@ pipeline {
       }
       steps {
         lock('Docker') {
-          sh 'mvn clean deploy -Pjacoco,postgres,publish-sql -U -DskipTests' 
+          sh 'mvn clean deploy -Pdocker,jacoco,postgres,publish-sql -U'
         }
       }
     }
