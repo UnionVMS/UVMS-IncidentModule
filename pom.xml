@@ -11,7 +11,7 @@
 
     <groupId>eu.europa.ec.fisheries.uvms.incident</groupId>
     <artifactId>incident</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.11-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>Incident handling module</description>
 
@@ -98,6 +98,7 @@
 
     <scm>
         <connection>scm:git:https://github.com/UnionVMS/UVMS-IncidentModule.git</connection>
+        <developerConnection>scm:git:https://github.com/UnionVMS/UVMS-IncidentModule.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
@@ -106,28 +107,7 @@
             <plugin>
                 <groupId>com.amashchenko.maven.plugin</groupId>
                 <artifactId>gitflow-maven-plugin</artifactId>
-                <version>1.12.0</version>
-            </plugin>
-            <plugin>
-                <groupId>com.e-gineering</groupId>
-                <artifactId>gitflow-helper-maven-plugin</artifactId>
-                <version>2.2.0</version>
-                <configuration>
-                    <releaseDeploymentRepository>focus-releases::default::http://nexus.focus.fish/nexus/content/repositories/releases/::false</releaseDeploymentRepository>
-                    <stageDeploymentRepository>focus-stages::default::https://nexus.focus.fish/nexus/content/repositories/stages/::false</stageDeploymentRepository>
-                    <snapshotDeploymentRepository>focus-snapshots::default::https://nexus.focus.fish/nexus/content/repositories/snapshots/::false</snapshotDeploymentRepository>
-                </configuration>
-                <extensions>true</extensions>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>enforce-versions</goal>
-                            <goal>retarget-deploy</goal>
-                            <goal>update-stage-dependencies</goal>
-                            <goal>promote-master</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <version>1.14.0</version>
             </plugin>
         </plugins>
     </build>
