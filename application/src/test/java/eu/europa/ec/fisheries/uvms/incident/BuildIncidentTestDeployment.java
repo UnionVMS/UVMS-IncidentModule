@@ -1,9 +1,10 @@
-package eu.europa.ec.fisheries.uvms.incident.arquillian;
+package eu.europa.ec.fisheries.uvms.incident;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import eu.europa.ec.fisheries.uvms.incident.unit.AssetMock;
 import org.eu.ingwar.tools.arquillian.extension.suite.annotations.ArquillianSuiteDeployment;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.Archive;
@@ -28,8 +29,24 @@ public abstract class BuildIncidentTestDeployment {
         testWar.addAsLibraries(files);
 
         testWar.addPackages(true, "eu.europa.ec.fisheries.uvms.incident");
-
         testWar.addAsResource("persistence.xml", "META-INF/persistence.xml");
+
+        return testWar;
+    }
+
+    @Deployment(name = "uvms", order = 1)
+    public static Archive<?> createUVMSMock() {
+        WebArchive testWar = ShrinkWrap.create(WebArchive.class, "unionvms.war");
+
+        File[] files = Maven.resolver().loadPomFromFile("pom.xml")
+                .importRuntimeAndTestDependencies()
+                .resolve()
+                .withTransitivity().asFile();
+        testWar.addAsLibraries(files);
+
+        testWar.addClass(UnionVMSRestMock.class);
+        testWar.addClass(MovementMock.class);
+        testWar.addClass(AssetMock.class);
 
         return testWar;
     }
