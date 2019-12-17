@@ -15,10 +15,12 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import javax.ejb.Stateless;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.jms.*;
 
+@Stateless
 public class IncidentProducer {
 
     private final static Logger LOG = LoggerFactory.getLogger(IncidentProducer.class);
