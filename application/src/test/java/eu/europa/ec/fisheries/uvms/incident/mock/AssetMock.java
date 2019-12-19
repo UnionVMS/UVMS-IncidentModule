@@ -1,10 +1,7 @@
-package eu.europa.ec.fisheries.uvms.incident.unit;
+package eu.europa.ec.fisheries.uvms.incident.mock;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import eu.europa.ec.fisheries.schema.movement.v1.MovementPoint;
-import eu.europa.ec.fisheries.schema.movement.v1.MovementSourceType;
 import eu.europa.ec.fisheries.uvms.asset.client.model.AssetDTO;
-import eu.europa.ec.fisheries.uvms.movement.client.model.MicroMovement;
 
 import javax.ejb.Stateless;
 import javax.ws.rs.*;

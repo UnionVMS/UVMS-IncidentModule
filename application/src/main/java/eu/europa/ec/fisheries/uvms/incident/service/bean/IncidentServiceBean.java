@@ -94,4 +94,8 @@ public class IncidentServiceBean {
         incidentLogServiceBean.createIncidentLogForStatus(status, updated);
         return updated;
     }
+
+    public Incident findByTicketId(UUID ticketId) {
+        return incidentDao.findByTicketId(ticketId);
+    }
 }
