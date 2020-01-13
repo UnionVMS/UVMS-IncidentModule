@@ -80,25 +80,25 @@ public class IncidentHelper {
 
         if(entity.getMovementId() != null) {
             MicroMovement micro = movementClient.getMicroMovementById(entity.getMovementId());
+            if(micro != null) {
+                MicroMovementDto lastKnownLocation = new MicroMovementDto();
 
-            MicroMovementDto lastKnownLocation = new MicroMovementDto();
+                MovementPointDto location = new MovementPointDto();
+                location.setLatitude(micro.getLocation().getLatitude());
+                location.setLongitude(micro.getLocation().getLongitude());
+                if (micro.getLocation().getAltitude() != null)
+                    location.setAltitude(micro.getLocation().getAltitude());
 
-            MovementPointDto location = new MovementPointDto();
-            location.setLatitude(micro.getLocation().getLatitude());
-            location.setLongitude(micro.getLocation().getLongitude());
-            if (micro.getLocation().getAltitude() != null)
-                location.setAltitude(micro.getLocation().getAltitude());
+                lastKnownLocation.setLocation(location);
+                lastKnownLocation.setHeading(micro.getHeading());
+                lastKnownLocation.setGuid(micro.getGuid());
+                lastKnownLocation.setTimestamp(micro.getTimestamp().getEpochSecond());
+                lastKnownLocation.setSpeed(micro.getSpeed());
+                lastKnownLocation.setSource(MovementSourceType.fromValue(micro.getSource().name()));
 
-            lastKnownLocation.setLocation(location);
-            lastKnownLocation.setHeading(micro.getHeading());
-            lastKnownLocation.setGuid(micro.getGuid());
-            lastKnownLocation.setTimestamp(micro.getTimestamp().getEpochSecond());
-            lastKnownLocation.setSpeed(micro.getSpeed());
-            lastKnownLocation.setSource(MovementSourceType.fromValue(micro.getSource().name()));
-
-            dto.setLastKnownLocation(lastKnownLocation);
+                dto.setLastKnownLocation(lastKnownLocation);
+            }
         }
-
         return dto;
     }
 
