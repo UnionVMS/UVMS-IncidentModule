@@ -31,6 +31,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.UUID;
 
 @Path("incident")
 @Produces(MediaType.APPLICATION_JSON)
@@ -57,6 +58,20 @@ public class IncidentResource {
             List<Incident> notSendingList = incidentServiceBean.getAssetNotSendingList();
             List<IncidentDto> dtoList = incidentHelper.incidentToDtoList(notSendingList);
             return Response.ok(dtoList).build();
+        } catch (Exception e) {
+            LOG.error("Error while fetching AssetNotSending List", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getRootCause(e)).build();
+        }
+    }
+
+    @GET
+    @Path("byTicketId/{ticketId}")
+    @RequiresFeature(UnionVMSFeature.viewAlarmsOpenTickets)
+    public Response getByTicketId(@PathParam("ticketId") UUID ticketId) {
+        try {
+            Incident incident = incidentServiceBean.findByTicketId(ticketId);
+            IncidentDto dto = incidentHelper.incidentEntityToDto(incident);
+            return Response.ok(dto).build();
         } catch (Exception e) {
             LOG.error("Error while fetching AssetNotSending List", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getRootCause(e)).build();
