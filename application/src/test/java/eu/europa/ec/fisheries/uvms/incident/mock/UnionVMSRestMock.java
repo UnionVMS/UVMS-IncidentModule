@@ -1,4 +1,4 @@
-package eu.europa.ec.fisheries.uvms.incident;
+package eu.europa.ec.fisheries.uvms.incident.mock;
 
 /*
 ﻿Developed with the contribution of the European Commission - Directorate General for Maritime Affairs and Fisheries

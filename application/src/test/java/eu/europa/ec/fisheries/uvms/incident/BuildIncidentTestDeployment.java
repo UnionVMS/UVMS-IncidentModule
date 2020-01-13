@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
-import eu.europa.ec.fisheries.uvms.incident.unit.AssetMock;
+import eu.europa.ec.fisheries.uvms.incident.mock.AssetMock;
+import eu.europa.ec.fisheries.uvms.incident.mock.MovementMock;
+import eu.europa.ec.fisheries.uvms.incident.mock.UnionVMSRestMock;
 import org.eu.ingwar.tools.arquillian.extension.suite.annotations.ArquillianSuiteDeployment;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.Archive;
@@ -60,5 +62,14 @@ public abstract class BuildIncidentTestDeployment {
         Client client = ClientBuilder.newClient();
         client.register(new JacksonJaxbJsonProvider(objectMapper, JacksonJaxbJsonProvider.DEFAULT_ANNOTATIONS));
         return client.target("http://localhost:8080/incident/rest");
+    }
+
+    protected ObjectMapper getObjectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper
+                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                .findAndRegisterModules();
+        return objectMapper;
     }
 }

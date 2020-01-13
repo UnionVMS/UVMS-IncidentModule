@@ -1,4 +1,4 @@
-package eu.europa.ec.fisheries.uvms.incident;
+package eu.europa.ec.fisheries.uvms.incident.mock;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;

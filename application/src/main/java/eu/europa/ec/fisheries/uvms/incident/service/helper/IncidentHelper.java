@@ -45,9 +45,11 @@ public class IncidentHelper {
 
     private void setAssetValues(Incident incident, String assetId) {
         AssetDTO asset = assetClient.getAssetById(AssetIdentifier.GUID, assetId);
-        incident.setAssetId(asset.getId());
-        incident.setAssetName(asset.getName());
-        incident.setIrcs(asset.getIrcs());
+        if(asset != null) {
+            incident.setAssetId(asset.getId());
+            incident.setAssetName(asset.getName());
+            incident.setIrcs(asset.getIrcs());
+        }
     }
 
     public IncidentDto incidentEntityToDto(Incident incident) {
@@ -76,25 +78,27 @@ public class IncidentHelper {
         if (entity.getUpdateDate() != null)
             dto.setUpdateDate(entity.getUpdateDate().getEpochSecond());
 
-        MicroMovement micro = movementClient.getMicroMovementById(entity.getMovementId());
+        if(entity.getMovementId() != null) {
+            MicroMovement micro = movementClient.getMicroMovementById(entity.getMovementId());
+            if(micro != null) {
+                MicroMovementDto lastKnownLocation = new MicroMovementDto();
 
-        MicroMovementDto lastKnownLocation = new MicroMovementDto();
+                MovementPointDto location = new MovementPointDto();
+                location.setLatitude(micro.getLocation().getLatitude());
+                location.setLongitude(micro.getLocation().getLongitude());
+                if (micro.getLocation().getAltitude() != null)
+                    location.setAltitude(micro.getLocation().getAltitude());
 
-        MovementPointDto location = new MovementPointDto();
-        location.setLatitude(micro.getLocation().getLatitude());
-        location.setLongitude(micro.getLocation().getLongitude());
-        if (micro.getLocation().getAltitude() != null)
-            location.setAltitude(micro.getLocation().getAltitude());
+                lastKnownLocation.setLocation(location);
+                lastKnownLocation.setHeading(micro.getHeading());
+                lastKnownLocation.setGuid(micro.getGuid());
+                lastKnownLocation.setTimestamp(micro.getTimestamp().getEpochSecond());
+                lastKnownLocation.setSpeed(micro.getSpeed());
+                lastKnownLocation.setSource(MovementSourceType.fromValue(micro.getSource().name()));
 
-        lastKnownLocation.setLocation(location);
-        lastKnownLocation.setHeading(micro.getHeading());
-        lastKnownLocation.setGuid(micro.getGuid());
-        lastKnownLocation.setTimestamp(micro.getTimestamp().getEpochSecond());
-        lastKnownLocation.setSpeed(micro.getSpeed());
-        lastKnownLocation.setSource(MovementSourceType.fromValue(micro.getSource().name()));
-
-        dto.setLastKnownLocation(lastKnownLocation);
-
+                dto.setLastKnownLocation(lastKnownLocation);
+            }
+        }
         return dto;
     }
 
