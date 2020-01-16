@@ -30,7 +30,7 @@
         <asset.version>6.4.1</asset.version>
         <exchange.module>5.0.20-UVMS</exchange.module>
 
-        <jackson.version>2.10.0</jackson.version>
+        <jackson.version>2.10.2</jackson.version>
 
     </properties>
 
