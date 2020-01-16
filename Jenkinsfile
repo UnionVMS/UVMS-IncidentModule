@@ -2,6 +2,9 @@ def digit
 
 pipeline {
   agent any
+  options {
+    lock resource: 'Docker'
+  }
   parameters {
     booleanParam(defaultValue: false, name: 'RELEASE', description: 'Create a release (This will only work from develop branch)')
     choice(choices: ['Incremental', 'Minor', 'Major'], name: 'RELEASE_TYPE', description: 'Type of release')
@@ -24,9 +27,7 @@ pipeline {
         expression { !params.RELEASE }
       }
       steps {
-        lock('Docker') {
-          sh 'mvn clean deploy -Pdocker,jacoco,postgres,publish-sql -U'
-        }
+        sh 'mvn clean deploy -Pdocker,jacoco,postgres,publish-sql -U'
       }
     }
     stage('SonarQube analysis') {
