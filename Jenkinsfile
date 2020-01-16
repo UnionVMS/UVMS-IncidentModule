@@ -11,6 +11,14 @@ pipeline {
     jdk 'JDK8'
   }
   stages {
+    stage('Remove docker containers') {
+      when {
+        expression { !params.RELEASE }
+      }
+      steps {
+        sh 'docker ps -a -q|xargs -r docker rm -f'
+      }
+    }
     stage('Build') {
       when {
         expression { !params.RELEASE }
