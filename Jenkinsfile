@@ -11,7 +11,7 @@ pipeline {
   }
   tools {
     maven 'Maven3'
-    jdk 'JDK8'
+    jdk 'JDK11'
   }
   stages {
     stage('Remove docker containers') {
