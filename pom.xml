@@ -29,7 +29,7 @@
         <movement.rules.version>2.2.0</movement.rules.version>
         <asset.version>6.4.1</asset.version>
         <exchange.module>5.0.20-UVMS</exchange.module>
-
+        <usm4uvms.version>4.1.0</usm4uvms.version>
         <jackson.version>2.10.2</jackson.version>
 
     </properties>

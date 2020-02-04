@@ -24,7 +24,6 @@
         <docker.dev.start.phase>test-compile</docker.dev.start.phase>
         <docker.liquibase.phase>test-compile</docker.liquibase.phase>
 		<docker.dev.stop.phase>verify</docker.dev.stop.phase>
-
     </properties>
 
     <dependencies>
@@ -32,6 +31,17 @@
             <groupId>eu.europa.ec.fisheries.uvms.movement</groupId>
             <artifactId>movement-client</artifactId>
             <version>${movement.version}</version>
+            <exclusions>
+                <exclusion>
+                        <groupId>eu.europa.ec.fisheries.uvms</groupId>
+                        <artifactId>usm4uvms</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.fisheries.uvms</groupId>
+            <artifactId>usm4uvms</artifactId>
+            <version>${usm4uvms.version}</version>
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.fisheries.uvms.asset</groupId>
