@@ -2,23 +2,32 @@ def digit
 
 pipeline {
   agent any
+  options {
+    lock resource: 'Docker'
+  }
   parameters {
     booleanParam(defaultValue: false, name: 'RELEASE', description: 'Create a release (This will only work from develop branch)')
     choice(choices: ['Incremental', 'Minor', 'Major'], name: 'RELEASE_TYPE', description: 'Type of release')
   }
   tools {
     maven 'Maven3'
-    jdk 'JDK8'
+    jdk 'JDK11'
   }
   stages {
+    stage('Remove docker containers') {
+      when {
+        expression { !params.RELEASE }
+      }
+      steps {
+        sh 'docker ps -a -q|xargs -r docker rm -f'
+      }
+    }
     stage('Build') {
       when {
         expression { !params.RELEASE }
       }
       steps {
-        lock('Docker') {
-          sh 'mvn clean deploy -Pdocker,jacoco,postgres,publish-sql -U'
-        }
+        sh 'mvn clean deploy -Pdocker,jacoco,postgres,publish-sql -U'
       }
     }
     stage('SonarQube analysis') {
