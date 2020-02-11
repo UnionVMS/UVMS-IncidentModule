@@ -55,7 +55,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         String asString = jsonb.toJson(ticket);
         jmsHelper.sendMessageToIncidentQueue(asString);
 
-        LockSupport.parkNanos(5000000000L);
+        LockSupport.parkNanos(2000000000L);
 
         List<Incident> after = incidentService.getAssetNotSendingList();
         assertEquals(before.size() + 1, after.size());
@@ -72,7 +72,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         String asString = jsonb.toJson(ticket);
         jmsHelper.sendMessageToIncidentQueue(asString);
 
-        LockSupport.parkNanos(5000000000L);
+        LockSupport.parkNanos(2000000000L);
 
         Incident incident = incidentService.findByTicketId(ticketId);
         assertNotNull(incident);
@@ -91,7 +91,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         String asString = jsonb.toJson(ticket);
         jmsHelper.sendMessageToIncidentQueue(asString);
 
-        LockSupport.parkNanos(5000000000L);
+        LockSupport.parkNanos(2000000000L);
 
         Incident created = incidentService.findByTicketId(ticketId);
         assertNotNull(created);
