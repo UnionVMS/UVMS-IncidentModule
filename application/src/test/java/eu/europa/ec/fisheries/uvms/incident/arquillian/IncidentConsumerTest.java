@@ -12,8 +12,6 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.jms.Message;
@@ -26,15 +24,17 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Arquillian.class)
 public class IncidentConsumerTest extends BuildIncidentTestDeployment {
 
-    private static final Logger log = LoggerFactory.getLogger(IncidentConsumerTest.class);
-
     @Inject
     private JMSHelper jmsHelper;
 
     @Inject
     private TicketHelper ticketHelper;
 
-    private Jsonb jsonb = new JsonBConfigurator().getContext(null);
+    private Jsonb jsonb;
+
+    {
+        jsonb = new JsonBConfigurator().getContext(null);
+    }
 
     @Before
     public void clearExchangeQueue() throws Exception {
