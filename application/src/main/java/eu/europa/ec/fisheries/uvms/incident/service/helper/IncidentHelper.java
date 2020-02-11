@@ -74,9 +74,9 @@ public class IncidentHelper {
         dto.setAssetName(entity.getAssetName());
         dto.setAssetIrcs(entity.getIrcs());
         dto.setStatus(entity.getStatus().name());
-        dto.setCreateDate(entity.getCreateDate().getEpochSecond());
+        dto.setCreateDate(entity.getCreateDate());
         if (entity.getUpdateDate() != null)
-            dto.setUpdateDate(entity.getUpdateDate().getEpochSecond());
+            dto.setUpdateDate(entity.getUpdateDate());
 
         if(entity.getMovementId() != null) {
             MicroMovement micro = movementClient.getMicroMovementById(entity.getMovementId());
@@ -92,7 +92,7 @@ public class IncidentHelper {
                 lastKnownLocation.setLocation(location);
                 lastKnownLocation.setHeading(micro.getHeading());
                 lastKnownLocation.setGuid(micro.getGuid());
-                lastKnownLocation.setTimestamp(micro.getTimestamp().getEpochSecond());
+                lastKnownLocation.setTimestamp(micro.getTimestamp());
                 lastKnownLocation.setSpeed(micro.getSpeed());
                 lastKnownLocation.setSource(MovementSourceType.fromValue(micro.getSource().name()));
 
@@ -110,7 +110,7 @@ public class IncidentHelper {
             dto.setIncidentId(entity.getIncidentId());
             dto.setMessage(entity.getMessage());
             dto.setEventType(entity.getEventType().name());
-            dto.setCreateDate(entity.getCreateDate().getEpochSecond());
+            dto.setCreateDate(entity.getCreateDate());
             dto.setPreviousValue(entity.getPreviousValue());
             dto.setCurrentValue(entity.getCurrentValue());
             retVal.add(dto);
@@ -124,7 +124,7 @@ public class IncidentHelper {
         dto.setHeading(model.getHeading());
         dto.setSource(MovementSourceType.fromValue(model.getSource().name()));
         dto.setSpeed(model.getSpeed());
-        dto.setTimestamp(model.getTimestamp().getEpochSecond());
+        dto.setTimestamp(model.getTimestamp());
         dto.setLocation(mapToMovementPointDto(model.getLocation()));
         return dto;
     }

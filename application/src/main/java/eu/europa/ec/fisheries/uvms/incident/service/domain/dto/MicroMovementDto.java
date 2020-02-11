@@ -1,5 +1,7 @@
 package eu.europa.ec.fisheries.uvms.incident.service.domain.dto;
 
+import java.time.Instant;
+
 public class MicroMovementDto {
 
     private MovementPointDto location;
@@ -8,7 +10,7 @@ public class MicroMovementDto {
 
     private String guid;
 
-    private long timestamp;
+    private Instant timestamp;
 
     private Double speed;
 
@@ -38,11 +40,11 @@ public class MicroMovementDto {
         this.guid = guid;
     }
 
-    public long getTimestamp() {
+    public Instant getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(long timestamp) {
+    public void setTimestamp(Instant timestamp) {
         this.timestamp = timestamp;
     }
 

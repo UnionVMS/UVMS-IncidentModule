@@ -1,9 +1,5 @@
 package eu.europa.ec.fisheries.uvms.incident.service.domain.entities;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.ser.InstantSerializer;
-import eu.europa.ec.fisheries.uvms.incident.service.domain.dto.IncidentInstantDeserializer;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.enums.EventTypeEnum;
 
 import javax.persistence.*;
@@ -40,8 +36,6 @@ public class IncidentLog {
 
     @NotNull
     @Column(name = "create_date")
-    @JsonSerialize(using = InstantSerializer.class)
-    @JsonDeserialize(using = IncidentInstantDeserializer.class)
     private Instant createDate;
 
     @Column(name = "previous_value")
