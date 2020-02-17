@@ -1,9 +1,7 @@
 package eu.europa.ec.fisheries.uvms.incident.service.message;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import eu.europa.ec.fisheries.schema.movementrules.ticket.v1.TicketType;
+import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
 import eu.europa.ec.fisheries.uvms.commons.message.api.MessageConstants;
 import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentServiceBean;
 import org.slf4j.Logger;
@@ -17,6 +15,7 @@ import javax.inject.Inject;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.TextMessage;
+import javax.json.bind.Jsonb;
 
 @MessageDriven(mappedName = MessageConstants.QUEUE_INCIDENT, activationConfig = {
         @ActivationConfigProperty(propertyName = "messagingType", propertyValue = MessageConstants.CONNECTION_TYPE),
@@ -28,16 +27,14 @@ import javax.jms.TextMessage;
 public class IncidentConsumer implements MessageListener {
     private static final Logger LOG = LoggerFactory.getLogger(IncidentConsumer.class);
 
-    private ObjectMapper om = new ObjectMapper();
-
     @Inject
     private IncidentServiceBean incidentServiceBean;
 
+    private Jsonb jsonb;
+
     @PostConstruct
     public void init() {
-        om.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        om.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        om.findAndRegisterModules();
+        jsonb = new JsonBConfigurator().getContext(null);
     }
 
     @Override
@@ -45,7 +42,7 @@ public class IncidentConsumer implements MessageListener {
         try {
             TextMessage tm = (TextMessage) message;
             String json = tm.getBody(String.class);
-            TicketType ticket = om.readValue(json, TicketType.class);
+            TicketType ticket = jsonb.fromJson(json, TicketType.class);
             String eventType = message.getStringProperty("eventName");
             switch (eventType) {
                 case "Incident":

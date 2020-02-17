@@ -1,9 +1,6 @@
 package eu.europa.ec.fisheries.uvms.incident.service.bean;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentLogDao;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.dto.MicroMovementDto;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
@@ -17,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.PostConstruct;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.json.bind.Jsonb;
 import java.time.Instant;
 import java.util.List;
 
@@ -29,13 +27,11 @@ public class IncidentLogServiceBean {
     @Inject
     private IncidentHelper incidentHelper;
 
-    private ObjectMapper om = new ObjectMapper();
+    private Jsonb jsonb;
 
     @PostConstruct
     public void init() {
-        om.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        om.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        om.findAndRegisterModules();
+        jsonb = new JsonBConfigurator().getContext(null);
     }
 
     public List<IncidentLog> getAssetNotSendingEventChanges(long incidentId) {
@@ -59,8 +55,8 @@ public class IncidentLogServiceBean {
         MicroMovementDto latestPositionDto = incidentHelper.mapToMicroMovementDto(latest);
 
         try {
-            String jsonPrevious = om.writeValueAsString(latestPositionDto);
-            String jsonCurrent = om.writeValueAsString(manualPositionDto);
+            String jsonPrevious = jsonb.toJson(latestPositionDto);
+            String jsonCurrent = jsonb.toJson(manualPositionDto);
             IncidentLog log = new IncidentLog();
             log.setCreateDate(Instant.now());
             log.setIncidentId(persisted.getId());
@@ -69,7 +65,7 @@ public class IncidentLogServiceBean {
             log.setCurrentValue(jsonCurrent);
             log.setMessage(EventTypeEnum.MANUEL_POSITION.getMessage());
             incidentLogDao.save(log);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             LOG.error("Error when creating MicroMovementExtended JSON object: " + e.getMessage(), e);
         }
     }

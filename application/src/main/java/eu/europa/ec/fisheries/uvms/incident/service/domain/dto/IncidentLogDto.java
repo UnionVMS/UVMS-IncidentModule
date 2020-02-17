@@ -1,6 +1,7 @@
 package eu.europa.ec.fisheries.uvms.incident.service.domain.dto;
 
 import java.io.Serializable;
+import java.time.Instant;
 
 public class IncidentLogDto implements Serializable {
     private final static long serialVersionUID = 1L;
@@ -9,7 +10,7 @@ public class IncidentLogDto implements Serializable {
     private long incidentId;
     private String message;
     private String eventType;
-    private long createDate;
+    private Instant createDate;
     private String previousValue;
     private String currentValue;
 
@@ -45,11 +46,11 @@ public class IncidentLogDto implements Serializable {
         this.eventType = eventType;
     }
 
-    public long getCreateDate() {
+    public Instant getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(long createDate) {
+    public void setCreateDate(Instant createDate) {
         this.createDate = createDate;
     }
 

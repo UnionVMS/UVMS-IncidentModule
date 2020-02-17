@@ -11,6 +11,7 @@ details. You should have received a copy of the GNU General Public License along
 
 package eu.europa.ec.fisheries.uvms.incident.rest;
 
+import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
 import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentLogServiceBean;
 import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentServiceBean;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.dto.IncidentDto;
@@ -25,8 +26,10 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.PostConstruct;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.json.bind.Jsonb;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -50,6 +53,13 @@ public class IncidentResource {
     @Inject
     private IncidentHelper incidentHelper;
 
+    private Jsonb jsonb;
+
+    @PostConstruct
+    public void init() {
+        jsonb = new JsonBConfigurator().getContext(null);
+    }
+
     @GET
     @Path("assetNotSending")
     @RequiresFeature(UnionVMSFeature.viewAlarmsOpenTickets)
@@ -57,7 +67,8 @@ public class IncidentResource {
         try {
             List<Incident> notSendingList = incidentServiceBean.getAssetNotSendingList();
             List<IncidentDto> dtoList = incidentHelper.incidentToDtoList(notSendingList);
-            return Response.ok(dtoList).build();
+            String response = jsonb.toJson(dtoList);
+            return Response.ok(response).build();
         } catch (Exception e) {
             LOG.error("Error while fetching AssetNotSending List", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getRootCause(e)).build();
@@ -71,7 +82,8 @@ public class IncidentResource {
         try {
             Incident incident = incidentServiceBean.findByTicketId(ticketId);
             IncidentDto dto = incidentHelper.incidentEntityToDto(incident);
-            return Response.ok(dto).build();
+            String response = jsonb.toJson(dto);
+            return Response.ok(response).build();
         } catch (Exception e) {
             LOG.error("Error while fetching AssetNotSending List", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getRootCause(e)).build();
@@ -85,7 +97,8 @@ public class IncidentResource {
         try {
             List<IncidentLog> eventChanges = incidentLogServiceBean.getAssetNotSendingEventChanges(incidentId);
             List<IncidentLogDto> dtoList = incidentHelper.incidentLogToDtoList(eventChanges);
-            return Response.ok(dtoList).build();
+            String response = jsonb.toJson(dtoList);
+            return Response.ok(response).build();
         } catch (Exception e) {
             LOG.error("Error while fetching AssetNotSending List", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getRootCause(e)).build();
@@ -99,7 +112,8 @@ public class IncidentResource {
         try {
             Incident updated = incidentServiceBean.updateIncidentStatus(incidentId, status);
             IncidentDto dto = incidentHelper.incidentEntityToDto(updated);
-            return Response.ok(dto).build();
+            String response = jsonb.toJson(dto);
+            return Response.ok(response).build();
         } catch (Exception e) {
             LOG.error("Error while fetching AssetNotSending List", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getRootCause(e)).build();
