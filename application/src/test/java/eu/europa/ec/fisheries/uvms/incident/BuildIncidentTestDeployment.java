@@ -1,9 +1,6 @@
 package eu.europa.ec.fisheries.uvms.incident;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
 import eu.europa.ec.fisheries.uvms.incident.mock.AssetMock;
 import eu.europa.ec.fisheries.uvms.incident.mock.MovementMock;
 import eu.europa.ec.fisheries.uvms.incident.mock.UnionVMSRestMock;
@@ -54,22 +51,9 @@ public abstract class BuildIncidentTestDeployment {
     }
 
     protected WebTarget getWebTarget() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .findAndRegisterModules();
         Client client = ClientBuilder.newClient();
-        client.register(new JacksonJaxbJsonProvider(objectMapper, JacksonJaxbJsonProvider.DEFAULT_ANNOTATIONS));
+        client.register(JsonBConfigurator.class);
         return client.target("http://localhost:8080/incident/rest");
     }
 
-    protected ObjectMapper getObjectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .findAndRegisterModules();
-        return objectMapper;
-    }
 }

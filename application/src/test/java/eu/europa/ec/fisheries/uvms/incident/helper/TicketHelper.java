@@ -21,7 +21,7 @@ public class TicketHelper {
         ticket.setUpdatedBy("UVMS");
         ticket.setStatus(TicketStatusType.POLL_PENDING);
         ticket.setTicketCount(1L);
-        String date = String.valueOf(Instant.now().getEpochSecond());
+        String date = String.valueOf(Instant.now());
         ticket.setOpenDate(date);
         ticket.setUpdated(date);
         return ticket;

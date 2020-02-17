@@ -1,6 +1,7 @@
 package eu.europa.ec.fisheries.uvms.incident.service.domain.dto;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
 public class IncidentDto implements Serializable {
@@ -13,8 +14,8 @@ public class IncidentDto implements Serializable {
     private String assetName;
     private String assetIrcs;
     private String status;
-    private long createDate;
-    private long updateDate;
+    private Instant createDate;
+    private Instant updateDate;
     private MicroMovementDto lastKnownLocation;
 
     public long getId() {
@@ -81,19 +82,19 @@ public class IncidentDto implements Serializable {
         this.lastKnownLocation = lastKnownLocation;
     }
 
-    public long getCreateDate() {
+    public Instant getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(long createDate) {
+    public void setCreateDate(Instant createDate) {
         this.createDate = createDate;
     }
 
-    public long getUpdateDate() {
+    public Instant getUpdateDate() {
         return updateDate;
     }
 
-    public void setUpdateDate(long updateDate) {
+    public void setUpdateDate(Instant updateDate) {
         this.updateDate = updateDate;
     }
 }

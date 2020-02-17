@@ -1,9 +1,6 @@
 package eu.europa.ec.fisheries.uvms.incident.service.message;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
 import eu.europa.ec.fisheries.uvms.commons.message.api.MessageConstants;
 import eu.europa.ec.fisheries.uvms.commons.message.context.MappedDiagnosticContext;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
@@ -18,7 +15,11 @@ import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
-import javax.jms.*;
+import javax.jms.Destination;
+import javax.jms.JMSConnectionFactory;
+import javax.jms.JMSContext;
+import javax.jms.TextMessage;
+import javax.json.bind.Jsonb;
 
 @Stateless
 public class IncidentProducer {
@@ -35,19 +36,17 @@ public class IncidentProducer {
     @Inject
     private IncidentHelper incidentHelper;
 
-    private ObjectMapper om = new ObjectMapper();
+    private Jsonb jsonb;
 
     @PostConstruct
     public void init() {
-        om.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        om.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        om.findAndRegisterModules();
+        jsonb = new JsonBConfigurator().getContext(null);
     }
 
     public void incidentCreated(@Observes @IncidentCreate Incident incident) {
         try {
             sendEvent(incident, "Incident");
-        } catch (Exception e){
+        } catch (Exception e) {
             LOG.error("Error while posting incident to queue: ", e);
             throw new RuntimeException(e);
         }
@@ -56,7 +55,7 @@ public class IncidentProducer {
     public void incidentUpdated(@Observes @IncidentUpdate Incident incident) {
         try {
             sendEvent(incident, "IncidentUpdate");
-        } catch (Exception e){
+        } catch (Exception e) {
             LOG.error("Error while posting incident to queue: ", e);
             throw new RuntimeException(e);
         }
@@ -64,12 +63,12 @@ public class IncidentProducer {
 
     private void sendEvent(Incident incident, String eventName) {
         try {
-            String outgoingJson = om.writeValueAsString(incidentHelper.incidentEntityToDto(incident));
+            String outgoingJson = jsonb.toJson(incidentHelper.incidentEntityToDto(incident));
             TextMessage message = this.context.createTextMessage(outgoingJson);
             message.setStringProperty(MessageConstants.EVENT_STREAM_EVENT, eventName);
             MappedDiagnosticContext.addThreadMappedDiagnosticContextToMessageProperties(message);
             context.createProducer().setDeliveryMode(1).setTimeToLive(5000L).send(destination, message);
-        } catch (JMSException | JsonProcessingException e) {
+        } catch (Exception e) {
             LOG.error("Error while sending ticket event to event stream topic: ", e);
             throw new RuntimeException(e);
         }

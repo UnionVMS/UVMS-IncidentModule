@@ -11,6 +11,8 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
  */
 package eu.europa.ec.fisheries.uvms.incident.rest;
 
+import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
+
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 import java.util.HashSet;
@@ -24,6 +26,7 @@ public class RestActivator extends Application {
 
     public RestActivator() {
         set.add(IncidentResource.class);
+        set.add(JsonBConfigurator.class);
     }
 
     @Override
