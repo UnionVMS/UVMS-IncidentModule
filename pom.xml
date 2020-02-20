@@ -18,7 +18,7 @@
     <properties>
         <installAtEnd>false</installAtEnd>
 
-        <docker.dev.version>3.40.19.w18-JsonBOverJackson</docker.dev.version>
+        <docker.dev.version>3.42.1.w18</docker.dev.version>
         <docker.liquibase.changeLogFile>LIQUIBASE/changelog/db-changelog-master.xml</docker.liquibase.changeLogFile>
         <docker.liquibase.db.user>incident</docker.liquibase.db.user>
         <docker.liquibase.db.passwd>incident</docker.liquibase.db.passwd>
