@@ -30,7 +30,7 @@
         <asset.version>6.7.0</asset.version>
         <exchange.module>5.2.5-UVMS</exchange.module>
         <usm4uvms.version>4.1.0</usm4uvms.version>
-
+        <uvms.pom>3.1</uvms.pom>
     </properties>
 
     <dependencies>
@@ -46,37 +46,37 @@
             <dependency>
                 <groupId>fish.focus.uvms.maven</groupId>
                 <artifactId>uvms-pom-gis-deps</artifactId>
-                <version>3.1</version>
+                <version>${uvms.pom}</version>
                 <type>pom</type>
             </dependency>
             <dependency>
                 <groupId>fish.focus.uvms.maven</groupId>
                 <artifactId>uvms-pom-logging-deps</artifactId>
-                <version>3.1</version>
+                <version>${uvms.pom}</version>
                 <type>pom</type>
             </dependency>
             <dependency>
                 <groupId>fish.focus.uvms.maven</groupId>
                 <artifactId>uvms-pom-monitoring-deps</artifactId>
-                <version>3.1</version>
+                <version>${uvms.pom}</version>
                 <type>pom</type>
             </dependency>
             <dependency>
                 <groupId>fish.focus.uvms.maven</groupId>
                 <artifactId>uvms-pom-test-deps</artifactId>
-                <version>3.1</version>
+                <version>${uvms.pom}</version>
                 <type>pom</type>
             </dependency>
             <dependency>
                 <groupId>fish.focus.uvms.maven</groupId>
                 <artifactId>uvms-pom-arquillian-deps</artifactId>
-                <version>3.1</version>
+                <version>${uvms.pom}</version>
                 <type>pom</type>
             </dependency>
             <dependency>
                 <groupId>fish.focus.uvms.maven</groupId>
                 <artifactId>uvms-pom-java11-deps</artifactId>
-                <version>3.1</version>
+                <version>${uvms.pom}</version>
                 <type>pom</type>
             </dependency>
         </dependencies>
