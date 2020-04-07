@@ -30,7 +30,7 @@
         <asset.version>6.7.2</asset.version>
         <exchange.module>5.2.5-UVMS</exchange.module>
         <usm4uvms.version>4.1.0</usm4uvms.version>
-        <uvms.pom>3.1</uvms.pom>
+        <uvms.pom>3.2</uvms.pom>
     </properties>
 
     <dependencies>
