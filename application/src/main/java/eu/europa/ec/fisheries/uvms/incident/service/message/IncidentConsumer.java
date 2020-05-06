@@ -18,7 +18,7 @@ import javax.jms.TextMessage;
 import javax.json.bind.Jsonb;
 
 @MessageDriven(activationConfig = {
-        @ActivationConfigProperty(propertyName = MessageConstants.DESTINATION_STR, propertyValue = MessageConstants.DESTINATION_TYPE_QUEUE),
+        @ActivationConfigProperty(propertyName = MessageConstants.DESTINATION_TYPE_STR, propertyValue = MessageConstants.DESTINATION_TYPE_QUEUE),
         @ActivationConfigProperty(propertyName = MessageConstants.DESTINATION_LOOKUP_STR, propertyValue = MessageConstants.QUEUE_INCIDENT)
 })
 public class IncidentConsumer implements MessageListener {
