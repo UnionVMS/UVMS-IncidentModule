@@ -17,12 +17,9 @@ import javax.jms.MessageListener;
 import javax.jms.TextMessage;
 import javax.json.bind.Jsonb;
 
-@MessageDriven(mappedName = MessageConstants.QUEUE_INCIDENT, activationConfig = {
-        @ActivationConfigProperty(propertyName = "messagingType", propertyValue = MessageConstants.CONNECTION_TYPE),
-        @ActivationConfigProperty(propertyName = "destinationType", propertyValue = MessageConstants.DESTINATION_TYPE_QUEUE),
-        @ActivationConfigProperty(propertyName = "destination", propertyValue = "IncidentEvent"),
-        @ActivationConfigProperty(propertyName = "destinationJndiName", propertyValue = MessageConstants.QUEUE_INCIDENT),
-        @ActivationConfigProperty(propertyName = "connectionFactoryJndiName", propertyValue = MessageConstants.CONNECTION_FACTORY)
+@MessageDriven(activationConfig = {
+        @ActivationConfigProperty(propertyName = MessageConstants.DESTINATION_TYPE_STR, propertyValue = MessageConstants.DESTINATION_TYPE_QUEUE),
+        @ActivationConfigProperty(propertyName = MessageConstants.DESTINATION_LOOKUP_STR, propertyValue = MessageConstants.QUEUE_INCIDENT)
 })
 public class IncidentConsumer implements MessageListener {
     private static final Logger LOG = LoggerFactory.getLogger(IncidentConsumer.class);
