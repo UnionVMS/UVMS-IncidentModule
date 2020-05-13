@@ -6,7 +6,7 @@ import eu.europa.ec.fisheries.uvms.incident.TransactionalTests;
 import eu.europa.ec.fisheries.uvms.incident.helper.JMSHelper;
 import eu.europa.ec.fisheries.uvms.incident.helper.TicketHelper;
 import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentServiceBean;
-import eu.europa.ec.fisheries.uvms.incident.service.domain.dto.StatusDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.StatusDto;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.enums.StatusEnum;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
@@ -14,7 +14,6 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.json.bind.Jsonb;
 import java.util.List;

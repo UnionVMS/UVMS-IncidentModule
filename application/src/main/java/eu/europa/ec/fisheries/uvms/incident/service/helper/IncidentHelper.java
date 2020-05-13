@@ -5,7 +5,7 @@ import eu.europa.ec.fisheries.schema.movementrules.ticket.v1.TicketType;
 import eu.europa.ec.fisheries.uvms.asset.client.AssetClient;
 import eu.europa.ec.fisheries.uvms.asset.client.model.AssetDTO;
 import eu.europa.ec.fisheries.uvms.asset.client.model.AssetIdentifier;
-import eu.europa.ec.fisheries.uvms.incident.service.domain.dto.*;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.*;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.IncidentLog;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.enums.StatusEnum;
@@ -28,18 +28,18 @@ public class IncidentHelper {
     @EJB
     private MovementRestClient movementClient;
 
-    public Incident constructIncident(TicketType ticket, MicroMovement movement) {
+    public Incident constructIncident(IncidentTicketDto ticket, MicroMovement movement) {
         Incident incident = new Incident();
-        if (ticket.getMobileTerminalGuid() != null) {
-            incident.setMobileTerminalId(UUID.fromString(ticket.getMobileTerminalGuid()));
+        if (ticket.getMobTermId() != null) {
+            incident.setMobileTerminalId(UUID.fromString(ticket.getMobTermId()));
         }
         incident.setCreateDate(Instant.now());
         incident.setStatus(StatusEnum.POLL_FAILED);
-        incident.setTicketId(UUID.fromString(ticket.getGuid()));
+        incident.setTicketId(ticket.getId());
         if (movement != null) {
             incident.setMovementId(UUID.fromString(movement.getGuid()));
         }
-        setAssetValues(incident, ticket.getAssetGuid());
+        setAssetValues(incident, ticket.getAssetId());
         return incident;
     }
 
@@ -91,7 +91,7 @@ public class IncidentHelper {
 
                 lastKnownLocation.setLocation(location);
                 lastKnownLocation.setHeading(micro.getHeading());
-                lastKnownLocation.setGuid(micro.getGuid());
+                lastKnownLocation.setId(micro.getGuid());
                 lastKnownLocation.setTimestamp(micro.getTimestamp());
                 lastKnownLocation.setSpeed(micro.getSpeed());
                 lastKnownLocation.setSource(MovementSourceType.fromValue(micro.getSource().name()));
@@ -120,7 +120,7 @@ public class IncidentHelper {
 
     public MicroMovementDto mapToMicroMovementDto(MicroMovement model) {
         MicroMovementDto dto = new MicroMovementDto();
-        dto.setGuid(model.getGuid());
+        dto.setId(model.getGuid());
         dto.setHeading(model.getHeading());
         dto.setSource(MovementSourceType.fromValue(model.getSource().name()));
         dto.setSpeed(model.getSpeed());

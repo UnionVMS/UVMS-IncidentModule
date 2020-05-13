@@ -3,8 +3,9 @@ package eu.europa.ec.fisheries.uvms.incident.service.bean;
 import eu.europa.ec.fisheries.schema.movement.v1.MovementSourceType;
 import eu.europa.ec.fisheries.schema.movementrules.ticket.v1.TicketStatusType;
 import eu.europa.ec.fisheries.schema.movementrules.ticket.v1.TicketType;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentDao;
-import eu.europa.ec.fisheries.uvms.incident.service.domain.dto.StatusDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.StatusDto;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.enums.StatusEnum;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.interfaces.IncidentCreate;
@@ -50,8 +51,8 @@ public class IncidentServiceBean {
         return unresolvedIncidents;
     }
 
-    public void createIncident(TicketType ticket) {
-        MicroMovement movement = movementClient.getMicroMovementById(UUID.fromString(ticket.getMovementGuid()));
+    public void createIncident(IncidentTicketDto ticket) {
+        MicroMovement movement = movementClient.getMicroMovementById(UUID.fromString(ticket.getMovementId()));
         if ("Asset not sending".equalsIgnoreCase(ticket.getRuleGuid())) {
             Incident incident = incidentHelper.constructIncident(ticket, movement);
             incidentDao.save(incident);
@@ -59,8 +60,8 @@ public class IncidentServiceBean {
         }
     }
 
-    public void updateIncident(TicketType ticket) {
-        Incident persisted = incidentDao.findByTicketId(UUID.fromString(ticket.getGuid()));
+    public void updateIncident(IncidentTicketDto ticket) {
+        Incident persisted = incidentDao.findByTicketId(ticket.getId());
 
         if (persisted != null) {
             String incidentStatus = persisted.getStatus().name();
@@ -70,9 +71,9 @@ public class IncidentServiceBean {
                 Incident updated = incidentDao.update(persisted);
                 updatedIncident.fire(updated);
                 incidentLogServiceBean.createIncidentLogForStatus(incidentStatus, updated);
-            } else if (ticket.getMovementGuid() != null &&
-                    !ticket.getMovementGuid().equals(persisted.getMovementId().toString())) {
-                MicroMovement movementFromTicket = movementClient.getMicroMovementById(UUID.fromString(ticket.getMovementGuid()));
+            } else if (ticket.getMovementId() != null &&
+                    !ticket.getMovementId().equals(persisted.getMovementId().toString())) {
+                MicroMovement movementFromTicket = movementClient.getMicroMovementById(UUID.fromString(ticket.getMovementId()));
                 if (movementFromTicket != null && movementFromTicket.getSource().equals(MovementSourceType.MANUAL)) {
                     MicroMovement latest = movementClient.getMicroMovementById(persisted.getMovementId());
                     persisted.setStatus(StatusEnum.MANUAL_POSITION_MODE);

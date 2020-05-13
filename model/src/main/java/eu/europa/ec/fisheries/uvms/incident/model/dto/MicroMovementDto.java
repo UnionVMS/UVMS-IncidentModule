@@ -1,4 +1,4 @@
-package eu.europa.ec.fisheries.uvms.incident.service.domain.dto;
+package eu.europa.ec.fisheries.uvms.incident.model.dto;
 
 import java.time.Instant;
 
@@ -8,7 +8,7 @@ public class MicroMovementDto {
 
     private Double heading;
 
-    private String guid;
+    private String id;
 
     private Instant timestamp;
 
@@ -32,12 +32,12 @@ public class MicroMovementDto {
         this.heading = heading;
     }
 
-    public String getGuid() {
-        return guid;
+    public String getId() {
+        return id;
     }
 
-    public void setGuid(String guid) {
-        this.guid = guid;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public Instant getTimestamp() {

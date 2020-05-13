@@ -113,6 +113,7 @@
 
     <modules>
         <module>LIQUIBASE</module>
+        <module>model</module>
         <module>application</module>
     </modules>
 </project>

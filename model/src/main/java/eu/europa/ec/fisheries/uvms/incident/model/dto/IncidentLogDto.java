@@ -1,4 +1,4 @@
-package eu.europa.ec.fisheries.uvms.incident.service.domain.dto;
+package eu.europa.ec.fisheries.uvms.incident.model.dto;
 
 import java.io.Serializable;
 import java.time.Instant;
