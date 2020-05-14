@@ -27,8 +27,6 @@ public class IncidentConsumerTest extends BuildIncidentTestDeployment {
     @Inject
     private JMSHelper jmsHelper;
 
-    @Inject
-    private TicketHelper ticketHelper;
 
     private Jsonb jsonb;
 
@@ -48,7 +46,7 @@ public class IncidentConsumerTest extends BuildIncidentTestDeployment {
         UUID assetId = UUID.randomUUID();
         UUID movId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
-        TicketType ticket = ticketHelper.createTicket(ticketId, assetId, movId, mobTermId);
+        TicketType ticket = TicketHelper.createTicket(ticketId, assetId, movId, mobTermId);
 
         try (TopicListener listener = new TopicListener(jmsHelper.EVENT_STREAM, "")) {
             String asString = jsonb.toJson(ticket);

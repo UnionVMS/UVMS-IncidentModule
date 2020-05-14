@@ -37,7 +37,7 @@ public class IncidentHelper {
         incident.setStatus(StatusEnum.POLL_FAILED);
         incident.setTicketId(ticket.getId());
         if (movement != null) {
-            incident.setMovementId(UUID.fromString(movement.getGuid()));
+            incident.setMovementId(UUID.fromString(movement.getId()));
         }
         setAssetValues(incident, ticket.getAssetId());
         return incident;
@@ -91,7 +91,7 @@ public class IncidentHelper {
 
                 lastKnownLocation.setLocation(location);
                 lastKnownLocation.setHeading(micro.getHeading());
-                lastKnownLocation.setId(micro.getGuid());
+                lastKnownLocation.setId(micro.getId());
                 lastKnownLocation.setTimestamp(micro.getTimestamp());
                 lastKnownLocation.setSpeed(micro.getSpeed());
                 lastKnownLocation.setSource(MovementSourceType.fromValue(micro.getSource().name()));
@@ -120,7 +120,7 @@ public class IncidentHelper {
 
     public MicroMovementDto mapToMicroMovementDto(MicroMovement model) {
         MicroMovementDto dto = new MicroMovementDto();
-        dto.setId(model.getGuid());
+        dto.setId(model.getId());
         dto.setHeading(model.getHeading());
         dto.setSource(MovementSourceType.fromValue(model.getSource().name()));
         dto.setSpeed(model.getSpeed());

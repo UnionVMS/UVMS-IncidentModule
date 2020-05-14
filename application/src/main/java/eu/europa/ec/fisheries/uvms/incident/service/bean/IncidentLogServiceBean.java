@@ -34,7 +34,7 @@ public class IncidentLogServiceBean {
         jsonb = new JsonBConfigurator().getContext(null);
     }
 
-    public List<IncidentLog> getAssetNotSendingEventChanges(long incidentId) {
+    public List<IncidentLog> getIncidentLogByIncidentId(long incidentId) {
         return incidentLogDao.findAllByIncidentId(incidentId);
     }
 

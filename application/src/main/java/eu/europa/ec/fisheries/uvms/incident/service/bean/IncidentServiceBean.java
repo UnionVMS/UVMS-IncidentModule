@@ -73,11 +73,12 @@ public class IncidentServiceBean {
                 incidentLogServiceBean.createIncidentLogForStatus(incidentStatus, updated);
             } else if (ticket.getMovementId() != null &&
                     !ticket.getMovementId().equals(persisted.getMovementId().toString())) {
+
                 MicroMovement movementFromTicket = movementClient.getMicroMovementById(UUID.fromString(ticket.getMovementId()));
                 if (movementFromTicket != null && movementFromTicket.getSource().equals(MovementSourceType.MANUAL)) {
                     MicroMovement latest = movementClient.getMicroMovementById(persisted.getMovementId());
                     persisted.setStatus(StatusEnum.MANUAL_POSITION_MODE);
-                    persisted.setMovementId(UUID.fromString(movementFromTicket.getGuid()));
+                    persisted.setMovementId(UUID.fromString(movementFromTicket.getId()));
                     Incident updated = incidentDao.update(persisted);
                     updatedIncident.fire(updated);
                     incidentLogServiceBean.createIncidentLogForManualPosition(persisted, movementFromTicket, latest);
@@ -86,7 +87,7 @@ public class IncidentServiceBean {
         }
     }
 
-    public Incident updateIncidentStatus(long incidentId, StatusDto statusDto) throws Exception {
+    public Incident updateIncidentStatus(long incidentId, StatusDto statusDto) {
         Incident persisted = incidentDao.findById(incidentId);
         String status = persisted.getStatus().name();
         persisted.setStatus(StatusEnum.valueOf(statusDto.getStatus()));

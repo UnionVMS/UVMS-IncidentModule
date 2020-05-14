@@ -7,10 +7,9 @@ import javax.ejb.Stateless;
 import java.time.Instant;
 import java.util.UUID;
 
-@Stateless
 public class TicketHelper {
 
-    public TicketType createTicket(UUID ticketId, UUID assetId, UUID movId, UUID mobTermId) {
+    public static TicketType createTicket(UUID ticketId, UUID assetId, UUID movId, UUID mobTermId) {
         TicketType ticket = new TicketType();
         ticket.setGuid(ticketId.toString());
         ticket.setAssetGuid(assetId.toString());
