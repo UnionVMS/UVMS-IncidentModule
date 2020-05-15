@@ -50,7 +50,7 @@ public class IncidentDao {
         return query.getResultList();
     }
 
-    public List<Incident> findByAssetId(String assetId) {
+    public List<Incident> findByAssetId(UUID assetId) {
         TypedQuery<Incident> query = em.createNamedQuery(Incident.FIND_BY_ASSET_ID, Incident.class);
         query.setParameter("assetId", assetId);
         return query.getResultList();

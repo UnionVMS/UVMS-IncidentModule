@@ -120,7 +120,7 @@ public class IncidentResource {
     @RequiresFeature(UnionVMSFeature.viewAlarmsOpenTickets)
     public Response getIncidentsForAssetId(@PathParam("assetId") String assetId) {
         try {
-            List<Incident> incidents = incidentDao.findByAssetId(assetId);
+            List<Incident> incidents = incidentDao.findByAssetId(UUID.fromString(assetId));
             List<IncidentDto> dtoList = incidentHelper.incidentToDtoList(incidents);
             String response = jsonb.toJson(dtoList);
             return Response.ok(response).build();
@@ -135,9 +135,12 @@ public class IncidentResource {
     @RequiresFeature(UnionVMSFeature.viewAlarmsOpenTickets)
     public Response getIncidentLogsForAsset(@PathParam("assetId") String assetId) {
         try {
-            List<Incident> incidents = incidentDao.findByAssetId(assetId);
+            List<Incident> incidents = incidentDao.findByAssetId(UUID.fromString(assetId));
             List<Long> incidentIdList = incidents.stream().map(Incident::getId).collect(Collectors.toList());
-            List<IncidentLog> incidentLogs = incidentLogDao.findAllByIncidentId(incidentIdList);
+            List<IncidentLog> incidentLogs = new ArrayList<>();
+            if(!incidentIdList.isEmpty()) {
+                incidentLogs = incidentLogDao.findAllByIncidentId(incidentIdList);
+            }
             List<IncidentLogDto> dtoList = incidentHelper.incidentLogToDtoList(incidentLogs);
             String response = jsonb.toJson(dtoList);
             return Response.ok(response).build();

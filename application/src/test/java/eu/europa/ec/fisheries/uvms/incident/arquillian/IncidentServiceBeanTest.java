@@ -1,12 +1,12 @@
 package eu.europa.ec.fisheries.uvms.incident.arquillian;
 
-import eu.europa.ec.fisheries.schema.movementrules.ticket.v1.TicketType;
 import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
 import eu.europa.ec.fisheries.uvms.incident.TransactionalTests;
 import eu.europa.ec.fisheries.uvms.incident.helper.JMSHelper;
 import eu.europa.ec.fisheries.uvms.incident.helper.TicketHelper;
-import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentServiceBean;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.StatusDto;
+import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentServiceBean;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.enums.StatusEnum;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
@@ -50,7 +50,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID assetId = UUID.randomUUID();
         UUID movementId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
-        TicketType ticket = ticketHelper.createTicket(ticketId, assetId, movementId, mobTermId);
+        IncidentTicketDto ticket = ticketHelper.createTicket(ticketId, assetId, movementId, mobTermId);
         String asString = jsonb.toJson(ticket);
         jmsHelper.sendMessageToIncidentQueue(asString);
 
@@ -67,7 +67,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID assetId = UUID.randomUUID();
         UUID movementId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
-        TicketType ticket = ticketHelper.createTicket(ticketId, assetId, movementId, mobTermId);
+        IncidentTicketDto ticket = ticketHelper.createTicket(ticketId, assetId, movementId, mobTermId);
         String asString = jsonb.toJson(ticket);
         jmsHelper.sendMessageToIncidentQueue(asString);
 
@@ -86,7 +86,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID assetId = UUID.randomUUID();
         UUID movementId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
-        TicketType ticket = ticketHelper.createTicket(ticketId, assetId, movementId, mobTermId);
+        IncidentTicketDto ticket = ticketHelper.createTicket(ticketId, assetId, movementId, mobTermId);
         String asString = jsonb.toJson(ticket);
         jmsHelper.sendMessageToIncidentQueue(asString);
 
