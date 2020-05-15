@@ -14,9 +14,11 @@ package eu.europa.ec.fisheries.uvms.incident.rest;
 import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
 import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentLogServiceBean;
 import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentServiceBean;
-import eu.europa.ec.fisheries.uvms.incident.service.domain.dto.IncidentDto;
-import eu.europa.ec.fisheries.uvms.incident.service.domain.dto.IncidentLogDto;
-import eu.europa.ec.fisheries.uvms.incident.service.domain.dto.StatusDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentLogDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.StatusDto;
+import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentDao;
+import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentLogDao;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.IncidentLog;
 import eu.europa.ec.fisheries.uvms.incident.service.helper.IncidentHelper;
@@ -33,8 +35,10 @@ import javax.json.bind.Jsonb;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Path("incident")
 @Produces(MediaType.APPLICATION_JSON)
@@ -52,6 +56,12 @@ public class IncidentResource {
 
     @Inject
     private IncidentHelper incidentHelper;
+
+    @Inject
+    private IncidentDao incidentDao;
+
+    @Inject
+    private IncidentLogDao incidentLogDao;
 
     private Jsonb jsonb;
 
@@ -91,16 +101,51 @@ public class IncidentResource {
     }
 
     @GET
-    @Path("assetNotSendingChanges/{incidentId}")
+    @Path("incidentLogForIncident/{incidentId}")
     @RequiresFeature(UnionVMSFeature.viewAlarmsOpenTickets)
-    public Response getAssetNotSendingEventChanges(@PathParam("incidentId") long incidentId) {
+    public Response getIncidentLogForIncident(@PathParam("incidentId") long incidentId) {
         try {
-            List<IncidentLog> eventChanges = incidentLogServiceBean.getAssetNotSendingEventChanges(incidentId);
-            List<IncidentLogDto> dtoList = incidentHelper.incidentLogToDtoList(eventChanges);
+            List<IncidentLog> incidentLogs = incidentLogServiceBean.getIncidentLogByIncidentId(incidentId);
+            List<IncidentLogDto> dtoList = incidentHelper.incidentLogToDtoList(incidentLogs);
             String response = jsonb.toJson(dtoList);
             return Response.ok(response).build();
         } catch (Exception e) {
-            LOG.error("Error while fetching AssetNotSending List", e);
+            LOG.error("Error while fetching incident log for incident {} ", incidentId, e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getRootCause(e)).build();
+        }
+    }
+
+    @GET
+    @Path("incidentsForAssetId/{assetId}")
+    @RequiresFeature(UnionVMSFeature.viewAlarmsOpenTickets)
+    public Response getIncidentsForAssetId(@PathParam("assetId") String assetId) {
+        try {
+            List<Incident> incidents = incidentDao.findByAssetId(UUID.fromString(assetId));
+            List<IncidentDto> dtoList = incidentHelper.incidentToDtoList(incidents);
+            String response = jsonb.toJson(dtoList);
+            return Response.ok(response).build();
+        } catch (Exception e) {
+            LOG.error("Error while fetching incidents for asset id {} ", assetId, e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getRootCause(e)).build();
+        }
+    }
+
+    @GET
+    @Path("incidentLogsForAssetId/{assetId}")
+    @RequiresFeature(UnionVMSFeature.viewAlarmsOpenTickets)
+    public Response getIncidentLogsForAsset(@PathParam("assetId") String assetId) {
+        try {
+            List<Incident> incidents = incidentDao.findByAssetId(UUID.fromString(assetId));
+            List<Long> incidentIdList = incidents.stream().map(Incident::getId).collect(Collectors.toList());
+            List<IncidentLog> incidentLogs = new ArrayList<>();
+            if(!incidentIdList.isEmpty()) {
+                incidentLogs = incidentLogDao.findAllByIncidentId(incidentIdList);
+            }
+            List<IncidentLogDto> dtoList = incidentHelper.incidentLogToDtoList(incidentLogs);
+            String response = jsonb.toJson(dtoList);
+            return Response.ok(response).build();
+        } catch (Exception e) {
+            LOG.error("Error while fetching incidents for asset id {} ", assetId, e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getRootCause(e)).build();
         }
     }
@@ -119,4 +164,5 @@ public class IncidentResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getRootCause(e)).build();
         }
     }
+
 }

@@ -1,8 +1,8 @@
 package eu.europa.ec.fisheries.uvms.incident.service.message;
 
-import eu.europa.ec.fisheries.schema.movementrules.ticket.v1.TicketType;
 import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
 import eu.europa.ec.fisheries.uvms.commons.message.api.MessageConstants;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
 import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentServiceBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +39,7 @@ public class IncidentConsumer implements MessageListener {
         try {
             TextMessage tm = (TextMessage) message;
             String json = tm.getBody(String.class);
-            TicketType ticket = jsonb.fromJson(json, TicketType.class);
+            IncidentTicketDto ticket = jsonb.fromJson(json, IncidentTicketDto.class);
             String eventType = message.getStringProperty("eventName");
             switch (eventType) {
                 case "Incident":

@@ -2,7 +2,7 @@ package eu.europa.ec.fisheries.uvms.incident.service.bean;
 
 import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentLogDao;
-import eu.europa.ec.fisheries.uvms.incident.service.domain.dto.MicroMovementDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.MicroMovementDto;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.IncidentLog;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.enums.EventTypeEnum;
@@ -34,7 +34,7 @@ public class IncidentLogServiceBean {
         jsonb = new JsonBConfigurator().getContext(null);
     }
 
-    public List<IncidentLog> getAssetNotSendingEventChanges(long incidentId) {
+    public List<IncidentLog> getIncidentLogByIncidentId(long incidentId) {
         return incidentLogDao.findAllByIncidentId(incidentId);
     }
 

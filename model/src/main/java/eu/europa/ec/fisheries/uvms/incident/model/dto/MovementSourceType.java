@@ -1,4 +1,4 @@
-package eu.europa.ec.fisheries.uvms.incident.service.domain.dto;
+package eu.europa.ec.fisheries.uvms.incident.model.dto;
 
 public enum MovementSourceType {
     INMARSAT_C,
