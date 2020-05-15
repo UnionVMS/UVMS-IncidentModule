@@ -2,27 +2,27 @@ package eu.europa.ec.fisheries.uvms.incident.helper;
 
 import eu.europa.ec.fisheries.schema.movementrules.ticket.v1.TicketStatusType;
 import eu.europa.ec.fisheries.schema.movementrules.ticket.v1.TicketType;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
 
 import javax.ejb.Stateless;
 import java.time.Instant;
 import java.util.UUID;
 
-@Stateless
 public class TicketHelper {
 
-    public TicketType createTicket(UUID ticketId, UUID assetId, UUID movId, UUID mobTermId) {
-        TicketType ticket = new TicketType();
-        ticket.setGuid(ticketId.toString());
-        ticket.setAssetGuid(assetId.toString());
-        ticket.setMovementGuid(movId.toString());
-        ticket.setMobileTerminalGuid(mobTermId.toString());
+    public static IncidentTicketDto createTicket(UUID ticketId, UUID assetId, UUID movId, UUID mobTermId) {
+        IncidentTicketDto ticket = new IncidentTicketDto();
+        ticket.setId(ticketId);
+        ticket.setAssetId(assetId.toString());
+        ticket.setMovementId(movId.toString());
+        ticket.setMobTermId(mobTermId.toString());
         ticket.setRuleName("Asset not sending");
         ticket.setRuleGuid("Asset not sending");
         ticket.setUpdatedBy("UVMS");
-        ticket.setStatus(TicketStatusType.POLL_PENDING);
+        ticket.setStatus(TicketStatusType.POLL_PENDING.value());
         ticket.setTicketCount(1L);
-        String date = String.valueOf(Instant.now());
-        ticket.setOpenDate(date);
+        Instant date = Instant.now();
+        ticket.setCreatedDate(date);
         ticket.setUpdated(date);
         return ticket;
     }

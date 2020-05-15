@@ -31,7 +31,7 @@ public class MovementMock {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getMicroMovement(@PathParam("id") UUID id) {
         MicroMovement movement = new MicroMovement();
-        movement.setGuid(id.toString());
+        movement.setId(id.toString());
         MovementPoint point = new MovementPoint();
         point.setLatitude(123d);
         point.setLongitude(123d);

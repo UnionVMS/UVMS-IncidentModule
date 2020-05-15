@@ -29,4 +29,10 @@ public class IncidentLogDao {
         query.setParameter("incidentId", incidentId);
         return query.getResultList();
     }
+
+    public List<IncidentLog> findAllByIncidentId(List<Long> incidentId) {
+        TypedQuery<IncidentLog> query = em.createNamedQuery(IncidentLog.FIND_ALL_BY_INCIDENT_ID, IncidentLog.class);
+        query.setParameter("incidentId", incidentId);
+        return query.getResultList();
+    }
 }
