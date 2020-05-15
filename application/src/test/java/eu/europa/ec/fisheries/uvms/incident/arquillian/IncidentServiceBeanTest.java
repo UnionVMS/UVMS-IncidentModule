@@ -27,9 +27,6 @@ import static org.junit.Assert.assertNotNull;
 public class IncidentServiceBeanTest extends TransactionalTests {
 
     @Inject
-    private TicketHelper ticketHelper;
-
-    @Inject
     private JMSHelper jmsHelper;
 
     @Inject
@@ -50,7 +47,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID assetId = UUID.randomUUID();
         UUID movementId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
-        IncidentTicketDto ticket = ticketHelper.createTicket(ticketId, assetId, movementId, mobTermId);
+        IncidentTicketDto ticket = TicketHelper.createTicket(ticketId, assetId, movementId, mobTermId);
         String asString = jsonb.toJson(ticket);
         jmsHelper.sendMessageToIncidentQueue(asString);
 
@@ -67,7 +64,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID assetId = UUID.randomUUID();
         UUID movementId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
-        IncidentTicketDto ticket = ticketHelper.createTicket(ticketId, assetId, movementId, mobTermId);
+        IncidentTicketDto ticket = TicketHelper.createTicket(ticketId, assetId, movementId, mobTermId);
         String asString = jsonb.toJson(ticket);
         jmsHelper.sendMessageToIncidentQueue(asString);
 
@@ -86,7 +83,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID assetId = UUID.randomUUID();
         UUID movementId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
-        IncidentTicketDto ticket = ticketHelper.createTicket(ticketId, assetId, movementId, mobTermId);
+        IncidentTicketDto ticket = TicketHelper.createTicket(ticketId, assetId, movementId, mobTermId);
         String asString = jsonb.toJson(ticket);
         jmsHelper.sendMessageToIncidentQueue(asString);
 
