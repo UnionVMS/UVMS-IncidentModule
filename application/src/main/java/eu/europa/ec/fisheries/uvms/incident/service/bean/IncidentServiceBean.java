@@ -2,7 +2,6 @@ package eu.europa.ec.fisheries.uvms.incident.service.bean;
 
 import eu.europa.ec.fisheries.schema.movement.v1.MovementSourceType;
 import eu.europa.ec.fisheries.schema.movementrules.ticket.v1.TicketStatusType;
-import eu.europa.ec.fisheries.schema.movementrules.ticket.v1.TicketType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentDao;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.StatusDto;
@@ -66,7 +65,7 @@ public class IncidentServiceBean {
         if (persisted != null) {
             String incidentStatus = persisted.getStatus().name();
 
-            if (ticket.getStatus().equals(TicketStatusType.CLOSED)) {
+            if (ticket.getStatus().equals(TicketStatusType.CLOSED.value())) {
                 persisted.setStatus(StatusEnum.RESOLVED);
                 Incident updated = incidentDao.update(persisted);
                 updatedIncident.fire(updated);
