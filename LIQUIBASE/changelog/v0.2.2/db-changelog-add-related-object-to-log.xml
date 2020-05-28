@@ -6,10 +6,10 @@
                    logicalFilePath="changelog/v0.2.2/db-changelog-add-related-object-to-log.xml">
 
     <changeSet id="Add related object to log and remove old and new value" author="joemat">
-        <addColum tableName="incident_log">
+        <addColumn tableName="incident_log">
             <column name="related_object_id"
                     type="uuid" />
-        </addColum>
+        </addColumn>
 
         <dropColumn tableName="incident_log">
             <column name="previous_value"/>
