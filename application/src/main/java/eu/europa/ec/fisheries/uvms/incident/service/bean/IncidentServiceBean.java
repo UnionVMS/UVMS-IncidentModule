@@ -3,10 +3,11 @@ package eu.europa.ec.fisheries.uvms.incident.service.bean;
 import eu.europa.ec.fisheries.schema.movement.v1.MovementSourceType;
 import eu.europa.ec.fisheries.schema.movementrules.ticket.v1.TicketStatusType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
-import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentDao;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.StatusDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.EventTypeEnum;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
+import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentDao;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
-import eu.europa.ec.fisheries.uvms.incident.service.domain.enums.StatusEnum;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.interfaces.IncidentCreate;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.interfaces.IncidentUpdate;
 import eu.europa.ec.fisheries.uvms.incident.service.helper.IncidentHelper;
@@ -55,6 +56,9 @@ public class IncidentServiceBean {
         if ("Asset not sending".equalsIgnoreCase(ticket.getRuleGuid())) {
             Incident incident = incidentHelper.constructIncident(ticket, movement);
             incidentDao.save(incident);
+
+            incidentLogServiceBean.createIncidentLogForStatus(incident, "Asset not sending, sending autopoll",
+                    EventTypeEnum.POLL_CREATED, UUID.fromString(ticket.getPollId()));
             createdIncident.fire(incident);
         }
     }
@@ -69,18 +73,18 @@ public class IncidentServiceBean {
                 persisted.setStatus(StatusEnum.RESOLVED);
                 Incident updated = incidentDao.update(persisted);
                 updatedIncident.fire(updated);
-                incidentLogServiceBean.createIncidentLogForStatus(incidentStatus, updated);
+                incidentLogServiceBean.createIncidentLogForStatus(updated, EventTypeEnum.INCIDENT_CLOSED.getMessage(),
+                        EventTypeEnum.INCIDENT_CLOSED, UUID.fromString(ticket.getMovementId()));
+
             } else if (ticket.getMovementId() != null &&
                     !ticket.getMovementId().equals(persisted.getMovementId().toString())) {
+                MicroMovement movementFromTicketUpdate = movementClient.getMicroMovementById(UUID.fromString(ticket.getMovementId()));
 
-                MicroMovement movementFromTicket = movementClient.getMicroMovementById(UUID.fromString(ticket.getMovementId()));
-                if (movementFromTicket != null && movementFromTicket.getSource().equals(MovementSourceType.MANUAL)) {
-                    MicroMovement latest = movementClient.getMicroMovementById(persisted.getMovementId());
+                if (movementFromTicketUpdate != null && movementFromTicketUpdate.getSource().equals(MovementSourceType.MANUAL)) {
                     persisted.setStatus(StatusEnum.MANUAL_POSITION_MODE);
-                    persisted.setMovementId(UUID.fromString(movementFromTicket.getId()));
                     Incident updated = incidentDao.update(persisted);
                     updatedIncident.fire(updated);
-                    incidentLogServiceBean.createIncidentLogForManualPosition(persisted, movementFromTicket, latest);
+                    incidentLogServiceBean.createIncidentLogForManualPosition(persisted, movementFromTicketUpdate);
                 }
             }
         }
@@ -88,11 +92,11 @@ public class IncidentServiceBean {
 
     public Incident updateIncidentStatus(long incidentId, StatusDto statusDto) {
         Incident persisted = incidentDao.findById(incidentId);
-        String status = persisted.getStatus().name();
-        persisted.setStatus(StatusEnum.valueOf(statusDto.getStatus()));
+        persisted.setStatus(statusDto.getStatus());
         Incident updated = incidentDao.update(persisted);
         updatedIncident.fire(updated);
-        incidentLogServiceBean.createIncidentLogForStatus(status, updated);
+        incidentLogServiceBean.createIncidentLogForStatus(updated, EventTypeEnum.INCIDENT_STATUS.getMessage(),
+                statusDto.getEventType(), statusDto.getRelatedObjectId());
         return updated;
     }
 

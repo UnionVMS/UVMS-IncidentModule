@@ -1,14 +1,14 @@
 package eu.europa.ec.fisheries.uvms.incident.service.helper;
 
 import eu.europa.ec.fisheries.schema.movement.v1.MovementPoint;
-import eu.europa.ec.fisheries.schema.movementrules.ticket.v1.TicketType;
 import eu.europa.ec.fisheries.uvms.asset.client.AssetClient;
 import eu.europa.ec.fisheries.uvms.asset.client.model.AssetDTO;
 import eu.europa.ec.fisheries.uvms.asset.client.model.AssetIdentifier;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.*;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.MovementSourceType;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.IncidentLog;
-import eu.europa.ec.fisheries.uvms.incident.service.domain.enums.StatusEnum;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 import eu.europa.ec.fisheries.uvms.movement.client.MovementRestClient;
 import eu.europa.ec.fisheries.uvms.movement.client.model.MicroMovement;
 
@@ -34,7 +34,7 @@ public class IncidentHelper {
             incident.setMobileTerminalId(UUID.fromString(ticket.getMobTermId()));
         }
         incident.setCreateDate(Instant.now());
-        incident.setStatus(StatusEnum.POLL_FAILED);
+        incident.setStatus(StatusEnum.POLL_INITIATED);
         incident.setTicketId(ticket.getId());
         if (movement != null) {
             incident.setMovementId(UUID.fromString(movement.getId()));
@@ -111,8 +111,7 @@ public class IncidentHelper {
             dto.setMessage(entity.getMessage());
             dto.setEventType(entity.getEventType().name());
             dto.setCreateDate(entity.getCreateDate());
-            dto.setPreviousValue(entity.getPreviousValue());
-            dto.setCurrentValue(entity.getCurrentValue());
+            dto.setRelatedObjectId(entity.getRelatedObjectId());
             retVal.add(dto);
         }
         return retVal;

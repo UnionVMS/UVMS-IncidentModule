@@ -8,7 +8,7 @@ import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.StatusDto;
 import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentServiceBean;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
-import eu.europa.ec.fisheries.uvms.incident.service.domain.enums.StatusEnum;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;

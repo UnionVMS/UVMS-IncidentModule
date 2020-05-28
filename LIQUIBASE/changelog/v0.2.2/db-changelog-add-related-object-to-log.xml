@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.7.xsd"
+                   logicalFilePath="changelog/v0.2.2/db-changelog-add-related-object-to-log.xml">
+
+    <changeSet id="Add related object to log and remove old and new value" author="joemat">
+        <addColum tableName="incident_log">
+            <column name="related_object_id"
+                    type="uuid" />
+        </addColum>
+
+        <dropColumn tableName="incident_log">
+            <column name="previous_value"/>
+            <column name="current_value"/>
+        </dropColumn>
+    </changeSet>
+</databaseChangeLog>

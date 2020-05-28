@@ -1,6 +1,6 @@
 package eu.europa.ec.fisheries.uvms.incident.service.domain.entities;
 
-import eu.europa.ec.fisheries.uvms.incident.service.domain.enums.StatusEnum;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -61,6 +61,12 @@ public class Incident {
 
     @Column(name = "update_date")
     private Instant updateDate;
+
+    @PrePersist
+    @PreUpdate
+    public void preUpdate(){
+        updateDate = Instant.now();
+    }
 
     public long getId() {
         return id;

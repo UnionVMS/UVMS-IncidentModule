@@ -25,7 +25,7 @@ public class RestActivator extends Application {
     private final Set<Class<?>> set = new HashSet<>();
 
     public RestActivator() {
-        set.add(IncidentResource.class);
+        set.add(IncidentRestResource.class);
         set.add(JsonBConfigurator.class);
     }
 

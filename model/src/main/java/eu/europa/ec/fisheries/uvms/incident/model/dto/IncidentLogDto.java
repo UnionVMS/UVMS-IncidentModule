@@ -2,6 +2,7 @@ package eu.europa.ec.fisheries.uvms.incident.model.dto;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.UUID;
 
 public class IncidentLogDto implements Serializable {
     private final static long serialVersionUID = 1L;
@@ -11,8 +12,7 @@ public class IncidentLogDto implements Serializable {
     private String message;
     private String eventType;
     private Instant createDate;
-    private String previousValue;
-    private String currentValue;
+    private UUID relatedObjectId;
 
     public long getId() {
         return id;
@@ -54,19 +54,11 @@ public class IncidentLogDto implements Serializable {
         this.createDate = createDate;
     }
 
-    public String getPreviousValue() {
-        return previousValue;
+    public UUID getRelatedObjectId() {
+        return relatedObjectId;
     }
 
-    public void setPreviousValue(String previousValue) {
-        this.previousValue = previousValue;
-    }
-
-    public String getCurrentValue() {
-        return currentValue;
-    }
-
-    public void setCurrentValue(String currentValue) {
-        this.currentValue = currentValue;
+    public void setRelatedObjectId(UUID relatedObjectId) {
+        this.relatedObjectId = relatedObjectId;
     }
 }
