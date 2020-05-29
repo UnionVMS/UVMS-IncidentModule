@@ -6,9 +6,10 @@ import eu.europa.ec.fisheries.uvms.incident.helper.JMSHelper;
 import eu.europa.ec.fisheries.uvms.incident.helper.TicketHelper;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.StatusDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.EventTypeEnum;
 import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentServiceBean;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
-import eu.europa.ec.fisheries.uvms.incident.service.domain.enums.StatusEnum;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;
@@ -91,11 +92,12 @@ public class IncidentServiceBeanTest extends TransactionalTests {
 
         Incident created = incidentService.findByTicketId(ticketId);
         assertNotNull(created);
-        assertEquals(StatusEnum.POLL_FAILED, created.getStatus());
+        assertEquals(StatusEnum.POLL_INITIATED, created.getStatus());
 
         created.setStatus(StatusEnum.RESOLVED);
         StatusDto status = new StatusDto();
-        status.setStatus("RESOLVED");
+        status.setStatus(StatusEnum.RESOLVED);
+        status.setEventType(EventTypeEnum.INCIDENT_CLOSED);
         incidentService.updateIncidentStatus(created.getId(), status);
 
         Incident updated = incidentService.findByTicketId(ticketId);

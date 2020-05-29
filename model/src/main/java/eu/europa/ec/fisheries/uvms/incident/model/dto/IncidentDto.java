@@ -7,7 +7,7 @@ import java.util.UUID;
 public class IncidentDto implements Serializable {
     private final static long serialVersionUID = 1L;
 
-    private long id;
+    private Long id;
     private UUID assetId;
     private UUID mobileTerminalId;
     private UUID ticketId;
@@ -18,11 +18,11 @@ public class IncidentDto implements Serializable {
     private Instant updateDate;
     private MicroMovementDto lastKnownLocation;
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

@@ -44,9 +44,9 @@ import java.util.stream.Collectors;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @Stateless
-public class IncidentResource {
+public class IncidentRestResource {
 
-    private static final Logger LOG = LoggerFactory.getLogger(IncidentResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IncidentRestResource.class);
 
     @Inject
     private IncidentServiceBean incidentServiceBean;
@@ -151,9 +151,9 @@ public class IncidentResource {
     }
 
     @POST
-    @Path("assetNotSending/{incidentId}/status")
+    @Path("updateStatusForIncident/{incidentId}")
     @RequiresFeature(UnionVMSFeature.manageAlarmsOpenTickets)
-    public Response updateAssetNotSendingStatus(@PathParam("incidentId") long incidentId, StatusDto status) {
+    public Response updateIncident(@PathParam("incidentId") long incidentId, StatusDto status) {
         try {
             Incident updated = incidentServiceBean.updateIncidentStatus(incidentId, status);
             IncidentDto dto = incidentHelper.incidentEntityToDto(updated);

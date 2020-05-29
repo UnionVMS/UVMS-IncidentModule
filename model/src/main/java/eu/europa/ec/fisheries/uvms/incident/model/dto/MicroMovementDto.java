@@ -1,6 +1,9 @@
 package eu.europa.ec.fisheries.uvms.incident.model.dto;
 
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.MovementSourceType;
+
 import java.time.Instant;
+
 
 public class MicroMovementDto {
 

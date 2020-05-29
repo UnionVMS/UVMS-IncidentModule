@@ -1,7 +1,7 @@
 package eu.europa.ec.fisheries.uvms.incident.service.dao;
 
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
-import eu.europa.ec.fisheries.uvms.incident.service.domain.enums.StatusEnum;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
