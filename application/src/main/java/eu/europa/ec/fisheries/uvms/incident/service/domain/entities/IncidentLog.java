@@ -1,11 +1,11 @@
 package eu.europa.ec.fisheries.uvms.incident.service.domain.entities;
 
-import eu.europa.ec.fisheries.uvms.incident.service.domain.enums.EventTypeEnum;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.EventTypeEnum;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
-import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @Table(name = "incident_log")
@@ -21,7 +21,7 @@ public class IncidentLog {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(columnDefinition = "uuid", name = "id")
-    private long id;
+    private Long id;
 
     @NotNull
     @Column(name = "incident_id")
@@ -36,21 +36,18 @@ public class IncidentLog {
     @Enumerated(value = EnumType.STRING)
     private EventTypeEnum eventType;
 
+    @Column(name = "related_object_id")
+    private UUID relatedObjectId;
+
     @NotNull
     @Column(name = "create_date")
     private Instant createDate;
 
-    @Column(name = "previous_value")
-    private String previousValue;
-
-    @Column(name = "current_value")
-    private String currentValue;
-
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -86,38 +83,12 @@ public class IncidentLog {
         this.createDate = createDate;
     }
 
-    public String getPreviousValue() {
-        return previousValue;
+    public UUID getRelatedObjectId() {
+        return relatedObjectId;
     }
 
-    public void setPreviousValue(String previousValue) {
-        this.previousValue = previousValue;
+    public void setRelatedObjectId(UUID relatedObjectId) {
+        this.relatedObjectId = relatedObjectId;
     }
 
-    public String getCurrentValue() {
-        return currentValue;
-    }
-
-    public void setCurrentValue(String currentValue) {
-        this.currentValue = currentValue;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        IncidentLog that = (IncidentLog) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(incidentId, that.incidentId) &&
-                Objects.equals(message, that.message) &&
-                Objects.equals(previousValue, that.previousValue) &&
-                Objects.equals(currentValue, that.currentValue) &&
-                Objects.equals(eventType, that.eventType) &&
-                Objects.equals(createDate, that.createDate);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
 }

@@ -1,5 +1,7 @@
 package eu.europa.ec.fisheries.uvms.incident.model.dto;
 
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.*;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;

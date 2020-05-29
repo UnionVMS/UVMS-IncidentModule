@@ -1,6 +1,6 @@
 package eu.europa.ec.fisheries.uvms.incident.service.domain.entities;
 
-import eu.europa.ec.fisheries.uvms.incident.service.domain.enums.StatusEnum;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -26,7 +26,7 @@ public class Incident {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
-    private long id;
+    private Long id;
 
     @NotNull
     @Column(name = "asset_id")
@@ -62,11 +62,17 @@ public class Incident {
     @Column(name = "update_date")
     private Instant updateDate;
 
-    public long getId() {
+    @PrePersist
+    @PreUpdate
+    public void preUpdate(){
+        updateDate = Instant.now();
+    }
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
