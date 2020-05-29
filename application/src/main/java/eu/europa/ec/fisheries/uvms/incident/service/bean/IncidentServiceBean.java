@@ -58,7 +58,7 @@ public class IncidentServiceBean {
             incidentDao.save(incident);
 
             incidentLogServiceBean.createIncidentLogForStatus(incident, "Asset not sending, sending autopoll",
-                    EventTypeEnum.POLL_CREATED, UUID.fromString(ticket.getPollId()));
+                    EventTypeEnum.POLL_CREATED, (ticket.getPollId() == null ? null : UUID.fromString(ticket.getPollId())));
             createdIncident.fire(incident);
         }
     }
@@ -95,7 +95,7 @@ public class IncidentServiceBean {
         persisted.setStatus(statusDto.getStatus());
         Incident updated = incidentDao.update(persisted);
         updatedIncident.fire(updated);
-        incidentLogServiceBean.createIncidentLogForStatus(updated, EventTypeEnum.INCIDENT_STATUS.getMessage(),
+        incidentLogServiceBean.createIncidentLogForStatus(updated, statusDto.getEventType().getMessage(),
                 statusDto.getEventType(), statusDto.getRelatedObjectId());
         return updated;
     }
