@@ -109,7 +109,7 @@ public class IncidentHelper {
             dto.setId(entity.getId());
             dto.setIncidentId(entity.getIncidentId());
             dto.setMessage(entity.getMessage());
-            dto.setEventType(entity.getEventType().name());
+            dto.setEventType(entity.getEventType());
             dto.setCreateDate(entity.getCreateDate());
             dto.setRelatedObjectId(entity.getRelatedObjectId());
             retVal.add(dto);

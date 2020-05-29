@@ -95,7 +95,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
 
         created.setStatus(StatusEnum.RESOLVED);
         StatusDto status = new StatusDto();
-        status.setStatus("RESOLVED");
+        status.setStatus(StatusEnum.RESOLVED);
         incidentService.updateIncidentStatus(created.getId(), status);
 
         Incident updated = incidentService.findByTicketId(ticketId);

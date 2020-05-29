@@ -21,7 +21,7 @@ public class IncidentLog {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(columnDefinition = "uuid", name = "id")
-    private long id;
+    private Long id;
 
     @NotNull
     @Column(name = "incident_id")
@@ -43,11 +43,11 @@ public class IncidentLog {
     @Column(name = "create_date")
     private Instant createDate;
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
