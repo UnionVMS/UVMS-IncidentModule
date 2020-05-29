@@ -6,6 +6,7 @@ import eu.europa.ec.fisheries.uvms.incident.helper.JMSHelper;
 import eu.europa.ec.fisheries.uvms.incident.helper.TicketHelper;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.StatusDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.EventTypeEnum;
 import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentServiceBean;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
@@ -96,6 +97,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         created.setStatus(StatusEnum.RESOLVED);
         StatusDto status = new StatusDto();
         status.setStatus(StatusEnum.RESOLVED);
+        status.setEventType(EventTypeEnum.INCIDENT_CLOSED);
         incidentService.updateIncidentStatus(created.getId(), status);
 
         Incident updated = incidentService.findByTicketId(ticketId);
