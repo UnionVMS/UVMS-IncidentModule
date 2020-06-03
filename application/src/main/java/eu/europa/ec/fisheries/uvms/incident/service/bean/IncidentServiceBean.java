@@ -58,7 +58,7 @@ public class IncidentServiceBean {
             incidentDao.save(incident);
 
             incidentLogServiceBean.createIncidentLogForStatus(incident, "Asset not sending, sending autopoll",
-                    EventTypeEnum.POLL_CREATED, (ticket.getPollId() == null ? null : UUID.fromString(ticket.getPollId())));
+                    EventTypeEnum.AUTO_POLL_CREATED, (ticket.getPollId() == null ? null : UUID.fromString(ticket.getPollId())));
             createdIncident.fire(incident);
         }
     }
@@ -77,7 +77,7 @@ public class IncidentServiceBean {
                         EventTypeEnum.INCIDENT_CLOSED, UUID.fromString(ticket.getMovementId()));
 
             } else if (ticket.getMovementId() != null &&
-                    !ticket.getMovementId().equals(persisted.getMovementId().toString())) {
+                    !UUID.fromString(ticket.getMovementId()).equals(persisted.getMovementId())) {
                 MicroMovement movementFromTicketUpdate = movementClient.getMicroMovementById(UUID.fromString(ticket.getMovementId()));
 
                 if (movementFromTicketUpdate != null && movementFromTicketUpdate.getSource().equals(MovementSourceType.MANUAL)) {

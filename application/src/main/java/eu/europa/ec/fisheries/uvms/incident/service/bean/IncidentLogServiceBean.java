@@ -45,9 +45,9 @@ public class IncidentLogServiceBean {
         IncidentLog log = new IncidentLog();
         log.setCreateDate(Instant.now());
         log.setIncidentId(persisted.getId());
-        log.setEventType(EventTypeEnum.MANUEL_POSITION);
+        log.setEventType(EventTypeEnum.MANUAL_POSITION);
         log.setRelatedObjectId(UUID.fromString(manual.getId()));
-        log.setMessage(EventTypeEnum.MANUEL_POSITION.getMessage());
+        log.setMessage(EventTypeEnum.MANUAL_POSITION.getMessage());
         incidentLogDao.save(log);
     }
 }
