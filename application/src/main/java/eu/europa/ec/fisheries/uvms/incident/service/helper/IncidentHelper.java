@@ -34,7 +34,7 @@ public class IncidentHelper {
             incident.setMobileTerminalId(UUID.fromString(ticket.getMobTermId()));
         }
         incident.setCreateDate(Instant.now());
-        incident.setStatus(StatusEnum.POLL_INITIATED);
+        incident.setStatus(StatusEnum.INCIDENT_CREATED);
         incident.setTicketId(ticket.getId());
         if (movement != null) {
             incident.setMovementId(UUID.fromString(movement.getId()));

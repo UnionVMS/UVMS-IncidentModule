@@ -95,7 +95,21 @@ public class IncidentRestResource {
             String response = jsonb.toJson(dto);
             return Response.ok(response).build();
         } catch (Exception e) {
-            LOG.error("Error while fetching AssetNotSending List", e);
+            LOG.error("Error while fetching incident by ticketId.", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getRootCause(e)).build();
+        }
+    }
+
+    @GET
+    @Path("{incidentId}")
+    @RequiresFeature(UnionVMSFeature.viewAlarmsOpenTickets)
+    public Response getByIncidentId(@PathParam("incidentId") Long incidentId) {
+        try {
+            Incident incident = incidentDao.findById(incidentId);
+            IncidentDto incidentDto = incidentHelper.incidentEntityToDto(incident);
+            return Response.ok(incidentDto).build();
+        } catch (Exception e) {
+            LOG.error("Error while fetching incident by id", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getRootCause(e)).build();
         }
     }

@@ -92,7 +92,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
 
         Incident created = incidentService.findByTicketId(ticketId);
         assertNotNull(created);
-        assertEquals(StatusEnum.POLL_INITIATED, created.getStatus());
+        assertEquals(StatusEnum.INCIDENT_CREATED, created.getStatus());
 
         created.setStatus(StatusEnum.RESOLVED);
         StatusDto status = new StatusDto();
