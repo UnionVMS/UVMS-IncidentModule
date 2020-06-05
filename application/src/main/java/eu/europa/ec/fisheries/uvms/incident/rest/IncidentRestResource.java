@@ -81,7 +81,7 @@ public class IncidentRestResource {
             return Response.ok(response).build();
         } catch (Exception e) {
             LOG.error("Error while fetching AssetNotSending List", e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getRootCause(e)).build();
+            throw e;
         }
     }
 
@@ -96,7 +96,7 @@ public class IncidentRestResource {
             return Response.ok(response).build();
         } catch (Exception e) {
             LOG.error("Error while fetching incident by ticketId.", e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getRootCause(e)).build();
+            throw e;
         }
     }
 
@@ -110,7 +110,7 @@ public class IncidentRestResource {
             return Response.ok(incidentDto).build();
         } catch (Exception e) {
             LOG.error("Error while fetching incident by id", e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getRootCause(e)).build();
+            throw e;
         }
     }
 
@@ -125,7 +125,7 @@ public class IncidentRestResource {
             return Response.ok(response).build();
         } catch (Exception e) {
             LOG.error("Error while fetching incident log for incident {} ", incidentId, e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getRootCause(e)).build();
+            throw e;
         }
     }
 
@@ -140,7 +140,7 @@ public class IncidentRestResource {
             return Response.ok(response).build();
         } catch (Exception e) {
             LOG.error("Error while fetching incidents for asset id {} ", assetId, e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getRootCause(e)).build();
+            throw e;
         }
     }
 
@@ -160,7 +160,7 @@ public class IncidentRestResource {
             return Response.ok(response).build();
         } catch (Exception e) {
             LOG.error("Error while fetching incidents for asset id {} ", assetId, e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getRootCause(e)).build();
+            throw e;
         }
     }
 
@@ -175,7 +175,7 @@ public class IncidentRestResource {
             return Response.ok(response).build();
         } catch (Exception e) {
             LOG.error("Error while fetching AssetNotSending List", e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getRootCause(e)).build();
+            throw e;
         }
     }
 
