@@ -25,7 +25,7 @@
 
         <!-- UVMS Libraries -->
         <uvms.common.version>4.1.7</uvms.common.version>
-        <movement.version>5.5.9-UVMS</movement.version>
+        <movement.version>5.5.10-UVMS</movement.version>
         <movement.rules.version>2.3.9</movement.rules.version>
         <asset.version>6.7.12</asset.version>
         <exchange.module>5.2.11-UVMS</exchange.module>
