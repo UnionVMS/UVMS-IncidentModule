@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.7.xsd"
+                   logicalFilePath="changelog/v0.2.5/db-changelog-add-type-and-status-to-log.xml">
+
+    <changeSet id="Add related object type and incident status" author="joemat">
+        <addColumn tableName="incident_log">
+            <column name="related_object_type"
+                    type="VARCHAR(60)" />
+
+            <column name="incident_status"
+                    type="VARCHAR(60)" />
+        </addColumn>
+
+    </changeSet>
+</databaseChangeLog>

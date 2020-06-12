@@ -1,5 +1,7 @@
 package eu.europa.ec.fisheries.uvms.incident.service.bean;
 
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.RelatedObjectType;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentLogDao;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.IncidentLog;
@@ -36,6 +38,8 @@ public class IncidentLogServiceBean {
         log.setEventType(eventType);
         log.setRelatedObjectId(relatedObjectId);
         log.setMessage(message);
+        log.setIncidentStatus(updated.getStatus());
+        log.setRelatedObjectType( relatedObjectId == null ? RelatedObjectType.NONE :  eventType.getRelatedObjectType());
         incidentLogDao.save(log);
 
     }
@@ -48,6 +52,8 @@ public class IncidentLogServiceBean {
         log.setEventType(EventTypeEnum.MANUAL_POSITION);
         log.setRelatedObjectId(UUID.fromString(manual.getId()));
         log.setMessage(EventTypeEnum.MANUAL_POSITION.getMessage());
+        log.setIncidentStatus(persisted.getStatus());
+        log.setRelatedObjectType(RelatedObjectType.MOVEMENT);
         incidentLogDao.save(log);
     }
 }

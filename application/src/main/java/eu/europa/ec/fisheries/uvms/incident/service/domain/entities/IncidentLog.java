@@ -1,6 +1,8 @@
 package eu.europa.ec.fisheries.uvms.incident.service.domain.entities;
 
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.EventTypeEnum;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.RelatedObjectType;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -42,6 +44,12 @@ public class IncidentLog {
     @NotNull
     @Column(name = "create_date")
     private Instant createDate;
+
+    @Column(name = "related_object_type")
+    private RelatedObjectType relatedObjectType;
+
+    @Column(name = "incident_status")
+    private StatusEnum incidentStatus;
 
     public Long getId() {
         return id;
@@ -91,4 +99,19 @@ public class IncidentLog {
         this.relatedObjectId = relatedObjectId;
     }
 
+    public RelatedObjectType getRelatedObjectType() {
+        return relatedObjectType;
+    }
+
+    public void setRelatedObjectType(RelatedObjectType relatedObjectType) {
+        this.relatedObjectType = relatedObjectType;
+    }
+
+    public StatusEnum getIncidentStatus() {
+        return incidentStatus;
+    }
+
+    public void setIncidentStatus(StatusEnum incidentStatus) {
+        this.incidentStatus = incidentStatus;
+    }
 }
