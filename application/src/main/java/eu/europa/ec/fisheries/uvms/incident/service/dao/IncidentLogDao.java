@@ -9,6 +9,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.util.List;
+import java.util.UUID;
 
 @Stateless
 public class IncidentLogDao {
@@ -28,6 +29,13 @@ public class IncidentLogDao {
         TypedQuery<IncidentLog> query = em.createNamedQuery(IncidentLog.FIND_ALL_BY_INCIDENT_ID, IncidentLog.class);
         query.setParameter("incidentId", incidentId);
         return query.getResultList();
+    }
+
+    public boolean checkIfMovementAlreadyExistsForIncident(long incidentId, UUID movementId) {
+        TypedQuery<IncidentLog> query = em.createNamedQuery(IncidentLog.CHECK_IF_INCIDENT_ALREADY_HAS_MOVEMENT, IncidentLog.class);
+        query.setParameter("incidentId", incidentId);
+        query.setParameter("movementId", movementId);
+        return !query.getResultList().isEmpty();
     }
 
     public List<IncidentLog> findAllByIncidentId(List<Long> incidentId) {

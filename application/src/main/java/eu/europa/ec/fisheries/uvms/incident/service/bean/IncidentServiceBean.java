@@ -7,6 +7,7 @@ import eu.europa.ec.fisheries.uvms.incident.model.dto.StatusDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.EventTypeEnum;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentDao;
+import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentLogDao;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.interfaces.IncidentCreate;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.interfaces.IncidentUpdate;
@@ -43,6 +44,9 @@ public class IncidentServiceBean {
 
     @Inject
     private IncidentDao incidentDao;
+
+    @Inject
+    private IncidentLogDao incidentLogDao;
 
     public List<Incident> getAssetNotSendingList() {
         List<Incident> unresolvedIncidents = incidentDao.findUnresolvedIncidents();
@@ -81,10 +85,12 @@ public class IncidentServiceBean {
                 MicroMovement movementFromTicketUpdate = movementClient.getMicroMovementById(UUID.fromString(ticket.getMovementId()));
 
                 if (movementFromTicketUpdate != null && movementFromTicketUpdate.getSource().equals(MovementSourceType.MANUAL)) {
-                    persisted.setStatus(StatusEnum.MANUAL_POSITION_MODE);
-                    Incident updated = incidentDao.update(persisted);
-                    updatedIncident.fire(updated);
-                    incidentLogServiceBean.createIncidentLogForManualPosition(persisted, movementFromTicketUpdate);
+                    if (!incidentLogDao.checkIfMovementAlreadyExistsForIncident(persisted.getId(), UUID.fromString(ticket.getMovementId()))){
+                        persisted.setStatus(StatusEnum.MANUAL_POSITION_MODE);
+                        Incident updated = incidentDao.update(persisted);
+                        updatedIncident.fire(updated);
+                        incidentLogServiceBean.createIncidentLogForManualPosition(persisted, movementFromTicketUpdate);
+                    }
                 }
             }
         }
