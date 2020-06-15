@@ -112,29 +112,10 @@ public class IncidentHelper {
             dto.setEventType(entity.getEventType());
             dto.setCreateDate(entity.getCreateDate());
             dto.setRelatedObjectId(entity.getRelatedObjectId());
+            dto.setRelatedObjectType(entity.getRelatedObjectType());
+            dto.setIncidentStatus(entity.getIncidentStatus());
             retVal.add(dto);
         }
         return retVal;
-    }
-
-    public MicroMovementDto mapToMicroMovementDto(MicroMovement model) {
-        MicroMovementDto dto = new MicroMovementDto();
-        dto.setId(model.getId());
-        dto.setHeading(model.getHeading());
-        dto.setSource(MovementSourceType.fromValue(model.getSource().name()));
-        dto.setSpeed(model.getSpeed());
-        dto.setTimestamp(model.getTimestamp());
-        dto.setLocation(mapToMovementPointDto(model.getLocation()));
-        return dto;
-    }
-
-    private MovementPointDto mapToMovementPointDto(MovementPoint model) {
-        MovementPointDto dto = new MovementPointDto();
-        dto.setLatitude(model.getLatitude());
-        dto.setLongitude(model.getLongitude());
-        if (model.getAltitude() != null) {
-            dto.setAltitude(model.getAltitude());
-        }
-        return dto;
     }
 }

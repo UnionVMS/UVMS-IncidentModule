@@ -1,6 +1,8 @@
 package eu.europa.ec.fisheries.uvms.incident.model.dto;
 
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.EventTypeEnum;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.RelatedObjectType;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -15,6 +17,8 @@ public class IncidentLogDto implements Serializable {
     private EventTypeEnum eventType;
     private Instant createDate;
     private UUID relatedObjectId;
+    private RelatedObjectType relatedObjectType;
+    private StatusEnum incidentStatus;
 
     public Long getId() {
         return id;
@@ -62,5 +66,21 @@ public class IncidentLogDto implements Serializable {
 
     public void setRelatedObjectId(UUID relatedObjectId) {
         this.relatedObjectId = relatedObjectId;
+    }
+
+    public RelatedObjectType getRelatedObjectType() {
+        return relatedObjectType;
+    }
+
+    public void setRelatedObjectType(RelatedObjectType relatedObjectType) {
+        this.relatedObjectType = relatedObjectType;
+    }
+
+    public StatusEnum getIncidentStatus() {
+        return incidentStatus;
+    }
+
+    public void setIncidentStatus(StatusEnum incidentStatus) {
+        this.incidentStatus = incidentStatus;
     }
 }
