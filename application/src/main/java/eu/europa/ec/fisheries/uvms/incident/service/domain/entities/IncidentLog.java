@@ -14,11 +14,14 @@ import java.util.UUID;
 @NamedQueries({
         @NamedQuery(name = IncidentLog.FIND_ALL_BY_INCIDENT_ID, query = "SELECT i FROM IncidentLog i WHERE i.incidentId = :incidentId"),
         @NamedQuery(name = IncidentLog.FIND_ALL_BY_INCIDENT_ID_LIST, query = "SELECT i FROM IncidentLog i WHERE i.incidentId in :incidentId"),
+        @NamedQuery(name = IncidentLog.CHECK_IF_INCIDENT_ALREADY_HAS_MOVEMENT, query = "SELECT i FROM IncidentLog i WHERE i.incidentId = :incidentId AND i.relatedObjectId = :movementId"),
+
 })
 public class IncidentLog {
 
     public static final String FIND_ALL_BY_INCIDENT_ID = "IncidentLog.findByIncidentId";
     public static final String FIND_ALL_BY_INCIDENT_ID_LIST = "IncidentLog.findByIncidentIdList";
+    public static final String CHECK_IF_INCIDENT_ALREADY_HAS_MOVEMENT = "IncidentLog.findIfIncidentAlreadyHasMovement";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
