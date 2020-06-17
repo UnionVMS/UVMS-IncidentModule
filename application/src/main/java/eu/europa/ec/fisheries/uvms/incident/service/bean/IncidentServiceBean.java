@@ -13,8 +13,11 @@ import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.interfaces.IncidentCreate;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.interfaces.IncidentUpdate;
 import eu.europa.ec.fisheries.uvms.incident.service.helper.IncidentHelper;
+import eu.europa.ec.fisheries.uvms.incident.service.message.IncidentConsumer;
 import eu.europa.ec.fisheries.uvms.movement.client.MovementRestClient;
 import eu.europa.ec.fisheries.uvms.movement.client.model.MicroMovement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -25,6 +28,8 @@ import java.util.UUID;
 
 @Stateless
 public class IncidentServiceBean {
+
+    private static final Logger LOG = LoggerFactory.getLogger(IncidentServiceBean.class);
 
     @Inject
     private IncidentLogServiceBean incidentLogServiceBean;
@@ -60,14 +65,24 @@ public class IncidentServiceBean {
     }
 
     public void createIncident(IncidentTicketDto ticket) {
-        MicroMovement movement = movementClient.getMicroMovementById(UUID.fromString(ticket.getMovementId()));
-        if ("Asset not sending".equalsIgnoreCase(ticket.getRuleGuid())) {
-            Incident incident = incidentHelper.constructIncident(ticket, movement);
-            incidentDao.save(incident);
+        try {
+            MicroMovement movement = movementClient.getMicroMovementById(UUID.fromString(ticket.getMovementId()));
+            if ("Asset not sending".equalsIgnoreCase(ticket.getRuleGuid())) {
+                Incident incident = incidentHelper.constructIncident(ticket, movement);
+                incidentDao.save(incident);
 
-            incidentLogServiceBean.createIncidentLogForStatus(incident, "Asset not sending, sending autopoll",
-                    EventTypeEnum.AUTO_POLL_CREATED, (ticket.getPollId() == null ? null : UUID.fromString(ticket.getPollId())));
-            createdIncident.fire(incident);
+                if(ticket.getPollId() != null && ticket.getPollId().length() != 36 ) {
+                    incidentLogServiceBean.createIncidentLogForStatus(incident, "Creating autopoll failed since pollId is: " + ticket.getPollId(),
+                            EventTypeEnum.AUTO_POLL_CREATED, null);
+                } else {
+                    incidentLogServiceBean.createIncidentLogForStatus(incident, "Asset not sending, sending autopoll",
+                            EventTypeEnum.AUTO_POLL_CREATED, (ticket.getPollId() == null ? null : UUID.fromString(ticket.getPollId())));
+                }
+                createdIncident.fire(incident);
+            }
+        }catch (IllegalArgumentException e) {
+            LOG.error("Error: {} from UUID {}", e.getMessage(), ticket.getPollId());
+            throw e;
         }
     }
 
