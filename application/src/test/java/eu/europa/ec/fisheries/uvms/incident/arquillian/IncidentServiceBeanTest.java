@@ -4,6 +4,7 @@ import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
 import eu.europa.ec.fisheries.uvms.incident.TransactionalTests;
 import eu.europa.ec.fisheries.uvms.incident.helper.JMSHelper;
 import eu.europa.ec.fisheries.uvms.incident.helper.TicketHelper;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.AssetNotSendingDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.StatusDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.EventTypeEnum;
@@ -42,7 +43,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
     @Test
     @OperateOnDeployment("incident")
     public void getAssetNotSendingListTest() throws Exception {
-        List<Incident> before = incidentService.getAssetNotSendingList();
+        AssetNotSendingDto before = incidentService.getAssetNotSendingList();
 
         UUID ticketId = UUID.randomUUID();
         UUID assetId = UUID.randomUUID();
@@ -54,8 +55,8 @@ public class IncidentServiceBeanTest extends TransactionalTests {
 
         LockSupport.parkNanos(2000000000L);
 
-        List<Incident> after = incidentService.getAssetNotSendingList();
-        assertEquals(before.size() + 1, after.size());
+        AssetNotSendingDto after = incidentService.getAssetNotSendingList();
+        assertEquals(before.getUnresolved().size() + 1, after.getUnresolved().size());
     }
 
     @Test

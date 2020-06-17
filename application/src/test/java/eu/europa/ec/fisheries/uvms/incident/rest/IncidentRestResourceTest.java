@@ -2,6 +2,7 @@ package eu.europa.ec.fisheries.uvms.incident.rest;
 
 import eu.europa.ec.fisheries.uvms.incident.BuildIncidentTestDeployment;
 import eu.europa.ec.fisheries.uvms.incident.helper.JMSHelper;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.AssetNotSendingDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentLogDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
@@ -65,10 +66,10 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
     @Test
     @OperateOnDeployment("incident")
     public void assetNotSendingTest() {
-        List<IncidentDto> response = getWebTarget()
+        AssetNotSendingDto response = getWebTarget()
                 .path("incident/assetNotSending")
                 .request(MediaType.APPLICATION_JSON)
-                .get(new GenericType<>() {});
+                .get(AssetNotSendingDto.class);
         assertNotNull(response);
     }
 
