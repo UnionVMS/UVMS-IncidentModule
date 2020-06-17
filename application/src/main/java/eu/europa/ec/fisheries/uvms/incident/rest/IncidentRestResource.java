@@ -12,6 +12,7 @@ details. You should have received a copy of the GNU General Public License along
 package eu.europa.ec.fisheries.uvms.incident.rest;
 
 import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.AssetNotSendingDto;
 import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentLogServiceBean;
 import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentServiceBean;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
@@ -75,9 +76,8 @@ public class IncidentRestResource {
     @RequiresFeature(UnionVMSFeature.viewAlarmsOpenTickets)
     public Response getAssetNotSendingEvents() {
         try {
-            List<Incident> notSendingList = incidentServiceBean.getAssetNotSendingList();
-            List<IncidentDto> dtoList = incidentHelper.incidentToDtoList(notSendingList);
-            String response = jsonb.toJson(dtoList);
+            AssetNotSendingDto notSendingDto = incidentServiceBean.getAssetNotSendingList();
+            String response = jsonb.toJson(notSendingDto);
             return Response.ok(response).build();
         } catch (Exception e) {
             LOG.error("Error while fetching AssetNotSending List", e);

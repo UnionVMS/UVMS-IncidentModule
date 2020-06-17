@@ -2,6 +2,7 @@ package eu.europa.ec.fisheries.uvms.incident.service.bean;
 
 import eu.europa.ec.fisheries.schema.movement.v1.MovementSourceType;
 import eu.europa.ec.fisheries.schema.movementrules.ticket.v1.TicketStatusType;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.AssetNotSendingDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.StatusDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.EventTypeEnum;
@@ -48,11 +49,14 @@ public class IncidentServiceBean {
     @Inject
     private IncidentLogDao incidentLogDao;
 
-    public List<Incident> getAssetNotSendingList() {
+    public AssetNotSendingDto getAssetNotSendingList() {
+        AssetNotSendingDto dto = new AssetNotSendingDto();
         List<Incident> unresolvedIncidents = incidentDao.findUnresolvedIncidents();
+        dto.setUnresolved(incidentHelper.incidentToDtoList(unresolvedIncidents));
+
         List<Incident> resolvedSinceLast12Hours = incidentDao.findByStatusAndUpdatedSince();
-        unresolvedIncidents.addAll(resolvedSinceLast12Hours);
-        return unresolvedIncidents;
+        dto.setRecentlyResolved(incidentHelper.incidentToDtoList(resolvedSinceLast12Hours));
+        return dto;
     }
 
     public void createIncident(IncidentTicketDto ticket) {
