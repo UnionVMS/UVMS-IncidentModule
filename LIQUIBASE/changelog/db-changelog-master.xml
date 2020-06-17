@@ -10,5 +10,6 @@
     <include file="v0.1/db-changelog-createTables_0.1.xml" relativeToChangelogFile="true"/>
     <include file="v0.2.2/db-changelog-add-related-object-to-log.xml" relativeToChangelogFile="true"/>
     <include file="v0.2.5/db-changelog-add-type-and-status-to-log.xml" relativeToChangelogFile="true"/>
+    <include file="v0.2.7/db-changelog-map-db-values-for-enums-from-int-to-string.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

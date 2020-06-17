@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.7.xsd"
+                   logicalFilePath="changelog/v0.2.7/db-changelog-map-db-values-for-enums-from-int-to-string.xml">
+
+    <changeSet id="Map db values for enums from int to string for related object type" author="joemat">
+        <update  tableName="incident_log">
+            <column  name="related_object_type" value="NONE"/>
+            <where>related_object_type='0'</where>
+        </update>
+
+        <update  tableName="incident_log">
+            <column  name="related_object_type" value="NOTE"/>
+            <where>related_object_type='1'</where>
+        </update>
+
+        <update  tableName="incident_log">
+            <column  name="related_object_type" value="MOVEMENT"/>
+            <where>related_object_type='2'</where>
+        </update>
+
+        <update  tableName="incident_log">
+            <column  name="related_object_type" value="POLL"/>
+            <where>related_object_type='3'</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="Map db values for enums from int to string for incident status" author="joemat">
+        <update  tableName="incident_log">
+            <column  name="incident_status" value="INCIDENT_CREATED"/>
+            <where>incident_status='0'</where>
+        </update>
+
+        <update  tableName="incident_log">
+            <column  name="incident_status" value="POLL_FAILED"/>
+            <where>incident_status='1'</where>
+        </update>
+
+        <update  tableName="incident_log">
+            <column  name="incident_status" value="POLL_INITIATED"/>
+            <where>incident_status='2'</where>
+        </update>
+
+        <update  tableName="incident_log">
+            <column  name="incident_status" value="NOTE_ADDED"/>
+            <where>incident_status='3'</where>
+        </update>
+
+        <update  tableName="incident_log">
+            <column  name="incident_status" value="ATTEMPTED_CONTACT"/>
+            <where>incident_status='4'</where>
+        </update>
+
+        <update  tableName="incident_log">
+            <column  name="incident_status" value="MANUAL_POSITION_MODE"/>
+            <where>incident_status='5'</where>
+        </update>
+
+        <update  tableName="incident_log">
+            <column  name="incident_status" value="LONG_TERM_PARKED"/>
+            <where>incident_status='6'</where>
+        </update>
+
+        <update  tableName="incident_log">
+            <column  name="incident_status" value="TECHNICAL_ISSUE"/>
+            <where>incident_status='7'</where>
+        </update>
+
+        <update  tableName="incident_log">
+            <column  name="incident_status" value="RESOLVED"/>
+            <where>incident_status='8'</where>
+        </update>
+
+    </changeSet>
+
+</databaseChangeLog>
