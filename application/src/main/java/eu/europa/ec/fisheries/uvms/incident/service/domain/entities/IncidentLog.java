@@ -49,9 +49,11 @@ public class IncidentLog {
     private Instant createDate;
 
     @Column(name = "related_object_type")
+    @Enumerated(value = EnumType.STRING)
     private RelatedObjectType relatedObjectType;
 
     @Column(name = "incident_status")
+    @Enumerated(value = EnumType.STRING)
     private StatusEnum incidentStatus;
 
     public Long getId() {
