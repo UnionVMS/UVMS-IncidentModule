@@ -57,10 +57,10 @@ public class IncidentServiceBean {
     public AssetNotSendingDto getAssetNotSendingList() {
         AssetNotSendingDto dto = new AssetNotSendingDto();
         List<Incident> unresolvedIncidents = incidentDao.findUnresolvedIncidents(TicketType.ASSET_NOT_SENDING);
-        dto.setUnresolved(incidentHelper.incidentToDtoList(unresolvedIncidents));
+        dto.setUnresolved(incidentHelper.incidentToDtoMap(unresolvedIncidents));
 
-        List<Incident> resolvedSinceLast12Hours = incidentDao.findByStatusAndUpdatedSince(TicketType.ASSET_NOT_SENDING);
-        dto.setRecentlyResolved(incidentHelper.incidentToDtoList(resolvedSinceLast12Hours));
+        List<Incident> resolvedSinceLast12Hours = incidentDao.findByStatusAndUpdatedSince12Hours(TicketType.ASSET_NOT_SENDING);
+        dto.setRecentlyResolved(incidentHelper.incidentToDtoMap(resolvedSinceLast12Hours));
         return dto;
     }
 
