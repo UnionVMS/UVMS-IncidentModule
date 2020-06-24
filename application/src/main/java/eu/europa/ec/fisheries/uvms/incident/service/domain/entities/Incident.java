@@ -11,8 +11,8 @@ import java.util.UUID;
 @Entity
 @Table(name = "incident")
 @NamedQueries({
-        @NamedQuery(name = Incident.FIND_ALL_EXCLUDE_STATUS, query = "SELECT i FROM Incident i WHERE i.type = :type AND i.status <> :status"),
-        @NamedQuery(name = Incident.FIND_BY_STATUS_AND_UPDATED_SINCE, query = "SELECT i FROM Incident i WHERE i.type = :type AND i.status = :status AND i.updateDate > :updatedSince"),
+        @NamedQuery(name = Incident.FIND_ALL_EXCLUDE_STATUS, query = "SELECT i FROM Incident i WHERE i.type = :type AND i.status NOT IN :status"),
+        @NamedQuery(name = Incident.FIND_BY_STATUS_AND_UPDATED_SINCE, query = "SELECT i FROM Incident i WHERE i.type = :type AND i.status IN :status AND i.updateDate > :updatedSince"),
         @NamedQuery(name = Incident.FIND_BY_TICKET_ID, query = "SELECT i FROM Incident i WHERE i.ticketId = :ticketId"),
         @NamedQuery(name = Incident.FIND_BY_ASSET_ID, query = "SELECT i FROM Incident i WHERE i.assetId = :assetId"),
 })
