@@ -25,7 +25,6 @@ import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.IncidentLog;
 import eu.europa.ec.fisheries.uvms.incident.service.helper.IncidentHelper;
 import eu.europa.ec.fisheries.uvms.rest.security.RequiresFeature;
 import eu.europa.ec.fisheries.uvms.rest.security.UnionVMSFeature;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

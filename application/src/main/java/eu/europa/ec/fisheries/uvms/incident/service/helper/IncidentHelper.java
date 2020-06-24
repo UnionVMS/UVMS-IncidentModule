@@ -1,6 +1,5 @@
 package eu.europa.ec.fisheries.uvms.incident.service.helper;
 
-import eu.europa.ec.fisheries.schema.movement.v1.MovementPoint;
 import eu.europa.ec.fisheries.uvms.asset.client.AssetClient;
 import eu.europa.ec.fisheries.uvms.asset.client.model.AssetDTO;
 import eu.europa.ec.fisheries.uvms.asset.client.model.AssetIdentifier;
@@ -36,6 +35,7 @@ public class IncidentHelper {
         incident.setCreateDate(Instant.now());
         incident.setStatus(StatusEnum.INCIDENT_CREATED);
         incident.setTicketId(ticket.getId());
+        incident.setType(ticket.getType());
         if (movement != null) {
             incident.setMovementId(UUID.fromString(movement.getId()));
         }
@@ -71,6 +71,7 @@ public class IncidentHelper {
         dto.setAssetId(entity.getAssetId());
         dto.setMobileTerminalId(entity.getMobileTerminalId());
         dto.setTicketId(entity.getTicketId());
+        dto.setType(entity.getType());
         dto.setAssetName(entity.getAssetName());
         dto.setAssetIrcs(entity.getIrcs());
         dto.setStatus(entity.getStatus().name());

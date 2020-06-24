@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.7.xsd"
+                   logicalFilePath="changelog/v0.2.8/db-changelog-incident-type.xml">
+
+    <changeSet id="Add incident type" author="peerik">
+        <addColumn tableName="incident">
+            <column name="type"
+                    type="VARCHAR(60)" 
+                    defaultValue="ASSET_NOT_SENDING"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>
