@@ -134,7 +134,7 @@ public class IncidentRestResource {
     @RequiresFeature(UnionVMSFeature.viewAlarmsOpenTickets)
     public Response getIncidentsForAssetId(@PathParam("assetId") String assetId) {
         try {
-            List<Incident> incidents = incidentDao.findByAssetId(UUID.fromString(assetId));
+            List<Incident> incidents = incidentDao.findByAssetId(UUID.fromString(assetId)); 
             List<IncidentDto> dtoList = incidentHelper.incidentToDtoList(incidents);
             String response = jsonb.toJson(dtoList);
             return Response.ok(response).build();

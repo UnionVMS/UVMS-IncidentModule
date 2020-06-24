@@ -14,10 +14,14 @@ import eu.europa.ec.fisheries.uvms.movement.client.model.MicroMovement;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Stateless
 public class IncidentHelper {
@@ -56,13 +60,66 @@ public class IncidentHelper {
         return mapEntityToDto(incident);
     }
 
+//    public List<IncidentDto> incidentToDtoList(List<Incident> incidentList) {
+//        List<IncidentDto> retVal = new ArrayList<>();
+//        for (Incident i : incidentList) {
+//            IncidentDto dto = mapEntityToDto(i);
+//            retVal.add(dto);
+//        }
+//        return retVal;
+//    }
+    
     public List<IncidentDto> incidentToDtoList(List<Incident> incidentList) {
-        List<IncidentDto> retVal = new ArrayList<>();
-        for (Incident i : incidentList) {
-            IncidentDto dto = mapEntityToDto(i);
-            retVal.add(dto);
+        
+        List<UUID> listOfMoveIds = incidentList.stream()
+                    .map(i -> i.getMovementId())
+                    .collect(Collectors.toList());
+        
+        List<MicroMovement> microList = movementClient.getMicroMovementByIdList(listOfMoveIds);
+        
+        Map<String, MicroMovement> microMap =
+                microList.stream().collect(Collectors.toMap(MicroMovement::getId,
+                        m -> m));
+        
+        return incidentList.stream()
+                .map(i -> mapEntityToDto(i, microMap.get(i.getMovementId().toString())))
+                .collect(Collectors.toList());
+    }
+    
+    private IncidentDto mapEntityToDto(Incident entity, MicroMovement micro) {
+        IncidentDto dto = new IncidentDto();
+        dto.setId(entity.getId());
+        dto.setAssetId(entity.getAssetId());
+        dto.setMobileTerminalId(entity.getMobileTerminalId());
+        dto.setTicketId(entity.getTicketId());
+        dto.setAssetName(entity.getAssetName());
+        dto.setAssetIrcs(entity.getIrcs());
+        dto.setStatus(entity.getStatus().name());
+        dto.setCreateDate(entity.getCreateDate());
+        if (entity.getUpdateDate() != null)
+            dto.setUpdateDate(entity.getUpdateDate());
+
+        if(entity.getMovementId() != null) {
+            if(micro != null) {
+                MicroMovementDto lastKnownLocation = new MicroMovementDto();
+
+                MovementPointDto location = new MovementPointDto();
+                location.setLatitude(micro.getLocation().getLatitude());
+                location.setLongitude(micro.getLocation().getLongitude());
+                if (micro.getLocation().getAltitude() != null)
+                    location.setAltitude(micro.getLocation().getAltitude());
+
+                lastKnownLocation.setLocation(location);
+                lastKnownLocation.setHeading(micro.getHeading());
+                lastKnownLocation.setId(micro.getId());
+                lastKnownLocation.setTimestamp(micro.getTimestamp());
+                lastKnownLocation.setSpeed(micro.getSpeed());
+                lastKnownLocation.setSource(MovementSourceType.fromValue(micro.getSource().name()));
+
+                dto.setLastKnownLocation(lastKnownLocation);
+            }
         }
-        return retVal;
+        return dto;
     }
 
     private IncidentDto mapEntityToDto(Incident entity) {
