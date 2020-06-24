@@ -11,6 +11,7 @@ public class IncidentDto implements Serializable {
     private UUID assetId;
     private UUID mobileTerminalId;
     private UUID ticketId;
+    private String type;
     private String assetName;
     private String assetIrcs;
     private String status;
@@ -48,6 +49,14 @@ public class IncidentDto implements Serializable {
 
     public void setTicketId(UUID ticketId) {
         this.ticketId = ticketId;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getAssetName() {
