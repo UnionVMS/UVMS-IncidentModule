@@ -1,26 +1,26 @@
 package eu.europa.ec.fisheries.uvms.incident.model.dto;
 
-import java.util.List;
+import java.util.Map;
 
 public class AssetNotSendingDto {
 
-    List<IncidentDto> unresolved;
+    Map<Long, IncidentDto> unresolved;
 
-    List<IncidentDto> recentlyResolved;
+    Map<Long, IncidentDto> recentlyResolved;
 
-    public List<IncidentDto> getUnresolved() {
+    public Map<Long, IncidentDto> getUnresolved() {
         return unresolved;
     }
 
-    public void setUnresolved(List<IncidentDto> unresolved) {
+    public void setUnresolved(Map<Long, IncidentDto> unresolved) {
         this.unresolved = unresolved;
     }
 
-    public List<IncidentDto> getRecentlyResolved() {
+    public Map<Long, IncidentDto> getRecentlyResolved() {
         return recentlyResolved;
     }
 
-    public void setRecentlyResolved(List<IncidentDto> recentlyResolved) {
+    public void setRecentlyResolved(Map<Long, IncidentDto> recentlyResolved) {
         this.recentlyResolved = recentlyResolved;
     }
 }

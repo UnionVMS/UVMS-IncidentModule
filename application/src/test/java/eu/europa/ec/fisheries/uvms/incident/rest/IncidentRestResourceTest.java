@@ -16,7 +16,7 @@ import javax.json.bind.Jsonb;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -83,7 +83,7 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
                 .get(Response.class);
         assertEquals(200, response.getStatus());
 
-        List<IncidentLogDto> responseLogs = response.readEntity(new GenericType<List<IncidentLogDto>>() {});
+        Map<Long, IncidentLogDto> responseLogs = response.readEntity(new GenericType<Map<Long, IncidentLogDto>>() {});
         assertNotNull(responseLogs);
     }
 
@@ -97,7 +97,7 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
                 .get(Response.class);
         assertEquals(200, response.getStatus());
 
-        List<IncidentLogDto> responseLogs = response.readEntity(new GenericType<List<IncidentLogDto>>() {});
+        Map<Long, IncidentLogDto> responseLogs = response.readEntity(new GenericType<Map<Long, IncidentLogDto>>() {});
         assertNotNull(responseLogs);
     }
 
@@ -111,7 +111,7 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
                 .get(Response.class);
         assertEquals(200, response.getStatus());
 
-        List<IncidentDto> responseLogs = response.readEntity(new GenericType<List<IncidentDto>>() {});
+        Map<Long, IncidentDto> responseLogs = response.readEntity(new GenericType<Map<Long, IncidentDto>>() {});
         assertNotNull(responseLogs);
     }
 }

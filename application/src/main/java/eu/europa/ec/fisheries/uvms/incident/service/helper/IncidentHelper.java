@@ -1,6 +1,5 @@
 package eu.europa.ec.fisheries.uvms.incident.service.helper;
 
-import eu.europa.ec.fisheries.schema.movement.v1.MovementPoint;
 import eu.europa.ec.fisheries.uvms.asset.client.AssetClient;
 import eu.europa.ec.fisheries.uvms.asset.client.model.AssetDTO;
 import eu.europa.ec.fisheries.uvms.asset.client.model.AssetIdentifier;
@@ -15,12 +14,8 @@ import eu.europa.ec.fisheries.uvms.movement.client.model.MicroMovement;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
-
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Stateless
@@ -40,6 +35,7 @@ public class IncidentHelper {
         incident.setCreateDate(Instant.now());
         incident.setStatus(StatusEnum.INCIDENT_CREATED);
         incident.setTicketId(ticket.getId());
+        incident.setType(ticket.getType());
         if (movement != null) {
             incident.setMovementId(UUID.fromString(movement.getId()));
         }
@@ -60,16 +56,16 @@ public class IncidentHelper {
         return mapEntityToDto(incident);
     }
 
-//    public List<IncidentDto> incidentToDtoList(List<Incident> incidentList) {
-//        List<IncidentDto> retVal = new ArrayList<>();
-//        for (Incident i : incidentList) {
-//            IncidentDto dto = mapEntityToDto(i);
-//            retVal.add(dto);
-//        }
-//        return retVal;
-//    }
+    public Map<Long, IncidentDto> incidentToDtoMap(List<Incident> incidentList) {
+        Map<Long, IncidentDto> retVal = new TreeMap<>();
+        for (Incident i : incidentList) {
+            IncidentDto dto = mapEntityToDto(i);
+            retVal.put(dto.getId(), dto);
+        }
+        return retVal;
+    }
     
-    public List<IncidentDto> incidentToDtoList(List<Incident> incidentList) {
+    public Map<Long,IncidentDto> incidentToDtoList(List<Incident> incidentList) {
         
         List<UUID> listOfMoveIds = incidentList.stream()
                     .map(i -> i.getMovementId())
@@ -82,8 +78,8 @@ public class IncidentHelper {
                         m -> m));
         
         return incidentList.stream()
-                .map(i -> mapEntityToDto(i, microMap.get(i.getMovementId().toString())))
-                .collect(Collectors.toList());
+                .collect(Collectors.toMap(Incident::getId, 
+                        i -> mapEntityToDto(i, microMap.get(i.getMovementId().toString()))));
     }
     
     private IncidentDto mapEntityToDto(Incident entity, MicroMovement micro) {
@@ -96,31 +92,30 @@ public class IncidentHelper {
         dto.setAssetIrcs(entity.getIrcs());
         dto.setStatus(entity.getStatus().name());
         dto.setCreateDate(entity.getCreateDate());
-        if (entity.getUpdateDate() != null)
+        if (entity.getUpdateDate() != null) {
             dto.setUpdateDate(entity.getUpdateDate());
+        }
+        if(entity.getMovementId() != null && micro != null) {
+            MicroMovementDto lastKnownLocation = new MicroMovementDto();
 
-        if(entity.getMovementId() != null) {
-            if(micro != null) {
-                MicroMovementDto lastKnownLocation = new MicroMovementDto();
+            MovementPointDto location = new MovementPointDto();
+            location.setLatitude(micro.getLocation().getLatitude());
+            location.setLongitude(micro.getLocation().getLongitude());
+            if (micro.getLocation().getAltitude() != null)
+                location.setAltitude(micro.getLocation().getAltitude());
 
-                MovementPointDto location = new MovementPointDto();
-                location.setLatitude(micro.getLocation().getLatitude());
-                location.setLongitude(micro.getLocation().getLongitude());
-                if (micro.getLocation().getAltitude() != null)
-                    location.setAltitude(micro.getLocation().getAltitude());
+            lastKnownLocation.setLocation(location);
+            lastKnownLocation.setHeading(micro.getHeading());
+            lastKnownLocation.setId(micro.getId());
+            lastKnownLocation.setTimestamp(micro.getTimestamp());
+            lastKnownLocation.setSpeed(micro.getSpeed());
+            lastKnownLocation.setSource(MovementSourceType.fromValue(micro.getSource().name()));
 
-                lastKnownLocation.setLocation(location);
-                lastKnownLocation.setHeading(micro.getHeading());
-                lastKnownLocation.setId(micro.getId());
-                lastKnownLocation.setTimestamp(micro.getTimestamp());
-                lastKnownLocation.setSpeed(micro.getSpeed());
-                lastKnownLocation.setSource(MovementSourceType.fromValue(micro.getSource().name()));
-
-                dto.setLastKnownLocation(lastKnownLocation);
-            }
+            dto.setLastKnownLocation(lastKnownLocation);
         }
         return dto;
     }
+
 
     private IncidentDto mapEntityToDto(Incident entity) {
         IncidentDto dto = new IncidentDto();
@@ -128,6 +123,7 @@ public class IncidentHelper {
         dto.setAssetId(entity.getAssetId());
         dto.setMobileTerminalId(entity.getMobileTerminalId());
         dto.setTicketId(entity.getTicketId());
+        dto.setType(entity.getType());
         dto.setAssetName(entity.getAssetName());
         dto.setAssetIrcs(entity.getIrcs());
         dto.setStatus(entity.getStatus().name());
@@ -159,8 +155,8 @@ public class IncidentHelper {
         return dto;
     }
 
-    public List<IncidentLogDto> incidentLogToDtoList(List<IncidentLog> incidentLogList) {
-        List<IncidentLogDto> retVal = new ArrayList<>();
+    public Map<Long, IncidentLogDto> incidentLogToDtoList(List<IncidentLog> incidentLogList) {
+        Map<Long, IncidentLogDto> retVal = new TreeMap<>();
         for (IncidentLog entity : incidentLogList) {
             IncidentLogDto dto = new IncidentLogDto();
             dto.setId(entity.getId());
@@ -171,7 +167,7 @@ public class IncidentHelper {
             dto.setRelatedObjectId(entity.getRelatedObjectId());
             dto.setRelatedObjectType(entity.getRelatedObjectType());
             dto.setIncidentStatus(entity.getIncidentStatus());
-            retVal.add(dto);
+            retVal.put(dto.getId(), dto);
         }
         return retVal;
     }

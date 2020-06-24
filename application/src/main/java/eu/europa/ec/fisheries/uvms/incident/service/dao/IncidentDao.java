@@ -1,7 +1,9 @@
 package eu.europa.ec.fisheries.uvms.incident.service.dao;
 
+import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.TicketType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,15 +39,17 @@ public class IncidentDao {
         return incident;
     }
 
-    public List<Incident> findUnresolvedIncidents() {
+    public List<Incident> findUnresolvedIncidents(TicketType type) {
         TypedQuery<Incident> query = em.createNamedQuery(Incident.FIND_ALL_EXCLUDE_STATUS, Incident.class);
-        query.setParameter("status", StatusEnum.RESOLVED);
+        query.setParameter("type", type);
+        query.setParameter("status", ServiceConstants.RESOLVED_STATUS_LIST);
         return query.getResultList();
     }
 
-    public List<Incident> findByStatusAndUpdatedSince() {
+    public List<Incident> findByStatusAndUpdatedSince12Hours(TicketType type) {
         TypedQuery<Incident> query = em.createNamedQuery(Incident.FIND_BY_STATUS_AND_UPDATED_SINCE, Incident.class);
-        query.setParameter("status", StatusEnum.RESOLVED);
+        query.setParameter("type", type);
+        query.setParameter("status", ServiceConstants.RESOLVED_STATUS_LIST);
         query.setParameter("updatedSince", Instant.now().minus(12, ChronoUnit.HOURS));
         return query.getResultList();
     }

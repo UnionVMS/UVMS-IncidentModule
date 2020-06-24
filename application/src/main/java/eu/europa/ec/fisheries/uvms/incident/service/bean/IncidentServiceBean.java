@@ -7,13 +7,13 @@ import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.StatusDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.EventTypeEnum;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.TicketType;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentDao;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentLogDao;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.interfaces.IncidentCreate;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.interfaces.IncidentUpdate;
 import eu.europa.ec.fisheries.uvms.incident.service.helper.IncidentHelper;
-import eu.europa.ec.fisheries.uvms.incident.service.message.IncidentConsumer;
 import eu.europa.ec.fisheries.uvms.movement.client.MovementRestClient;
 import eu.europa.ec.fisheries.uvms.movement.client.model.MicroMovement;
 import org.slf4j.Logger;
@@ -56,11 +56,11 @@ public class IncidentServiceBean {
 
     public AssetNotSendingDto getAssetNotSendingList() {
         AssetNotSendingDto dto = new AssetNotSendingDto();
-        List<Incident> unresolvedIncidents = incidentDao.findUnresolvedIncidents();
-        dto.setUnresolved(incidentHelper.incidentToDtoList(unresolvedIncidents));
+        List<Incident> unresolvedIncidents = incidentDao.findUnresolvedIncidents(TicketType.ASSET_NOT_SENDING);
+        dto.setUnresolved(incidentHelper.incidentToDtoMap(unresolvedIncidents));
 
-        List<Incident> resolvedSinceLast12Hours = incidentDao.findByStatusAndUpdatedSince();
-        dto.setRecentlyResolved(incidentHelper.incidentToDtoList(resolvedSinceLast12Hours));
+        List<Incident> resolvedSinceLast12Hours = incidentDao.findByStatusAndUpdatedSince12Hours(TicketType.ASSET_NOT_SENDING);
+        dto.setRecentlyResolved(incidentHelper.incidentToDtoMap(resolvedSinceLast12Hours));
         return dto;
     }
 

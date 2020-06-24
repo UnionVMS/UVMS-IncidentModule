@@ -1,7 +1,7 @@
 package eu.europa.ec.fisheries.uvms.incident.service.domain.entities;
 
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
-
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.TicketType;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
@@ -11,8 +11,8 @@ import java.util.UUID;
 @Entity
 @Table(name = "incident")
 @NamedQueries({
-        @NamedQuery(name = Incident.FIND_ALL_EXCLUDE_STATUS, query = "SELECT i FROM Incident i WHERE i.status <> :status"),
-        @NamedQuery(name = Incident.FIND_BY_STATUS_AND_UPDATED_SINCE, query = "SELECT i FROM Incident i WHERE i.status = :status AND i.updateDate > :updatedSince"),
+        @NamedQuery(name = Incident.FIND_ALL_EXCLUDE_STATUS, query = "SELECT i FROM Incident i WHERE i.type = :type AND i.status NOT IN :status"),
+        @NamedQuery(name = Incident.FIND_BY_STATUS_AND_UPDATED_SINCE, query = "SELECT i FROM Incident i WHERE i.type = :type AND i.status IN :status AND i.updateDate > :updatedSince"),
         @NamedQuery(name = Incident.FIND_BY_TICKET_ID, query = "SELECT i FROM Incident i WHERE i.ticketId = :ticketId"),
         @NamedQuery(name = Incident.FIND_BY_ASSET_ID, query = "SELECT i FROM Incident i WHERE i.assetId = :assetId"),
 })
@@ -38,6 +38,11 @@ public class Incident {
     @NotNull
     @Column(name = "ticket_id")
     private UUID ticketId;
+
+    @NotNull
+    @Column(name = "type")
+    @Enumerated(value = EnumType.STRING)
+    private TicketType type;
 
     @NotNull
     @Column(name = "asset_name")
@@ -114,6 +119,14 @@ public class Incident {
 
     public void setTicketId(UUID ticketId) {
         this.ticketId = ticketId;
+    }
+
+    public TicketType getType() {
+        return type;
+    }
+
+    public void setType(TicketType type) {
+        this.type = type;
     }
 
     public StatusEnum getStatus() {

@@ -3,6 +3,7 @@ package eu.europa.ec.fisheries.uvms.incident.model.dto;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.TicketType;
 
 public class IncidentDto implements Serializable {
     private final static long serialVersionUID = 1L;
@@ -11,6 +12,7 @@ public class IncidentDto implements Serializable {
     private UUID assetId;
     private UUID mobileTerminalId;
     private UUID ticketId;
+    private TicketType type;
     private String assetName;
     private String assetIrcs;
     private String status;
@@ -48,6 +50,14 @@ public class IncidentDto implements Serializable {
 
     public void setTicketId(UUID ticketId) {
         this.ticketId = ticketId;
+    }
+
+    public TicketType getType() {
+        return type;
+    }
+
+    public void setType(TicketType type) {
+        this.type = type;
     }
 
     public String getAssetName() {
