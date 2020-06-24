@@ -71,7 +71,7 @@ public class IncidentHelper {
         dto.setAssetId(entity.getAssetId());
         dto.setMobileTerminalId(entity.getMobileTerminalId());
         dto.setTicketId(entity.getTicketId());
-        dto.setType(entity.getType().toString());
+        dto.setType(entity.getType());
         dto.setAssetName(entity.getAssetName());
         dto.setAssetIrcs(entity.getIrcs());
         dto.setStatus(entity.getStatus().name());
