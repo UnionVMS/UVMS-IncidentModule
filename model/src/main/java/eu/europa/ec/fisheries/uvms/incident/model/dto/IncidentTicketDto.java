@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public class IncidentTicketDto implements Serializable {
 
-    private TicketType type;
+    private IncidentType type;
     private UUID id;
     private String assetId;
     private String mobTermId;
@@ -26,11 +26,11 @@ public class IncidentTicketDto implements Serializable {
     private Instant updated;
     private String updatedBy;
 
-    public TicketType getType() {
+    public IncidentType getType() {
         return type;
     }
 
-    public void setType(TicketType type) {
+    public void setType(IncidentType type) {
         this.type = type;
     }
 

@@ -27,7 +27,7 @@ public class IncidentHelper {
     @EJB
     private MovementRestClient movementClient;
 
-    public Incident constructIncident(IncidentTicketDto ticket, MicroMovement movement) {
+    public Incident constructIncident(IncidentTicketDto ticket) {
         Incident incident = new Incident();
         if (ticket.getMobTermId() != null) {
             incident.setMobileTerminalId(UUID.fromString(ticket.getMobTermId()));
@@ -36,9 +36,7 @@ public class IncidentHelper {
         incident.setStatus(StatusEnum.INCIDENT_CREATED);
         incident.setTicketId(ticket.getId());
         incident.setType(ticket.getType());
-        if (movement != null) {
-            incident.setMovementId(UUID.fromString(movement.getId()));
-        }
+        incident.setMovementId(ticket.getMovementId() != null ? UUID.fromString(ticket.getMovementId()) : null);
         setAssetValues(incident, ticket.getAssetId());
         return incident;
     }
