@@ -87,7 +87,7 @@ public class IncidentServiceBean {
                     incidentLogServiceBean.createIncidentLogForStatus(incident, "Asset not sending, sending autopoll",
                             EventTypeEnum.AUTO_POLL_CREATED, (ticket.getPollId() == null ? null : UUID.fromString(ticket.getPollId())));
                 }
-            }else {
+            } else {
                 incidentLogServiceBean.createIncidentLogForStatus(incident, "Creating incident from rule " + ticket.getRuleGuid(),
                         EventTypeEnum.INCIDENT_STATUS, null);
             }

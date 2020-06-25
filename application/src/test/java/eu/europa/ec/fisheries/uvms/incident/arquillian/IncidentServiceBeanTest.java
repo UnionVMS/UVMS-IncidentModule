@@ -153,7 +153,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
 
         assertNotNull(openByAssetAndType);
 
-        UUID updatedMovement = UUID.randomUUID();
+        UUID updatedMovement = new UUID(0l, movementId.getMostSignificantBits());
         ticket.setMovementId(updatedMovement.toString());
         ticket.setUpdated(Instant.now());
 
