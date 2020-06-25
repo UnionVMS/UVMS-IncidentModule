@@ -14,9 +14,7 @@ import eu.europa.ec.fisheries.uvms.movement.client.model.MicroMovement;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Stateless
 public class IncidentHelper {
@@ -27,7 +25,7 @@ public class IncidentHelper {
     @EJB
     private MovementRestClient movementClient;
 
-    public Incident constructIncident(IncidentTicketDto ticket, MicroMovement movement) {
+    public Incident constructIncident(IncidentTicketDto ticket) {
         Incident incident = new Incident();
         if (ticket.getMobTermId() != null) {
             incident.setMobileTerminalId(UUID.fromString(ticket.getMobTermId()));
@@ -36,9 +34,7 @@ public class IncidentHelper {
         incident.setStatus(StatusEnum.INCIDENT_CREATED);
         incident.setTicketId(ticket.getId());
         incident.setType(ticket.getType());
-        if (movement != null) {
-            incident.setMovementId(UUID.fromString(movement.getId()));
-        }
+        incident.setMovementId(ticket.getMovementId() != null ? UUID.fromString(ticket.getMovementId()) : null);
         setAssetValues(incident, ticket.getAssetId());
         return incident;
     }
@@ -56,11 +52,11 @@ public class IncidentHelper {
         return mapEntityToDto(incident);
     }
 
-    public List<IncidentDto> incidentToDtoList(List<Incident> incidentList) {
-        List<IncidentDto> retVal = new ArrayList<>();
+    public Map<Long, IncidentDto> incidentToDtoMap(List<Incident> incidentList) {
+        Map<Long, IncidentDto> retVal = new TreeMap<>();
         for (Incident i : incidentList) {
             IncidentDto dto = mapEntityToDto(i);
-            retVal.add(dto);
+            retVal.put(dto.getId(), dto);
         }
         return retVal;
     }
@@ -103,8 +99,8 @@ public class IncidentHelper {
         return dto;
     }
 
-    public List<IncidentLogDto> incidentLogToDtoList(List<IncidentLog> incidentLogList) {
-        List<IncidentLogDto> retVal = new ArrayList<>();
+    public Map<Long, IncidentLogDto> incidentLogToDtoList(List<IncidentLog> incidentLogList) {
+        Map<Long, IncidentLogDto> retVal = new TreeMap<>();
         for (IncidentLog entity : incidentLogList) {
             IncidentLogDto dto = new IncidentLogDto();
             dto.setId(entity.getId());
@@ -115,7 +111,7 @@ public class IncidentHelper {
             dto.setRelatedObjectId(entity.getRelatedObjectId());
             dto.setRelatedObjectType(entity.getRelatedObjectType());
             dto.setIncidentStatus(entity.getIncidentStatus());
-            retVal.add(dto);
+            retVal.put(dto.getId(), dto);
         }
         return retVal;
     }
