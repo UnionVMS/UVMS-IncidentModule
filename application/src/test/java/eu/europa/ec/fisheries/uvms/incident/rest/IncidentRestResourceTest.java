@@ -101,17 +101,4 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
         assertNotNull(responseLogs);
     }
 
-    @Test
-    @OperateOnDeployment("incident")
-    public void getIncidentsForAssetTest() {
-        Response response = getWebTarget()
-                .path("incident/incidentsForAssetId")
-                .path(UUID.randomUUID().toString())
-                .request(MediaType.APPLICATION_JSON)
-                .get(Response.class);
-        assertEquals(200, response.getStatus());
-
-        Map<Long, IncidentDto> responseLogs = response.readEntity(new GenericType<Map<Long, IncidentDto>>() {});
-        assertNotNull(responseLogs);
-    }
 }

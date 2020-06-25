@@ -65,22 +65,67 @@ public class IncidentHelper {
         return retVal;
     }
     
-    public Map<Long,IncidentDto> incidentToDtoList(List<Incident> incidentList) {
-        
-        List<UUID> listOfMoveIds = incidentList.stream()
-                    .map(i -> i.getMovementId())
-                    .collect(Collectors.toList());
-        
-        List<MicroMovement> microList = movementClient.getMicroMovementByIdList(listOfMoveIds);
-        
-        Map<String, MicroMovement> microMap =
-                microList.stream().collect(Collectors.toMap(MicroMovement::getId,
-                        m -> m));
-        
-        return incidentList.stream()
-                .collect(Collectors.toMap(Incident::getId, 
-                        i -> mapEntityToDto(i, microMap.get(i.getMovementId().toString()))));
-    }
+//  public Map<Long,IncidentDto> incidentToDtoMap(List<Incident> incidentList) {
+//      
+//      List<UUID> listOfMoveIds = new ArrayList<>();
+//      for (Incident i : incidentList) {
+//          listOfMoveIds.add(i.getMovementId());
+//      }
+//      
+//      List<MicroMovement> microList = movementClient.getMicroMovementByIdList(listOfMoveIds);
+//      
+//   //   MicroMovement micro = movementClient.getMicroMovementById(entity.getMovementId());
+////      Map<String, MicroMovement> microMap = new HashMap<String, MicroMovement>();
+////      for (MicroMovement m : microList) {
+////          microMap.put(m.getId(), m);
+////      }
+//      
+//      Map<Long, IncidentDto> retVal = new HashMap<Long, IncidentDto>();//TreeMap<>();
+//      for (Incident i : incidentList) {
+//          MicroMovement m = null;
+//          for (MicroMovement micro : microList) {
+//              if(i.getMovementId().toString().equals(micro.getId())) {
+//                  m = micro;
+//              }
+//          }
+//          IncidentDto dto = mapEntityToDto(i, m);
+//          retVal.put(dto.getId(), dto);
+//      }
+//      return retVal;
+//      
+//  }   
+      
+//  List<UUID> listOfMoveIds = incidentList.stream()
+//              .map(i -> i.getMovementId())
+//              .collect(Collectors.toList());
+//  System.out.println("listOfMoveIds: " +listOfMoveIds.toString());
+//  List<MicroMovement> microList = movementClient.getMicroMovementByIdList(listOfMoveIds);
+//  System.out.println("microList: " +microList.toString());
+//  Map<String, MicroMovement> microMap =
+//          microList.stream().collect(Collectors.toMap(MicroMovement::getId,
+//                  m -> m));
+//  System.out.println("microMap: " +microMap.toString());
+//  return incidentList.stream()
+//          .collect(Collectors.toMap(Incident::getId, 
+//                  i -> mapEntityToDto(i, microMap.get(i.getMovementId().toString()))));
+
+    
+//    public Map<Long,IncidentDto> incidentToDtoMap(List<Incident> incidentList) {
+//        
+//        List<UUID> listOfMoveIds = incidentList.stream()
+//                    .map(i -> i.getMovementId())
+//                    .collect(Collectors.toList());
+//        System.out.println("listOfMoveIds: " +listOfMoveIds.toString());
+//        List<MicroMovement> microList = movementClient.getMicroMovementByIdList(listOfMoveIds);
+//        System.out.println("microList: " +microList.toString());
+//        Map<String, MicroMovement> microMap =
+//                microList.stream().collect(Collectors.toMap(MicroMovement::getId,
+//                        m -> m));
+//        System.out.println("microMap: " +microMap.toString());
+//        return incidentList.stream()
+//                .collect(Collectors.toMap(Incident::getId, 
+//                        i -> mapEntityToDto(i, microMap.get(i.getMovementId().toString()))));
+//    }
     
     private IncidentDto mapEntityToDto(Incident entity, MicroMovement micro) {
         IncidentDto dto = new IncidentDto();
@@ -155,7 +200,7 @@ public class IncidentHelper {
         return dto;
     }
 
-    public Map<Long, IncidentLogDto> incidentLogToDtoList(List<IncidentLog> incidentLogList) {
+    public Map<Long, IncidentLogDto> incidentLogToDtoMap(List<IncidentLog> incidentLogList) {
         Map<Long, IncidentLogDto> retVal = new TreeMap<>();
         for (IncidentLog entity : incidentLogList) {
             IncidentLogDto dto = new IncidentLogDto();
