@@ -1,7 +1,7 @@
 package eu.europa.ec.fisheries.uvms.incident.service.domain.entities;
 
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
-import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.TicketType;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
@@ -15,6 +15,7 @@ import java.util.UUID;
         @NamedQuery(name = Incident.FIND_BY_STATUS_AND_UPDATED_SINCE, query = "SELECT i FROM Incident i WHERE i.type = :type AND i.status IN :status AND i.updateDate > :updatedSince"),
         @NamedQuery(name = Incident.FIND_BY_TICKET_ID, query = "SELECT i FROM Incident i WHERE i.ticketId = :ticketId"),
         @NamedQuery(name = Incident.FIND_BY_ASSET_ID, query = "SELECT i FROM Incident i WHERE i.assetId = :assetId"),
+        @NamedQuery(name = Incident.FIND_BY_ASSET_TYPE_AND_EXCLUDE_STATUS, query = "SELECT i FROM Incident i WHERE i.assetId = :assetId AND i.type = :type AND i.status NOT IN :status"),
 })
 public class Incident {
 
@@ -22,6 +23,12 @@ public class Incident {
     public static final String FIND_BY_TICKET_ID = "Incident.findByTicketId";
     public static final String FIND_BY_STATUS_AND_UPDATED_SINCE = "Incident.findByClosedLast12Hours";
     public static final String FIND_BY_ASSET_ID = "Incident.findByAssetId";
+    public static final String FIND_BY_ASSET_TYPE_AND_EXCLUDE_STATUS = "Incident.findByAssetTypeAndExcludeStatus";
+
+    /* Daniel Wirdehäll 2020-06-25
+    Ja, jag föredrar löpnummer.
+    Ser ingen anledning för UUID i dessa läget.
+     */
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -35,20 +42,18 @@ public class Incident {
     @Column(name = "mobterm_id")
     private UUID mobileTerminalId;
 
-    @NotNull
     @Column(name = "ticket_id")
     private UUID ticketId;
 
     @NotNull
     @Column(name = "type")
     @Enumerated(value = EnumType.STRING)
-    private TicketType type;
+    private IncidentType type;
 
     @NotNull
     @Column(name = "asset_name")
     private String assetName;
 
-    @NotNull
     @Column(name = "ircs")
     private String ircs;
 
@@ -121,11 +126,11 @@ public class Incident {
         this.ticketId = ticketId;
     }
 
-    public TicketType getType() {
+    public IncidentType getType() {
         return type;
     }
 
-    public void setType(TicketType type) {
+    public void setType(IncidentType type) {
         this.type = type;
     }
 

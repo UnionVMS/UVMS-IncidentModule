@@ -60,4 +60,25 @@ public class IncidentConsumerTest extends BuildIncidentTestDeployment {
             assertEquals(assetId, incident.getAssetId());
         }
     }
+
+    @Test
+    @OperateOnDeployment("incident")
+    public void consumeIncidentQueueWoTicket() throws Exception {
+        UUID assetId = UUID.randomUUID();
+        UUID movId = UUID.randomUUID();
+        UUID mobTermId = UUID.randomUUID();
+        IncidentTicketDto ticket = TicketHelper.createTicket(null, assetId, movId, mobTermId);
+
+        try (TopicListener listener = new TopicListener(jmsHelper.EVENT_STREAM, "")) {
+            String asString = jsonb.toJson(ticket);
+            jmsHelper.sendMessageToIncidentQueue(asString);
+
+            Message message = listener.listenOnEventBus();
+            TextMessage textMessage = (TextMessage) message;
+
+            String text = textMessage.getText();
+            IncidentDto incident = jsonb.fromJson(text, IncidentDto.class);
+            assertEquals(assetId, incident.getAssetId());
+        }
+    }
 }

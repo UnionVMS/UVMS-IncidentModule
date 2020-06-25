@@ -2,7 +2,7 @@ package eu.europa.ec.fisheries.uvms.incident.helper;
 
 import eu.europa.ec.fisheries.schema.movementrules.ticket.v1.TicketStatusType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
-import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.TicketType;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -11,7 +11,7 @@ public class TicketHelper {
     public static IncidentTicketDto createTicket(UUID ticketId, UUID assetId, UUID movId, UUID mobTermId) {
         IncidentTicketDto ticket = new IncidentTicketDto();
         ticket.setId(ticketId);
-        ticket.setType(TicketType.ASSET_NOT_SENDING);
+        ticket.setType(IncidentType.ASSET_NOT_SENDING);
         ticket.setAssetId(assetId.toString());
         ticket.setMovementId(movId.toString());
         ticket.setMobTermId(mobTermId.toString());

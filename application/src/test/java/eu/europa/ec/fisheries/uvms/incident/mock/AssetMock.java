@@ -1,6 +1,5 @@
 package eu.europa.ec.fisheries.uvms.incident.mock;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import eu.europa.ec.fisheries.uvms.asset.client.model.AssetDTO;
 
 import javax.ejb.Stateless;
@@ -17,7 +16,7 @@ public class AssetMock {
     @Path("asset/guid/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getMicroMovement(@PathParam("id") UUID id) throws JsonProcessingException {
+    public Response getMicroMovement(@PathParam("id") UUID id) {
         AssetDTO asset = new AssetDTO();
         asset.setId(id);
         asset.setName("Asset");

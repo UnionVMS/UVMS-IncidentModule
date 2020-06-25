@@ -37,7 +37,8 @@ public class MovementMock {
         point.setLongitude(123d);
         point.setAltitude(0d);
         movement.setLocation(point);
-        movement.setSource(MovementSourceType.MANUAL);
+
+        movement.setSource(id.getMostSignificantBits() == 0l ? MovementSourceType.NAF : MovementSourceType.MANUAL);
         movement.setTimestamp(Instant.now());
         movement.setSpeed(122d);
         movement.setHeading(123d);
