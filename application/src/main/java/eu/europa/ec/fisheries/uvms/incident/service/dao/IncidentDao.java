@@ -2,16 +2,12 @@ package eu.europa.ec.fisheries.uvms.incident.service.dao;
 
 import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
-import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
-import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.TicketType;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
+import javax.persistence.*;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -39,14 +35,14 @@ public class IncidentDao {
         return incident;
     }
 
-    public List<Incident> findUnresolvedIncidents(TicketType type) {
+    public List<Incident> findUnresolvedIncidents(IncidentType type) {
         TypedQuery<Incident> query = em.createNamedQuery(Incident.FIND_ALL_EXCLUDE_STATUS, Incident.class);
         query.setParameter("type", type);
         query.setParameter("status", ServiceConstants.RESOLVED_STATUS_LIST);
         return query.getResultList();
     }
 
-    public List<Incident> findByStatusAndUpdatedSince12Hours(TicketType type) {
+    public List<Incident> findByStatusAndUpdatedSince12Hours(IncidentType type) {
         TypedQuery<Incident> query = em.createNamedQuery(Incident.FIND_BY_STATUS_AND_UPDATED_SINCE, Incident.class);
         query.setParameter("type", type);
         query.setParameter("status", ServiceConstants.RESOLVED_STATUS_LIST);
@@ -67,6 +63,20 @@ public class IncidentDao {
             return query.getSingleResult();
         } catch (Exception e) {
             LOG.warn("No Ticket found to be updated. Ticket ID: {}", ticketId);
+            return null;
+        }
+    }
+
+    public Incident findOpenByAssetAndType(UUID assetId, IncidentType type){
+        try {
+
+            TypedQuery<Incident> query = em.createNamedQuery(Incident.FIND_BY_ASSET_TYPE_AND_EXCLUDE_STATUS, Incident.class);
+            query.setParameter("type", type);
+            query.setParameter("status", ServiceConstants.RESOLVED_STATUS_LIST);
+            query.setParameter("assetId", assetId);
+            return query.getSingleResult();
+        }catch (NoResultException e) {
+            LOG.debug("No incident found for asset {} and type {}", assetId, type);
             return null;
         }
     }
