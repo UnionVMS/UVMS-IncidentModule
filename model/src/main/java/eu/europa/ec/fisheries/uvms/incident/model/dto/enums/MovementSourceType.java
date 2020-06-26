@@ -6,7 +6,8 @@ public enum MovementSourceType {
     IRIDIUM,
     MANUAL,
     OTHER,
-    NAF;
+    NAF,
+    FLUX;
 
     MovementSourceType() {
     }

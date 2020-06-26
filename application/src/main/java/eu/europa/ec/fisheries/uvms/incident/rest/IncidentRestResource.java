@@ -129,7 +129,7 @@ public class IncidentRestResource {
     public Response getIncidentLogForIncident(@PathParam("incidentId") long incidentId) {
         try {
             List<IncidentLog> incidentLogs = incidentLogServiceBean.getIncidentLogByIncidentId(incidentId);
-            Map<Long, IncidentLogDto> dtoList = incidentHelper.incidentLogToDtoList(incidentLogs);
+            Map<Long, IncidentLogDto> dtoList = incidentHelper.incidentLogToDtoMap(incidentLogs);
             String response = jsonb.toJson(dtoList);
             return Response.ok(response).build();
         } catch (Exception e) {
@@ -164,7 +164,7 @@ public class IncidentRestResource {
             if(!incidentIdList.isEmpty()) {
                 incidentLogs = incidentLogDao.findAllByIncidentId(incidentIdList);
             }
-            Map<Long, IncidentLogDto> dtoList = incidentHelper.incidentLogToDtoList(incidentLogs);
+            Map<Long, IncidentLogDto> dtoList = incidentHelper.incidentLogToDtoMap(incidentLogs);
             String response = jsonb.toJson(dtoList);
             return Response.ok(response).build();
         } catch (Exception e) {

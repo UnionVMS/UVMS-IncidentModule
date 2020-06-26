@@ -5,16 +5,19 @@ import eu.europa.ec.fisheries.uvms.asset.client.model.AssetDTO;
 import eu.europa.ec.fisheries.uvms.asset.client.model.AssetIdentifier;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.*;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.MovementSourceType;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.IncidentLog;
-import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 import eu.europa.ec.fisheries.uvms.movement.client.MovementRestClient;
 import eu.europa.ec.fisheries.uvms.movement.client.model.MicroMovement;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import java.time.Instant;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Stateless
 public class IncidentHelper {
@@ -53,7 +56,7 @@ public class IncidentHelper {
     }
 
     public Map<Long, IncidentDto> incidentToDtoMap(List<Incident> incidentList) {
-        Map<Long, IncidentDto> retVal = new TreeMap<>();
+        Map<Long, IncidentDto> retVal = new HashMap<>(incidentList.size());
         for (Incident i : incidentList) {
             IncidentDto dto = mapEntityToDto(i);
             retVal.put(dto.getId(), dto);
@@ -99,8 +102,8 @@ public class IncidentHelper {
         return dto;
     }
 
-    public Map<Long, IncidentLogDto> incidentLogToDtoList(List<IncidentLog> incidentLogList) {
-        Map<Long, IncidentLogDto> retVal = new TreeMap<>();
+    public Map<Long, IncidentLogDto> incidentLogToDtoMap(List<IncidentLog> incidentLogList) {
+        Map<Long, IncidentLogDto> retVal = new HashMap<>(incidentLogList.size());
         for (IncidentLog entity : incidentLogList) {
             IncidentLogDto dto = new IncidentLogDto();
             dto.setId(entity.getId());
