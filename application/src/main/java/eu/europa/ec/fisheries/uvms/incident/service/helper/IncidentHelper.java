@@ -16,6 +16,7 @@ import javax.ejb.Stateless;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Stateless
@@ -51,57 +52,24 @@ public class IncidentHelper {
     }
 
     public IncidentDto incidentEntityToDto(Incident incident) {
-        return mapEntityToDto(incident);
+        MicroMovement movement = null;
+        if(incident.getMovementId() != null) {
+            movement = movementClient.getMicroMovementById(incident.getMovementId());
+        }
+        return mapEntityToDto(incident, movement);
     }
 
-    // Old incidentToDtoMap 
-//    public Map<Long, IncidentDto> incidentToDtoMap(List<Incident> incidentList) {
-//        Map<Long, IncidentDto> retVal = new HashMap<>(incidentList.size());
-//        for (Incident i : incidentList) {
-//            IncidentDto dto = mapEntityToDto(i);
-//            retVal.put(dto.getId(), dto);
-//        }
-//        return retVal;
-//    }
-    
-  public Map<Long,IncidentDto> incidentToDtoMap(List<Incident> incidentList) {
-      
-      List<UUID> listOfMoveIds = new ArrayList<>();
-      for (Incident i : incidentList) {
-          listOfMoveIds.add(i.getMovementId());
-      }
-      
-      List<MicroMovement> microList = movementClient.getMicroMovementByIdList(listOfMoveIds);
-      
-      Map<Long, IncidentDto> retVal = new HashMap<>();//TreeMap<>();
-      for (Incident i : incidentList) {
-          MicroMovement m = null;
-          for (MicroMovement micro : microList) {
-              if(i.getMovementId().toString().equals(micro.getId())) {
-                  m = micro;
-              }
-          }
-          IncidentDto dto = mapEntityToDto(i, m);
-          retVal.put(dto.getId(), dto);
-      }
-      return retVal;
-  }   
-
-// not tested with streams instead of loops
-  
-//    public Map<Long,IncidentDto> incidentToDtoMap(List<Incident> incidentList) {
-//        
-//        List<UUID> listOfMoveIds = incidentList.stream()
-//                    .map(i -> i.getMovementId())
-//                    .collect(Collectors.toList());
-//        List<MicroMovement> microList = movementClient.getMicroMovementByIdList(listOfMoveIds);
-//        Map<String, MicroMovement> microMap =
-//                microList.stream().collect(Collectors.toMap(MicroMovement::getId,
-//                        m -> m));
-//        return incidentList.stream()
-//                .collect(Collectors.toMap(Incident::getId, 
-//                        i -> mapEntityToDto(i, microMap.get(i.getMovementId().toString()))));
-//    }
+    public Map<Long,IncidentDto> incidentToDtoMap(List<Incident> incidentList) {
+        List<UUID> movementIds = incidentList.stream()
+                    .map(Incident::getMovementId)
+                    .collect(Collectors.toList());
+        Map<String, MicroMovement> movementMap = movementClient.getMicroMovementByIdList(movementIds)
+                    .stream()
+                    .collect(Collectors.toMap(MicroMovement::getId, Function.identity()));
+        return incidentList
+                    .stream()
+                    .collect(Collectors.toMap(Incident::getId, i -> mapEntityToDto(i, movementMap.get(i.getMovementId().toString()))));
+    }
     
     private IncidentDto mapEntityToDto(Incident entity, MicroMovement micro) {
         IncidentDto dto = new IncidentDto();
@@ -133,45 +101,6 @@ public class IncidentHelper {
             lastKnownLocation.setSource(MovementSourceType.fromValue(micro.getSource().name()));
 
             dto.setLastKnownLocation(lastKnownLocation);
-        }
-        return dto;
-    }
-
-
-    private IncidentDto mapEntityToDto(Incident entity) {
-        IncidentDto dto = new IncidentDto();
-        dto.setId(entity.getId());
-        dto.setAssetId(entity.getAssetId());
-        dto.setMobileTerminalId(entity.getMobileTerminalId());
-        dto.setTicketId(entity.getTicketId());
-        dto.setType(entity.getType());
-        dto.setAssetName(entity.getAssetName());
-        dto.setAssetIrcs(entity.getIrcs());
-        dto.setStatus(entity.getStatus().name());
-        dto.setCreateDate(entity.getCreateDate());
-        if (entity.getUpdateDate() != null)
-            dto.setUpdateDate(entity.getUpdateDate());
-
-        if(entity.getMovementId() != null) {
-            MicroMovement micro = movementClient.getMicroMovementById(entity.getMovementId());
-            if(micro != null) {
-                MicroMovementDto lastKnownLocation = new MicroMovementDto();
-
-                MovementPointDto location = new MovementPointDto();
-                location.setLatitude(micro.getLocation().getLatitude());
-                location.setLongitude(micro.getLocation().getLongitude());
-                if (micro.getLocation().getAltitude() != null)
-                    location.setAltitude(micro.getLocation().getAltitude());
-
-                lastKnownLocation.setLocation(location);
-                lastKnownLocation.setHeading(micro.getHeading());
-                lastKnownLocation.setId(micro.getId());
-                lastKnownLocation.setTimestamp(micro.getTimestamp());
-                lastKnownLocation.setSpeed(micro.getSpeed());
-                lastKnownLocation.setSource(MovementSourceType.fromValue(micro.getSource().name()));
-
-                dto.setLastKnownLocation(lastKnownLocation);
-            }
         }
         return dto;
     }
