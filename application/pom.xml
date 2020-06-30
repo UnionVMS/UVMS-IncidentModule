@@ -37,7 +37,7 @@
         <dependency>
             <groupId>eu.europa.ec.fisheries.uvms.movement</groupId>
             <artifactId>movement-client</artifactId>
-            <version>${movement.version}</version> 
+            <version>${movement.version}</version>
             <exclusions>
                 <exclusion>
                         <groupId>eu.europa.ec.fisheries.uvms</groupId>
