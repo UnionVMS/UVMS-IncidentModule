@@ -13,11 +13,11 @@ import eu.europa.ec.fisheries.uvms.movement.client.model.MicroMovement;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Stateless
 public class IncidentHelper {
@@ -52,19 +52,26 @@ public class IncidentHelper {
     }
 
     public IncidentDto incidentEntityToDto(Incident incident) {
-        return mapEntityToDto(incident);
-    }
-
-    public Map<Long, IncidentDto> incidentToDtoMap(List<Incident> incidentList) {
-        Map<Long, IncidentDto> retVal = new HashMap<>(incidentList.size());
-        for (Incident i : incidentList) {
-            IncidentDto dto = mapEntityToDto(i);
-            retVal.put(dto.getId(), dto);
+        MicroMovement movement = null;
+        if(incident.getMovementId() != null) {
+            movement = movementClient.getMicroMovementById(incident.getMovementId());
         }
-        return retVal;
+        return mapEntityToDto(incident, movement);
     }
 
-    private IncidentDto mapEntityToDto(Incident entity) {
+    public Map<Long,IncidentDto> incidentToDtoMap(List<Incident> incidentList) {
+        List<UUID> movementIds = incidentList.stream()
+                    .map(Incident::getMovementId)
+                    .collect(Collectors.toList());
+        Map<String, MicroMovement> movementMap = movementClient.getMicroMovementByIdList(movementIds)
+                    .stream()
+                    .collect(Collectors.toMap(MicroMovement::getId, Function.identity()));
+        return incidentList
+                    .stream()
+                    .collect(Collectors.toMap(Incident::getId, i -> mapEntityToDto(i, movementMap.get(i.getMovementId().toString()))));
+    }
+    
+    private IncidentDto mapEntityToDto(Incident entity, MicroMovement micro) {
         IncidentDto dto = new IncidentDto();
         dto.setId(entity.getId());
         dto.setAssetId(entity.getAssetId());
@@ -75,29 +82,26 @@ public class IncidentHelper {
         dto.setAssetIrcs(entity.getIrcs());
         dto.setStatus(entity.getStatus().name());
         dto.setCreateDate(entity.getCreateDate());
-        if (entity.getUpdateDate() != null)
+        if (entity.getUpdateDate() != null) {
             dto.setUpdateDate(entity.getUpdateDate());
+        }
+        if(entity.getMovementId() != null && micro != null) {
+            MicroMovementDto lastKnownLocation = new MicroMovementDto();
 
-        if(entity.getMovementId() != null) {
-            MicroMovement micro = movementClient.getMicroMovementById(entity.getMovementId());
-            if(micro != null) {
-                MicroMovementDto lastKnownLocation = new MicroMovementDto();
-
-                MovementPointDto location = new MovementPointDto();
-                location.setLatitude(micro.getLocation().getLatitude());
-                location.setLongitude(micro.getLocation().getLongitude());
-                if (micro.getLocation().getAltitude() != null)
-                    location.setAltitude(micro.getLocation().getAltitude());
-
-                lastKnownLocation.setLocation(location);
-                lastKnownLocation.setHeading(micro.getHeading());
-                lastKnownLocation.setId(micro.getId());
-                lastKnownLocation.setTimestamp(micro.getTimestamp());
-                lastKnownLocation.setSpeed(micro.getSpeed());
-                lastKnownLocation.setSource(MovementSourceType.fromValue(micro.getSource().name()));
-
-                dto.setLastKnownLocation(lastKnownLocation);
+            MovementPointDto location = new MovementPointDto();
+            location.setLatitude(micro.getLocation().getLatitude());
+            location.setLongitude(micro.getLocation().getLongitude());
+            if (micro.getLocation().getAltitude() != null) {
+                location.setAltitude(micro.getLocation().getAltitude());
             }
+            lastKnownLocation.setLocation(location);
+            lastKnownLocation.setHeading(micro.getHeading());
+            lastKnownLocation.setId(micro.getId());
+            lastKnownLocation.setTimestamp(micro.getTimestamp());
+            lastKnownLocation.setSpeed(micro.getSpeed());
+            lastKnownLocation.setSource(MovementSourceType.fromValue(micro.getSource().name()));
+
+            dto.setLastKnownLocation(lastKnownLocation);
         }
         return dto;
     }

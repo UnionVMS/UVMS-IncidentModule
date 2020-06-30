@@ -4,7 +4,8 @@ import eu.europa.ec.fisheries.schema.movement.v1.MovementPoint;
 import eu.europa.ec.fisheries.schema.movement.v1.MovementSourceType;
 import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
 import eu.europa.ec.fisheries.uvms.movement.client.model.MicroMovement;
-
+import eu.europa.ec.fisheries.uvms.rest.security.RequiresFeature;
+import eu.europa.ec.fisheries.uvms.rest.security.UnionVMSFeature;
 import javax.annotation.PostConstruct;
 import javax.ejb.Stateless;
 import javax.json.bind.Jsonb;
@@ -12,6 +13,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Path("movement/rest/internal")
@@ -43,6 +46,31 @@ public class MovementMock {
         movement.setSpeed(122d);
         movement.setHeading(123d);
         String response = jsonb.toJson(movement);
+        return Response.ok(response).build();
+    }
+
+    @POST
+    @Path("/getMicroMovementList")
+    @RequiresFeature(UnionVMSFeature.manageInternalRest)
+    public Response getMicroMovementByIdList(List<UUID> moveIds) {
+        List<MicroMovement> responseList = new ArrayList<>();
+        for (UUID uuid : moveIds) {
+            MicroMovement movement = new MicroMovement();
+            movement.setId(uuid.toString());
+            MovementPoint point = new MovementPoint();
+            point.setLatitude(123d);
+            point.setLongitude(123d);
+            point.setAltitude(0d);
+            movement.setLocation(point);
+
+            movement.setSource(uuid.getMostSignificantBits() == 0l ? MovementSourceType.NAF : MovementSourceType.MANUAL);
+            movement.setTimestamp(Instant.now());
+            movement.setSpeed(122d);
+            movement.setHeading(123d);
+
+            responseList.add(movement);
+        }
+        String response = jsonb.toJson(responseList);
         return Response.ok(response).build();
     }
 }
