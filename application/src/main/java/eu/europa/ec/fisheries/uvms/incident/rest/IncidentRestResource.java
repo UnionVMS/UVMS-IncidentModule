@@ -33,7 +33,9 @@ import javax.annotation.PostConstruct;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.json.bind.Jsonb;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
@@ -49,6 +51,9 @@ import java.util.stream.Collectors;
 public class IncidentRestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(IncidentRestResource.class);
+
+    @Context
+    private HttpServletRequest servletRequest;
 
     @Inject
     private IncidentServiceBean incidentServiceBean;
@@ -178,7 +183,8 @@ public class IncidentRestResource {
     @RequiresFeature(UnionVMSFeature.manageAlarmsOpenTickets)
     public Response updateIncident(@PathParam("incidentId") long incidentId, StatusDto status) {
         try {
-            Incident updated = incidentServiceBean.updateIncidentStatus(incidentId, status);
+            String user = servletRequest.getRemoteUser();
+            Incident updated = incidentServiceBean.updateIncidentStatus(incidentId, status, user);
             IncidentDto dto = incidentHelper.incidentEntityToDto(updated);
             String response = jsonb.toJson(dto);
             return Response.ok(response).build();
