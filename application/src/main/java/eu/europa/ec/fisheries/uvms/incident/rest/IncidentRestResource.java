@@ -13,12 +13,12 @@ package eu.europa.ec.fisheries.uvms.incident.rest;
 
 import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.AssetNotSendingDto;
-import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
-import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentLogServiceBean;
-import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentServiceBean;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentLogDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.StatusDto;
+import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
+import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentLogServiceBean;
+import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentServiceBean;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentDao;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentLogDao;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
