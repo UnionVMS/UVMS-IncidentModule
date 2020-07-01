@@ -9,6 +9,7 @@ public enum  StatusEnum {
     LONG_TERM_PARKED,
     TECHNICAL_ISSUE,
     RESOLVED,
+    SYSTEM_AUTO_RESOLVED,
     INCIDENT_AUTO_UPDATED,
     REOPEN;
 }

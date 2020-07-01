@@ -183,8 +183,7 @@ public class IncidentRestResource {
     @RequiresFeature(UnionVMSFeature.manageAlarmsOpenTickets)
     public Response updateIncident(@PathParam("incidentId") long incidentId, StatusDto status) {
         try {
-            String user = servletRequest.getRemoteUser();
-            Incident updated = incidentServiceBean.updateIncidentStatus(incidentId, status, user);
+            Incident updated = incidentServiceBean.updateIncidentStatus(incidentId, status);
             IncidentDto dto = incidentHelper.incidentEntityToDto(updated);
             String response = jsonb.toJson(dto);
             return Response.ok(response).build();

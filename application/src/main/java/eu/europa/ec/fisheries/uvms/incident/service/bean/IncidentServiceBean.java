@@ -113,7 +113,7 @@ public class IncidentServiceBean {
         if (persisted != null) {
 
             if (ticket.getStatus().equals(TicketStatusType.CLOSED.value())) {
-                persisted.setStatus(StatusEnum.RESOLVED);
+                persisted.setStatus(StatusEnum.SYSTEM_AUTO_RESOLVED);
                 Incident updated = incidentDao.update(persisted);
                 updatedIncident.fire(updated);
                 incidentLogServiceBean.createIncidentLogForStatus(updated, EventTypeEnum.INCIDENT_CLOSED.getMessage(),
@@ -139,13 +139,12 @@ public class IncidentServiceBean {
         }
     }
 
-    public Incident updateIncidentStatus(long incidentId, StatusDto statusDto, String user) {
+    public Incident updateIncidentStatus(long incidentId, StatusDto statusDto) {
         Incident persisted = incidentDao.findById(incidentId);
-        if(ServiceConstants.RESOLVED_STATUS_LIST.contains(persisted.getStatus())){
-            persisted.setStatus(StatusEnum.REOPEN);
-            incidentLogServiceBean.createIncidentLogForStatus(persisted, "Incident reopened by: " + user + ". Incident can not autoclose.",
-                    EventTypeEnum.INCIDENT_STATUS, null);
+        if(persisted.getStatus().equals(StatusEnum.SYSTEM_AUTO_RESOLVED)){
+            throw new IllegalArgumentException("Not allowed to change status on incident " + incidentId + " since it has status 'SYSTEM AUTO RESOLVED'");
         }
+
         persisted.setStatus(statusDto.getStatus());
         Incident updated = incidentDao.update(persisted);
         updatedIncident.fire(updated);
