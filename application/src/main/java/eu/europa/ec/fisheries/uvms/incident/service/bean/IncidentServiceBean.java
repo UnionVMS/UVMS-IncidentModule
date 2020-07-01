@@ -125,6 +125,7 @@ public class IncidentServiceBean {
                 if (movementFromTicketUpdate != null && movementFromTicketUpdate.getSource().equals(MovementSourceType.MANUAL)) {
                     if (!incidentLogDao.checkIfMovementAlreadyExistsForIncident(persisted.getId(), UUID.fromString(ticket.getMovementId()))){
                         persisted.setStatus(StatusEnum.MANUAL_POSITION_MODE);
+                        persisted.setMovementId(UUID.fromString(ticket.getMovementId()));
                         incidentLogServiceBean.createIncidentLogForManualPosition(persisted, movementFromTicketUpdate);
                     }
                 } else {
