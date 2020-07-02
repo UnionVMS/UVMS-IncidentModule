@@ -13,12 +13,12 @@ package eu.europa.ec.fisheries.uvms.incident.rest;
 
 import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.AssetNotSendingDto;
-import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
-import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentLogServiceBean;
-import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentServiceBean;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentLogDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.StatusDto;
+import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
+import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentLogServiceBean;
+import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentServiceBean;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentDao;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentLogDao;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
@@ -33,7 +33,9 @@ import javax.annotation.PostConstruct;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.json.bind.Jsonb;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
@@ -49,6 +51,9 @@ import java.util.stream.Collectors;
 public class IncidentRestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(IncidentRestResource.class);
+
+    @Context
+    private HttpServletRequest servletRequest;
 
     @Inject
     private IncidentServiceBean incidentServiceBean;

@@ -8,6 +8,7 @@ import eu.europa.ec.fisheries.uvms.incident.model.dto.StatusDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.EventTypeEnum;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
+import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentDao;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentLogDao;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
@@ -112,7 +113,7 @@ public class IncidentServiceBean {
         if (persisted != null) {
 
             if (ticket.getStatus().equals(TicketStatusType.CLOSED.value())) {
-                persisted.setStatus(StatusEnum.RESOLVED);
+                persisted.setStatus(StatusEnum.SYSTEM_AUTO_RESOLVED);
                 Incident updated = incidentDao.update(persisted);
                 updatedIncident.fire(updated);
                 incidentLogServiceBean.createIncidentLogForStatus(updated, EventTypeEnum.INCIDENT_CLOSED.getMessage(),
@@ -125,6 +126,7 @@ public class IncidentServiceBean {
                 if (movementFromTicketUpdate != null && movementFromTicketUpdate.getSource().equals(MovementSourceType.MANUAL)) {
                     if (!incidentLogDao.checkIfMovementAlreadyExistsForIncident(persisted.getId(), UUID.fromString(ticket.getMovementId()))){
                         persisted.setStatus(StatusEnum.MANUAL_POSITION_MODE);
+                        persisted.setMovementId(UUID.fromString(ticket.getMovementId()));
                         incidentLogServiceBean.createIncidentLogForManualPosition(persisted, movementFromTicketUpdate);
                     }
                 } else {
@@ -139,6 +141,10 @@ public class IncidentServiceBean {
 
     public Incident updateIncidentStatus(long incidentId, StatusDto statusDto) {
         Incident persisted = incidentDao.findById(incidentId);
+        if(persisted.getStatus().equals(StatusEnum.SYSTEM_AUTO_RESOLVED)){
+            throw new IllegalArgumentException("Not allowed to change status on incident " + incidentId + " since it has status 'SYSTEM AUTO RESOLVED'");
+        }
+
         persisted.setStatus(statusDto.getStatus());
         Incident updated = incidentDao.update(persisted);
         updatedIncident.fire(updated);
