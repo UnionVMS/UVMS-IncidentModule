@@ -8,7 +8,6 @@ import eu.europa.ec.fisheries.uvms.incident.model.dto.StatusDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.EventTypeEnum;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
-import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentDao;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentLogDao;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
@@ -31,6 +30,8 @@ import java.util.UUID;
 public class IncidentServiceBean {
 
     private static final Logger LOG = LoggerFactory.getLogger(IncidentServiceBean.class);
+
+    private static final String uuidPattern = "[a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8}";
 
     @Inject
     private IncidentLogServiceBean incidentLogServiceBean;
@@ -81,8 +82,9 @@ public class IncidentServiceBean {
 
             if ("Asset not sending".equalsIgnoreCase(ticket.getRuleGuid())) {
 
-                if(ticket.getPollId() != null && ticket.getPollId().length() != 36 ) {
-                    incidentLogServiceBean.createIncidentLogForStatus(incident, "Creating autopoll failed since pollId is: " + ticket.getPollId(),
+
+                if(ticket.getPollId() != null && !ticket.getPollId().matches(uuidPattern)) {
+                    incidentLogServiceBean.createIncidentLogForStatus(incident, "Creating autopoll failed since: " + ticket.getPollId(),
                             EventTypeEnum.AUTO_POLL_CREATED, null);
                 } else {
                     incidentLogServiceBean.createIncidentLogForStatus(incident, "Asset not sending, sending autopoll",
