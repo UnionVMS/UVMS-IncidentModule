@@ -14,6 +14,7 @@ import org.junit.runner.RunWith;
 import javax.inject.Inject;
 import javax.json.bind.Jsonb;
 import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Map;
@@ -69,8 +70,20 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
         AssetNotSendingDto response = getWebTarget()
                 .path("incident/assetNotSending")
                 .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
                 .get(AssetNotSendingDto.class);
         assertNotNull(response);
+    }
+
+    @Test
+    @OperateOnDeployment("incident")
+    public void noAuthTest() {
+        Response response = getWebTarget()
+                .path("incident/assetNotSending")
+                .request(MediaType.APPLICATION_JSON)
+                .get(Response.class);
+        assertNotNull(response);
+        assertEquals(403, response.getStatus());
     }
 
     @Test
@@ -80,6 +93,7 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
                 .path("incident/incidentLogForIncident")
                 .path("1")
                 .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
                 .get(Response.class);
         assertEquals(200, response.getStatus());
 
@@ -94,6 +108,7 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
                 .path("incident/incidentLogsForAssetId")
                 .path(UUID.randomUUID().toString())
                 .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
                 .get(Response.class);
         assertEquals(200, response.getStatus());
 
@@ -108,6 +123,7 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
                 .path("incident/incidentsForAssetId")
                 .path(UUID.randomUUID().toString())
                 .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
                 .get(Response.class);
         assertEquals(200, response.getStatus());
 
