@@ -28,9 +28,9 @@ import java.util.List;
 
 @Startup
 @Singleton
-public class IncidentExecutorServiceBean {
+public class IncidentTimerBean {
 
-    private static final Logger LOG = LoggerFactory.getLogger(IncidentExecutorServiceBean.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IncidentTimerBean.class);
     
     @Inject
     IncidentDao incidentDao;
