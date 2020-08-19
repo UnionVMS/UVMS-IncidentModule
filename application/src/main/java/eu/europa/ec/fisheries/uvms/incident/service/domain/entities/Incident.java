@@ -12,6 +12,7 @@ import java.util.UUID;
 @Table(name = "incident")
 @NamedQueries({
         @NamedQuery(name = Incident.FIND_ALL_EXCLUDE_STATUS, query = "SELECT i FROM Incident i WHERE i.type = :type AND i.status NOT IN :status"),
+        @NamedQuery(name = Incident.FIND_BY_STATUS, query = "SELECT i FROM Incident i WHERE i.status = :status"),
         @NamedQuery(name = Incident.FIND_BY_STATUS_AND_UPDATED_SINCE, query = "SELECT i FROM Incident i WHERE i.type = :type AND i.status IN :status AND i.updateDate > :updatedSince"),
         @NamedQuery(name = Incident.FIND_BY_TICKET_ID, query = "SELECT i FROM Incident i WHERE i.ticketId = :ticketId"),
         @NamedQuery(name = Incident.FIND_BY_ASSET_ID, query = "SELECT i FROM Incident i WHERE i.assetId = :assetId"),
@@ -19,9 +20,10 @@ import java.util.UUID;
 })
 public class Incident {
 
-    public static final String FIND_ALL_EXCLUDE_STATUS = "Incident.findByStatus";
+    public static final String FIND_ALL_EXCLUDE_STATUS = "Incident.findByNotInStatus";
+    public static final String FIND_BY_STATUS = "Incident.findByStatus";
     public static final String FIND_BY_TICKET_ID = "Incident.findByTicketId";
-    public static final String FIND_BY_STATUS_AND_UPDATED_SINCE = "Incident.findByClosedLast12Hours";
+    public static final String FIND_BY_STATUS_AND_UPDATED_SINCE = "Incident.findByStatusAndUpdatedSince";
     public static final String FIND_BY_ASSET_ID = "Incident.findByAssetId";
     public static final String FIND_BY_ASSET_TYPE_AND_EXCLUDE_STATUS = "Incident.findByAssetTypeAndExcludeStatus";
 
