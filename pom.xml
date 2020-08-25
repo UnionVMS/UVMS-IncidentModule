@@ -11,24 +11,24 @@
 
     <groupId>eu.europa.ec.fisheries.uvms.incident</groupId>
     <artifactId>incident</artifactId>
-    <version>0.3.4</version>
+    <version>0.3.5</version>
     <packaging>pom</packaging>
     <description>Incident handling module</description>
 
     <properties>
         <installAtEnd>false</installAtEnd>
 
-        <docker.dev.version>3.44.2</docker.dev.version>
+        <docker.dev.version>3.44.6</docker.dev.version>
         <docker.liquibase.changeLogFile>LIQUIBASE/changelog/db-changelog-master.xml</docker.liquibase.changeLogFile>
         <docker.liquibase.db.user>incident</docker.liquibase.db.user>
         <docker.liquibase.db.passwd>incident</docker.liquibase.db.passwd>
 
         <!-- UVMS Libraries -->
         <uvms.common.version>4.1.7</uvms.common.version>
-        <movement.version>5.5.13-UVMS</movement.version>
-        <movement.rules.version>2.3.14</movement.rules.version>
-        <asset.version>6.7.16</asset.version>
-        <exchange.module>5.3.0-UVMS</exchange.module>
+        <movement.version>5.5.14-UVMS</movement.version>
+        <movement.rules.version>2.3.15</movement.rules.version>
+        <asset.version>6.7.17</asset.version>
+        <exchange.module>5.3.1-UVMS</exchange.module>
         <usm4uvms.version>4.1.1</usm4uvms.version>
         <uvms.pom>3.3</uvms.pom>
     </properties>

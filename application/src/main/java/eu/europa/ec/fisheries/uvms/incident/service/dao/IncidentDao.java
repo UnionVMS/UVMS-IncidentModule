@@ -1,5 +1,6 @@
 package eu.europa.ec.fisheries.uvms.incident.service.dao;
 
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
@@ -79,6 +80,12 @@ public class IncidentDao {
             LOG.debug("No incident found for asset {} and type {}", assetId, type);
             return null;
         }
+    }
+
+    public List<Incident> findByStatus(StatusEnum status){
+        TypedQuery<Incident> query = em.createNamedQuery(Incident.FIND_BY_STATUS, Incident.class);
+        query.setParameter("status", status);
+        return query.getResultList();
     }
 
     public Incident update(Incident entity) {
