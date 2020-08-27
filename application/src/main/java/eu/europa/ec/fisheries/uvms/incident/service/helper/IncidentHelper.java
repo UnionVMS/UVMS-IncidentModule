@@ -51,6 +51,23 @@ public class IncidentHelper {
         }
     }
 
+    public Incident incidentDtoToIncident(IncidentDto incidentDto) {
+        Incident incident = new Incident();
+        incident.setAssetId(incidentDto.getAssetId());
+        incident.setMobileTerminalId(incidentDto.getMobileTerminalId());
+        incident.setTicketId(incidentDto.getTicketId());
+        incident.setType(incidentDto.getType());
+        incident.setAssetName(incidentDto.getAssetName());
+        incident.setIrcs(incidentDto.getAssetIrcs());
+        if (incidentDto.getLastKnownLocation() != null) {
+            incident.setMovementId(UUID.fromString(incidentDto.getLastKnownLocation().getId()));
+        }
+        if (incidentDto.getStatus() != null) {
+            incident.setStatus(StatusEnum.valueOf(incidentDto.getStatus()));
+        }
+        return incident;
+    }
+
     public IncidentDto incidentEntityToDto(Incident incident) {
         MicroMovement movement = null;
         if(incident.getMovementId() != null) {
