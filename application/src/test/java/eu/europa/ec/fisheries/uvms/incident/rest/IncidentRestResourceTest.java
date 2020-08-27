@@ -2,6 +2,7 @@ package eu.europa.ec.fisheries.uvms.incident.rest;
 
 import eu.europa.ec.fisheries.uvms.incident.BuildIncidentTestDeployment;
 import eu.europa.ec.fisheries.uvms.incident.helper.JMSHelper;
+import eu.europa.ec.fisheries.uvms.incident.helper.TicketHelper;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.AssetNotSendingDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentLogDto;
@@ -16,6 +17,7 @@ import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
 import javax.json.bind.Jsonb;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -27,6 +29,7 @@ import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(Arquillian.class)
 public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
@@ -43,8 +46,6 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
     @Inject
     private JMSHelper jmsHelper;
 
-    //For some reason I can not get jsonb.toJson to work, it only gives me abstract method error
-    // so the below tests just check that the endpoints are reached and dont return exceptions
     /*@Before
     public void consumeIncidentQueue() throws Exception {
         jmsHelper.clearQueue(jmsHelper.QUEUE_NAME);
@@ -92,7 +93,42 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
         assertNotNull(response);
         assertEquals(Arrays.asList(IncidentType.values()), response);
     }
+    public void createIncidentTest() {
+        IncidentDto incidentDto = TicketHelper.createIncidentDto();
+        IncidentDto createdIncident = getWebTarget()
+                .path("incident")
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .post(Entity.json(incidentDto), IncidentDto.class);
 
+        assertNotNull(createdIncident.getId());
+        assertEquals(incidentDto.getAssetId(), createdIncident.getAssetId());
+        assertEquals(incidentDto.getType(), createdIncident.getType());
+        assertNotNull(createdIncident.getUpdateDate());
+        assertNotNull(createdIncident.getCreateDate());
+    }
+
+    @Test
+    @OperateOnDeployment("incident")
+    public void createIncidentLogCreatedTest() {
+        IncidentDto incidentDto = TicketHelper.createIncidentDto();
+        IncidentDto createdIncident = getWebTarget()
+                .path("incident")
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .post(Entity.json(incidentDto), IncidentDto.class);
+
+        Map<Long, IncidentLogDto> logs = getWebTarget()
+                .path("incident/incidentLogForIncident")
+                .path(createdIncident.getId().toString())
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .get(new GenericType<Map<Long, IncidentLogDto>>() {});
+
+        assertEquals(1, logs.size());
+        assertTrue(logs.values().stream()
+                .anyMatch(log -> log.getMessage().contains(BuildIncidentTestDeployment.USER_NAME)));
+    }
 
     @Test
     @OperateOnDeployment("incident")
