@@ -7,7 +7,7 @@
 
     <changeSet id="Add expiry date to incident" author="joemat">
         <addColumn tableName="incident">
-            <column name="expiry-date"
+            <column name="expiry_date"
                     type="TIMESTAMP WITH TIME ZONE"/>
         </addColumn>
     </changeSet>
