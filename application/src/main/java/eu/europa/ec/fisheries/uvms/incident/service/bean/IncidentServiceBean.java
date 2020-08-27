@@ -3,6 +3,7 @@ package eu.europa.ec.fisheries.uvms.incident.service.bean;
 import eu.europa.ec.fisheries.schema.movement.v1.MovementSourceType;
 import eu.europa.ec.fisheries.schema.movementrules.ticket.v1.TicketStatusType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.AssetNotSendingDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.StatusDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.EventTypeEnum;
@@ -23,6 +24,7 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -100,6 +102,15 @@ public class IncidentServiceBean {
             LOG.error("Error: {} from UUID {}", e.getMessage(), ticket.getPollId());
             throw e;
         }
+    }
+
+    public IncidentDto createIncident(IncidentDto incidentDto, String user) {
+        Incident incident = incidentHelper.incidentDtoToIncident(incidentDto);
+        incident.setStatus(StatusEnum.INCIDENT_CREATED);
+        incident.setCreateDate(Instant.now());
+        Incident persistedIncident = incidentDao.save(incident);
+        incidentLogServiceBean.createIncidentLogForStatus(persistedIncident, "Incident created by " + user, EventTypeEnum.INCIDENT_CREATED, null);
+        return incidentHelper.incidentEntityToDto(persistedIncident);
     }
 
     public void updateIncident(IncidentTicketDto ticket) {
