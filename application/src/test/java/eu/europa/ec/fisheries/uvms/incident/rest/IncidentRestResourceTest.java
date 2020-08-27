@@ -24,6 +24,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Arrays;
 import java.util.List;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.UUID;
 
@@ -96,6 +98,8 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
 
     public void createIncidentTest() {
         IncidentDto incidentDto = TicketHelper.createIncidentDto();
+        Instant expiryDate = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+        incidentDto.setExpiryDate(expiryDate);
         IncidentDto createdIncident = getWebTarget()
                 .path("incident")
                 .request(MediaType.APPLICATION_JSON)
@@ -105,6 +109,7 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
         assertNotNull(createdIncident.getId());
         assertEquals(incidentDto.getAssetId(), createdIncident.getAssetId());
         assertEquals(incidentDto.getType(), createdIncident.getType());
+        assertEquals(expiryDate, createdIncident.getExpiryDate());
         assertNotNull(createdIncident.getUpdateDate());
         assertNotNull(createdIncident.getCreateDate());
     }
