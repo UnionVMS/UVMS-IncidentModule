@@ -61,7 +61,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID mobTermId = UUID.randomUUID();
         IncidentTicketDto ticket = TicketHelper.createTicket(ticketId, assetId, movementId, mobTermId);
         String asString = jsonb.toJson(ticket);
-        jmsHelper.sendMessageToIncidentQueue(asString);
+        jmsHelper.sendMessageToIncidentQueue(asString, "Incident");
 
         LockSupport.parkNanos(2000000000L);
 
@@ -78,7 +78,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID mobTermId = UUID.randomUUID();
         IncidentTicketDto ticket = TicketHelper.createTicket(ticketId, assetId, movementId, mobTermId);
         String asString = jsonb.toJson(ticket);
-        jmsHelper.sendMessageToIncidentQueue(asString);
+        jmsHelper.sendMessageToIncidentQueue(asString, "Incident");
 
         LockSupport.parkNanos(2000000000L);
 
@@ -90,6 +90,31 @@ public class IncidentServiceBeanTest extends TransactionalTests {
 
     @Test
     @OperateOnDeployment("incident")
+    public void setIncidentTypeToManual() throws Exception {
+        UUID ticketId = UUID.randomUUID();
+        UUID assetId = UUID.randomUUID();
+        UUID movementId = UUID.randomUUID();
+        UUID mobTermId = UUID.randomUUID();
+        IncidentTicketDto ticket = TicketHelper.createTicket(ticketId, assetId, movementId, mobTermId);
+        String asString = jsonb.toJson(ticket);
+        jmsHelper.sendMessageToIncidentQueue(asString,"Incident");
+
+        LockSupport.parkNanos(2000000000L);
+
+        ticket.setMovementId(UUID.randomUUID().toString());
+        asString = jsonb.toJson(ticket);
+        jmsHelper.sendMessageToIncidentQueue(asString, "IncidentUpdate");
+
+        LockSupport.parkNanos(2000000000L);
+
+        Incident incident = incidentService.findByTicketId(ticketId);
+        assertNotNull(incident);
+        assertEquals(assetId, incident.getAssetId());
+        assertEquals(IncidentType.MANUAL_MODE, incident.getType());
+    }
+
+    @Test
+    @OperateOnDeployment("incident")
     public void updateIncidentTest() throws Exception {
         UUID ticketId = UUID.randomUUID();
         UUID assetId = UUID.randomUUID();
@@ -97,7 +122,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID mobTermId = UUID.randomUUID();
         IncidentTicketDto ticket = TicketHelper.createTicket(ticketId, assetId, movementId, mobTermId);
         String asString = jsonb.toJson(ticket);
-        jmsHelper.sendMessageToIncidentQueue(asString);
+        jmsHelper.sendMessageToIncidentQueue(asString, "Incident");
 
         LockSupport.parkNanos(2000000000L);
 

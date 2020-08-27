@@ -46,9 +46,9 @@ public class JMSHelper {
         }
     }
 
-    public void sendMessageToIncidentQueue(String message) throws JMSException {
+    public void sendMessageToIncidentQueue(String message, String eventName) throws JMSException {
         TextMessage textMessage = context.createTextMessage(message);
-        textMessage.setStringProperty("eventName", "Incident");
+        textMessage.setStringProperty("eventName", eventName);
         context.createProducer().send(destination, textMessage);
     }
 

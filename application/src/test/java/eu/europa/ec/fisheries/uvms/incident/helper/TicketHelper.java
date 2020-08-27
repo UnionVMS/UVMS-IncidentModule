@@ -32,7 +32,7 @@ public class TicketHelper {
         incidentDto.setAssetId(UUID.randomUUID());
         incidentDto.setAssetName("Test asset");
         incidentDto.setStatus("INCIDENT_CREATED");
-        incidentDto.setType(IncidentType.LONG_TERM_PARKED);
+        incidentDto.setType(IncidentType.PARKED);
         return incidentDto;
     }
 }

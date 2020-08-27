@@ -94,7 +94,7 @@ public class IncidentServiceBean {
                 }
             } else {
                 incidentLogServiceBean.createIncidentLogForStatus(incident, "Creating incident from rule " + ticket.getRuleGuid(),
-                        EventTypeEnum.INCIDENT_STATUS, null);
+                        EventTypeEnum.INCIDENT_CREATED, null);
             }
 
             createdIncident.fire(incident);
@@ -126,7 +126,7 @@ public class IncidentServiceBean {
         if (persisted != null) {
 
             if (ticket.getStatus().equals(TicketStatusType.CLOSED.value())) {
-                persisted.setStatus(StatusEnum.SYSTEM_AUTO_RESOLVED);
+                persisted.setStatus(StatusEnum.RESOLVED);
                 Incident updated = incidentDao.update(persisted);
                 updatedIncident.fire(updated);
                 incidentLogServiceBean.createIncidentLogForStatus(updated, EventTypeEnum.INCIDENT_CLOSED.getMessage(),
@@ -159,8 +159,8 @@ public class IncidentServiceBean {
 
     public Incident updateIncidentStatus(long incidentId, StatusDto statusDto) {
         Incident persisted = incidentDao.findById(incidentId);
-        if(persisted.getStatus().equals(StatusEnum.SYSTEM_AUTO_RESOLVED)){
-            throw new IllegalArgumentException("Not allowed to change status on incident " + incidentId + " since it has status 'SYSTEM AUTO RESOLVED'");
+        if(persisted.getStatus().equals(StatusEnum.RESOLVED)){
+            throw new IllegalArgumentException("Not allowed to change status on incident " + incidentId + " since it has status 'RESOLVED'");
         }
 
         persisted.setStatus(statusDto.getStatus());

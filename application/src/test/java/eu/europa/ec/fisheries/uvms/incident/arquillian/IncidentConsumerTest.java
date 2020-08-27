@@ -50,7 +50,7 @@ public class IncidentConsumerTest extends BuildIncidentTestDeployment {
 
         try (TopicListener listener = new TopicListener(jmsHelper.EVENT_STREAM, "")) {
             String asString = jsonb.toJson(ticket);
-            jmsHelper.sendMessageToIncidentQueue(asString);
+            jmsHelper.sendMessageToIncidentQueue(asString, "Incident");
 
             Message message = listener.listenOnEventBus();
             TextMessage textMessage = (TextMessage) message;
@@ -71,7 +71,7 @@ public class IncidentConsumerTest extends BuildIncidentTestDeployment {
 
         try (TopicListener listener = new TopicListener(jmsHelper.EVENT_STREAM, "")) {
             String asString = jsonb.toJson(ticket);
-            jmsHelper.sendMessageToIncidentQueue(asString);
+            jmsHelper.sendMessageToIncidentQueue(asString, "Incident");
 
             Message message = listener.listenOnEventBus();
             TextMessage textMessage = (TextMessage) message;

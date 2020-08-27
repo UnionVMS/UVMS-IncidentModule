@@ -93,6 +93,7 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
         assertNotNull(response);
         assertEquals(Arrays.asList(IncidentType.values()), response);
     }
+
     public void createIncidentTest() {
         IncidentDto incidentDto = TicketHelper.createIncidentDto();
         IncidentDto createdIncident = getWebTarget()

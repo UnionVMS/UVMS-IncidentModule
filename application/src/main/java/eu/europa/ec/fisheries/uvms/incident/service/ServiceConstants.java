@@ -7,6 +7,5 @@ import java.util.List;
 
 public class ServiceConstants {
 
-    public static final List<StatusEnum> RESOLVED_STATUS_LIST = Arrays.asList(StatusEnum.LONG_TERM_PARKED, StatusEnum.RESOLVED, StatusEnum.SYSTEM_AUTO_RESOLVED);
-    public static final List<StatusEnum> SOFT_RESOLVED_STATUS_LIST = Arrays.asList(StatusEnum.LONG_TERM_PARKED, StatusEnum.RESOLVED);
+    public static final List<StatusEnum> RESOLVED_STATUS_LIST = Arrays.asList(StatusEnum.PARKED, StatusEnum.RESOLVED);
 }
