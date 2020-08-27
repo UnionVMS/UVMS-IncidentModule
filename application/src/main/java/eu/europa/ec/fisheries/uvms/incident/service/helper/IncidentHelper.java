@@ -59,6 +59,7 @@ public class IncidentHelper {
         incident.setType(incidentDto.getType());
         incident.setAssetName(incidentDto.getAssetName());
         incident.setIrcs(incidentDto.getAssetIrcs());
+        incident.setExpiryDate(incidentDto.getExpiryDate());
         if (incidentDto.getLastKnownLocation() != null) {
             incident.setMovementId(UUID.fromString(incidentDto.getLastKnownLocation().getId()));
         }
