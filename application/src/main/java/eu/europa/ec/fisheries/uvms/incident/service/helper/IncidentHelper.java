@@ -82,6 +82,7 @@ public class IncidentHelper {
         dto.setAssetIrcs(entity.getIrcs());
         dto.setStatus(entity.getStatus().name());
         dto.setCreateDate(entity.getCreateDate());
+        dto.setExpiryDate(entity.getExpiryDate());
         if (entity.getUpdateDate() != null) {
             dto.setUpdateDate(entity.getUpdateDate());
         }

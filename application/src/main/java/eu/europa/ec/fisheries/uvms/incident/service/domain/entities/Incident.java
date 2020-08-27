@@ -74,6 +74,9 @@ public class Incident {
     @Column(name = "update_date")
     private Instant updateDate;
 
+    @Column(name = "expiry_date")
+    private Instant expiryDate;
+
     @PrePersist
     @PreUpdate
     public void preUpdate(){
@@ -166,6 +169,14 @@ public class Incident {
 
     public void setMovementId(UUID movementId) {
         this.movementId = movementId;
+    }
+
+    public Instant getExpiryDate() {
+        return expiryDate;
+    }
+
+    public void setExpiryDate(Instant expiryDate) {
+        this.expiryDate = expiryDate;
     }
 
     @Override
