@@ -6,6 +6,9 @@ import eu.europa.ec.fisheries.uvms.incident.model.dto.AssetNotSendingDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentLogDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
+import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;
@@ -17,6 +20,8 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -63,6 +68,31 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
             incident = jsonb.fromJson(text, IncidentDto.class);
         }
     }*/
+
+    @Test
+    @OperateOnDeployment("incident")
+    public void getStatuseThatCountAsResolved() {
+        List<StatusEnum> response = getWebTarget()
+                .path("incident/resolvedStatuses")
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .get(new GenericType<List<StatusEnum>>() {});
+        assertNotNull(response);
+        assertEquals(ServiceConstants.RESOLVED_STATUS_LIST, response);
+    }
+
+    @Test
+    @OperateOnDeployment("incident")
+    public void getIncidentTypes() {
+        List<IncidentType> response = getWebTarget()
+                .path("incident/incidentTypes")
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .get(new GenericType<List<IncidentType>>() {});
+        assertNotNull(response);
+        assertEquals(Arrays.asList(IncidentType.values()), response);
+    }
+
 
     @Test
     @OperateOnDeployment("incident")

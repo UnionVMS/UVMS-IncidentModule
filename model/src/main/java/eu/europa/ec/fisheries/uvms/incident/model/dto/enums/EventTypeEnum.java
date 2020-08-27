@@ -7,7 +7,8 @@ public enum EventTypeEnum {
     AUTO_POLL_CREATED("Automatic poll has been created", RelatedObjectType.POLL),
     NOTE_CREATED("Note has been created", RelatedObjectType.NOTE),
     INCIDENT_CLOSED("Incident has been closed", RelatedObjectType.MOVEMENT),
-    INCIDENT_STATUS("Incident Status updated", RelatedObjectType.NONE);
+    INCIDENT_STATUS("Incident Status updated", RelatedObjectType.NONE),
+    INCIDENT_TYPE("Incident Type updated", RelatedObjectType.NONE);
 
     private String message;
     private RelatedObjectType relatedObjectType;

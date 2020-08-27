@@ -117,18 +117,18 @@ public class IncidentServiceBeanTest extends TransactionalTests {
 
     @Test
     @OperateOnDeployment("incident")
-    public void createAssetSendingDespiteLongTermParkedTest() {
+    public void createAssetSendingDespiteParkedTest() {
         UUID assetId = UUID.randomUUID();
         UUID movementId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
         IncidentTicketDto ticket = TicketHelper.createTicket(null, assetId, movementId, mobTermId);
         ticket.setRuleName("Asset sending despite long term parked");
         ticket.setRuleGuid("Asset sending despite long term parked");
-        ticket.setType(IncidentType.LONG_TERM_PARKED);
+        ticket.setType(IncidentType.PARKED);
 
         incidentService.createIncident(ticket);
 
-        Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(assetId, IncidentType.LONG_TERM_PARKED);
+        Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(assetId, IncidentType.PARKED);
 
         assertNotNull(openByAssetAndType);
         assertEquals(movementId, openByAssetAndType.getMovementId());
@@ -145,11 +145,11 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         IncidentTicketDto ticket = TicketHelper.createTicket(null, assetId, movementId, mobTermId);
         ticket.setRuleName("Asset sending despite long term parked");
         ticket.setRuleGuid("Asset sending despite long term parked");
-        ticket.setType(IncidentType.LONG_TERM_PARKED);
+        ticket.setType(IncidentType.PARKED);
 
         incidentService.createIncident(ticket);
 
-        Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(assetId, IncidentType.LONG_TERM_PARKED);
+        Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(assetId, IncidentType.PARKED);
 
         assertNotNull(openByAssetAndType);
 

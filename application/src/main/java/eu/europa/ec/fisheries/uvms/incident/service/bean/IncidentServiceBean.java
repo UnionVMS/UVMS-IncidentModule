@@ -127,7 +127,12 @@ public class IncidentServiceBean {
 
                 if (movementFromTicketUpdate != null && movementFromTicketUpdate.getSource().equals(MovementSourceType.MANUAL)) {
                     if (!incidentLogDao.checkIfMovementAlreadyExistsForIncident(persisted.getId(), UUID.fromString(ticket.getMovementId()))){
-                        persisted.setStatus(StatusEnum.MANUAL_POSITION_MODE);
+                        if(!persisted.getType().equals(IncidentType.MANUAL_MODE)){
+                            persisted.setStatus(StatusEnum.MANUAL_POSITION_MODE);
+                            persisted.setType(IncidentType.MANUAL_MODE);
+                            incidentLogServiceBean.createIncidentLogForStatus(persisted, "Incident changed to type manual mode", EventTypeEnum.INCIDENT_TYPE, null);
+                        }
+
                         persisted.setMovementId(UUID.fromString(ticket.getMovementId()));
                         incidentLogServiceBean.createIncidentLogForManualPosition(persisted, movementFromTicketUpdate);
                     }
