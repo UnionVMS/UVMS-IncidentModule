@@ -23,6 +23,8 @@ import java.util.Arrays;
 @ArquillianSuiteDeployment
 public abstract class BuildIncidentTestDeployment {
 
+    public static String USER_NAME = "user";
+
     @EJB
     private JwtTokenHandler tokenHandler;
 
@@ -69,7 +71,7 @@ public abstract class BuildIncidentTestDeployment {
 
     protected String getToken() {
         if (token == null) {
-            token = tokenHandler.createToken("user",
+            token = tokenHandler.createToken(USER_NAME,
                     Arrays.asList(UnionVMSFeature.manageManualMovements.getFeatureId(),
                             UnionVMSFeature.viewMovements.getFeatureId(),
                             UnionVMSFeature.viewManualMovements.getFeatureId(),

@@ -1,6 +1,7 @@
 package eu.europa.ec.fisheries.uvms.incident.helper;
 
 import eu.europa.ec.fisheries.schema.movementrules.ticket.v1.TicketStatusType;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import java.time.Instant;
@@ -24,5 +25,14 @@ public class TicketHelper {
         ticket.setCreatedDate(date);
         ticket.setUpdated(date);
         return ticket;
+    }
+
+    public static IncidentDto createIncidentDto() {
+        IncidentDto incidentDto = new IncidentDto();
+        incidentDto.setAssetId(UUID.randomUUID());
+        incidentDto.setAssetName("Test asset");
+        incidentDto.setStatus("INCIDENT_CREATED");
+        incidentDto.setType(IncidentType.LONG_TERM_PARKED);
+        return incidentDto;
     }
 }
