@@ -110,6 +110,7 @@ public class IncidentServiceBean {
         incident.setCreateDate(Instant.now());
         Incident persistedIncident = incidentDao.save(incident);
         incidentLogServiceBean.createIncidentLogForStatus(persistedIncident, "Incident created by " + user, EventTypeEnum.INCIDENT_CREATED, null);
+        createdIncident.fire(persistedIncident);
         return incidentHelper.incidentEntityToDto(persistedIncident);
     }
 
