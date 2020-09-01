@@ -1,6 +1,8 @@
 package eu.europa.ec.fisheries.uvms.incident.service.bean;
 
 import eu.europa.ec.fisheries.schema.movement.v1.MovementSourceType;
+import eu.europa.ec.fisheries.schema.movementrules.ticket.v1.TicketStatusType;
+import eu.europa.ec.fisheries.uvms.asset.client.AssetClient;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.AssetNotSendingDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
@@ -161,6 +163,11 @@ public class IncidentServiceBean {
 
                 persisted.setMovementId(UUID.fromString(ticket.getMovementId()));
                 incidentLogServiceBean.createIncidentLogForManualPosition(persisted, UUID.fromString(ticket.getMovementId()));
+            } else if (ticket.getMovementSource() != null && !ticket.getMovementSource().equals(MovementSourceType.AIS)){
+                persisted.setStatus(StatusEnum.RESOLVED);
+                Incident updated = incidentDao.update(persisted);
+                incidentLogServiceBean.createIncidentLogForStatus(updated, EventTypeEnum.INCIDENT_CLOSED.getMessage(),
+                        EventTypeEnum.INCIDENT_CLOSED, UUID.fromString(ticket.getMovementId()));
             }
         }
     }
