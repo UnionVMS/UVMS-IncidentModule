@@ -3,6 +3,8 @@ package eu.europa.ec.fisheries.uvms.incident.model.dto.enums;
 public enum EventTypeEnum {
     MANUAL_POSITION("New Manual position created", RelatedObjectType.MOVEMENT),
     MANUAL_POSITION_LATE("No new manual position in 65 minutes while in manual position mode", RelatedObjectType.NONE),
+    RECEIVED_AIS_POSITION("Received AIS position", RelatedObjectType.MOVEMENT),
+    RECEIVED_VMS_POSITION("Received VMS position", RelatedObjectType.MOVEMENT),
     POLL_CREATED("Poll has been created", RelatedObjectType.POLL),
     AUTO_POLL_CREATED("Automatic poll has been created", RelatedObjectType.POLL),
     NOTE_CREATED("Note has been created", RelatedObjectType.NOTE),

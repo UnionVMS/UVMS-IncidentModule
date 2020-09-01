@@ -1,7 +1,8 @@
 package eu.europa.ec.fisheries.uvms.incident.service.domain.entities;
 
-import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
@@ -17,6 +18,8 @@ import java.util.UUID;
         @NamedQuery(name = Incident.FIND_BY_TICKET_ID, query = "SELECT i FROM Incident i WHERE i.ticketId = :ticketId"),
         @NamedQuery(name = Incident.FIND_BY_ASSET_ID, query = "SELECT i FROM Incident i WHERE i.assetId = :assetId"),
         @NamedQuery(name = Incident.FIND_BY_ASSET_TYPE_AND_EXCLUDE_STATUS, query = "SELECT i FROM Incident i WHERE i.assetId = :assetId AND i.type = :type AND i.status NOT IN :status"),
+        @NamedQuery(name = Incident.FIND_BY_TYPES_AND_EXCLUDE_STATUS, query = "SELECT i FROM Incident i WHERE i.type IN :type AND i.status NOT IN :status"),
+        @NamedQuery(name = Incident.FIND_BY_ASSET_AND_EXCLUDE_STATUS, query = "SELECT i FROM Incident i WHERE i.assetId = :assetId AND i.status NOT IN :status"),
 })
 public class Incident {
 
@@ -26,6 +29,8 @@ public class Incident {
     public static final String FIND_BY_STATUS_AND_UPDATED_SINCE = "Incident.findByStatusAndUpdatedSince";
     public static final String FIND_BY_ASSET_ID = "Incident.findByAssetId";
     public static final String FIND_BY_ASSET_TYPE_AND_EXCLUDE_STATUS = "Incident.findByAssetTypeAndExcludeStatus";
+    public static final String FIND_BY_TYPES_AND_EXCLUDE_STATUS = "Incident.findByTypeAndExcludeStatus";
+    public static final String FIND_BY_ASSET_AND_EXCLUDE_STATUS = "Incident.findByAssetAndExcludeStatus";
 
     /* Daniel Wirdehäll 2020-06-25
     Ja, jag föredrar löpnummer.

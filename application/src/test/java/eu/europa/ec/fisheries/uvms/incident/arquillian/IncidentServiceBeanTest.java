@@ -9,11 +9,11 @@ import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.StatusDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.EventTypeEnum;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentServiceBean;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentDao;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentLogDao;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
-import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.IncidentLog;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -96,21 +96,39 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID movementId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
         IncidentTicketDto ticket = TicketHelper.createTicket(ticketId, assetId, movementId, mobTermId);
-        String asString = jsonb.toJson(ticket);
-        jmsHelper.sendMessageToIncidentQueue(asString,"Incident");
-
-        LockSupport.parkNanos(2000000000L);
+        incidentService.createIncident(ticket);
 
         ticket.setMovementId(UUID.randomUUID().toString());
-        asString = jsonb.toJson(ticket);
-        jmsHelper.sendMessageToIncidentQueue(asString, "IncidentUpdate");
-
-        LockSupport.parkNanos(2000000000L);
+        incidentService.updateIncident(ticket);
 
         Incident incident = incidentService.findByTicketId(ticketId);
         assertNotNull(incident);
         assertEquals(assetId, incident.getAssetId());
         assertEquals(IncidentType.MANUAL_MODE, incident.getType());
+    }
+
+    @Test
+    @OperateOnDeployment("incident")
+    public void setIncidentTypeToManualCheckLog() throws Exception {
+        UUID ticketId = UUID.randomUUID();
+        UUID assetId = UUID.randomUUID();
+        UUID movementId = UUID.randomUUID();
+        UUID mobTermId = UUID.randomUUID();
+        IncidentTicketDto ticket = TicketHelper.createTicket(ticketId, assetId, movementId, mobTermId);
+        incidentService.createIncident(ticket);
+
+        ticket.setMovementId(UUID.randomUUID().toString());
+        incidentService.updateIncident(ticket);
+
+        Incident incident = incidentService.findByTicketId(ticketId);
+        assertNotNull(incident);
+
+        assertTrue(incidentLogDao.checkIfMovementAlreadyExistsForIncident(incident.getId(), UUID.fromString(ticket.getMovementId())));
+        List<IncidentLog> incidentLog = incidentLogDao.findAllByIncidentId(incident.getId());
+
+        IncidentLog manualMovementLog = incidentLog.stream().filter(log -> UUID.fromString(ticket.getMovementId()).equals(log.getRelatedObjectId())).findAny().get();
+        assertEquals(StatusEnum.MANUAL_POSITION_MODE, manualMovementLog.getIncidentStatus());
+        assertEquals(EventTypeEnum.MANUAL_POSITION, manualMovementLog.getEventType());
     }
 
     @Test
@@ -130,7 +148,6 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         assertNotNull(created);
         assertEquals(StatusEnum.INCIDENT_CREATED, created.getStatus());
 
-        created.setStatus(StatusEnum.RESOLVED);
         StatusDto status = new StatusDto();
         status.setStatus(StatusEnum.RESOLVED);
         status.setEventType(EventTypeEnum.INCIDENT_CLOSED);

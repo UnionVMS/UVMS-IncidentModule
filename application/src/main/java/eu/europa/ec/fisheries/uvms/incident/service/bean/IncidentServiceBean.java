@@ -1,7 +1,6 @@
 package eu.europa.ec.fisheries.uvms.incident.service.bean;
 
 import eu.europa.ec.fisheries.schema.movement.v1.MovementSourceType;
-import eu.europa.ec.fisheries.schema.movementrules.ticket.v1.TicketStatusType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.AssetNotSendingDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
@@ -12,15 +11,13 @@ import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentDao;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentLogDao;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
+import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.IncidentLog;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.interfaces.IncidentCreate;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.interfaces.IncidentUpdate;
 import eu.europa.ec.fisheries.uvms.incident.service.helper.IncidentHelper;
-import eu.europa.ec.fisheries.uvms.movement.client.MovementRestClient;
-import eu.europa.ec.fisheries.uvms.movement.client.model.MicroMovement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
@@ -41,8 +38,8 @@ public class IncidentServiceBean {
     @Inject
     private IncidentHelper incidentHelper;
 
-    @EJB
-    private MovementRestClient movementClient;
+    @Inject
+    AssetCommunicationBean assetCommunication;
 
     @Inject
     @IncidentCreate
@@ -79,11 +76,15 @@ public class IncidentServiceBean {
 
     private void internalCreateIncident(IncidentTicketDto ticket){
         try {
+            if(IncidentType.ASSET_NOT_SENDING.equals(ticket.getType())) {
+                String pollId = assetCommunication.createPollInternal(ticket);
+                ticket.setPollId(pollId);
+            }
+
             Incident incident = incidentHelper.constructIncident(ticket);
             incidentDao.save(incident);
 
             if ("Asset not sending".equalsIgnoreCase(ticket.getRuleGuid())) {
-
 
                 if(ticket.getPollId() != null && !ticket.getPollId().matches(uuidPattern)) {
                     incidentLogServiceBean.createIncidentLogForStatus(incident, "Creating autopoll failed since: " + ticket.getPollId(),
@@ -123,39 +124,113 @@ public class IncidentServiceBean {
     }
 
     private void internalUpdateIncident(IncidentTicketDto ticket, Incident persisted){
+
         if (persisted != null) {
+            switch (persisted.getType()) {
+                case ASSET_NOT_SENDING:
+                    updateAssetNotSending(ticket, persisted);
+                    break;
+                case MANUAL_MODE:
+                    updateManualMovement(ticket, persisted);
+                    break;
+                case PARKED:
+                    updateParked(ticket, persisted);
+                    break;
+                case SEASONAL_FISHING:
+                    updateSeasonalFishing(ticket, persisted);
+                    break;
+                case OWNER_TRANSFER:
+                    updateOwnerTransfer(ticket, persisted);
+                    break;
+            }
+            Incident updated = incidentDao.update(persisted);
+            updatedIncident.fire(updated);
 
-            if (ticket.getStatus().equals(TicketStatusType.CLOSED.value())) {
-                persisted.setStatus(StatusEnum.RESOLVED);
-                Incident updated = incidentDao.update(persisted);
-                updatedIncident.fire(updated);
-                incidentLogServiceBean.createIncidentLogForStatus(updated, EventTypeEnum.INCIDENT_CLOSED.getMessage(),
-                        EventTypeEnum.INCIDENT_CLOSED, UUID.fromString(ticket.getMovementId()));
+        }
+    }
 
-            } else if (ticket.getMovementId() != null &&
-                    !UUID.fromString(ticket.getMovementId()).equals(persisted.getMovementId())) {
-                MicroMovement movementFromTicketUpdate = movementClient.getMicroMovementById(UUID.fromString(ticket.getMovementId()));
+    private void updateAssetNotSending(IncidentTicketDto ticket, Incident persisted){
+        if (ticket.getMovementId() != null &&
+                !UUID.fromString(ticket.getMovementId()).equals(persisted.getMovementId())) {
 
-                if (movementFromTicketUpdate != null && movementFromTicketUpdate.getSource().equals(MovementSourceType.MANUAL)) {
-                    if (!incidentLogDao.checkIfMovementAlreadyExistsForIncident(persisted.getId(), UUID.fromString(ticket.getMovementId()))){
-                        if(!persisted.getType().equals(IncidentType.MANUAL_MODE)){
-                            persisted.setStatus(StatusEnum.MANUAL_POSITION_MODE);
-                            persisted.setType(IncidentType.MANUAL_MODE);
-                            incidentLogServiceBean.createIncidentLogForStatus(persisted, "Incident changed to type manual mode", EventTypeEnum.INCIDENT_TYPE, null);
-                        }
+            if (ticket.getMovementSource() != null && ticket.getMovementSource().equals(MovementSourceType.MANUAL)) {
 
-                        persisted.setMovementId(UUID.fromString(ticket.getMovementId()));
-                        incidentLogServiceBean.createIncidentLogForManualPosition(persisted, movementFromTicketUpdate);
-                    }
-                } else {
-                    persisted.setStatus(StatusEnum.INCIDENT_AUTO_UPDATED);
-                    incidentLogServiceBean.createIncidentLogForStatus(persisted, "Update from rule: " + ticket.getRuleGuid(), EventTypeEnum.INCIDENT_STATUS, null);
-                }
-                Incident updated = incidentDao.update(persisted);
-                updatedIncident.fire(updated);
+                persisted.setStatus(StatusEnum.MANUAL_POSITION_MODE);
+                persisted.setType(IncidentType.MANUAL_MODE);
+                incidentLogServiceBean.createIncidentLogForStatus(persisted, "Incident changed to type manual mode", EventTypeEnum.INCIDENT_TYPE, null);
+
+                persisted.setMovementId(UUID.fromString(ticket.getMovementId()));
+                incidentLogServiceBean.createIncidentLogForManualPosition(persisted, UUID.fromString(ticket.getMovementId()));
             }
         }
     }
+
+    private void updateManualMovement(IncidentTicketDto ticket, Incident persisted){
+        if (ticket.getMovementSource().equals(MovementSourceType.MANUAL)
+                && !incidentLogDao.checkIfMovementAlreadyExistsForIncident(persisted.getId(), UUID.fromString(ticket.getMovementId()))) {
+            persisted.setMovementId(UUID.fromString(ticket.getMovementId()));
+            incidentLogServiceBean.createIncidentLogForManualPosition(persisted, UUID.fromString(ticket.getMovementId()));
+        } else if(ticket.getMovementSource().equals(MovementSourceType.AIS)){   //how often should I do this?
+            IncidentLog recentAis = incidentLogServiceBean.findLogWithTypeEntryFromTheLastHour(persisted.getId(), EventTypeEnum.RECEIVED_AIS_POSITION);
+            if(recentAis != null) {
+                recentAis.setCreateDate(Instant.now());
+                recentAis.setRelatedObjectId(UUID.fromString(ticket.getMovementId()));
+            }else{
+                incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_AIS_POSITION.getMessage(), EventTypeEnum.RECEIVED_AIS_POSITION, UUID.fromString(ticket.getMovementId()));
+            }
+        } else {
+            persisted.setStatus(StatusEnum.RECEIVING_VMS_POSITIONS);
+            incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_VMS_POSITION.getMessage(), EventTypeEnum.RECEIVED_VMS_POSITION, UUID.fromString(ticket.getMovementId()));
+        }
+    }
+
+    private void updateParked(IncidentTicketDto ticket, Incident persisted){
+        if(ticket.getMovementSource().equals(MovementSourceType.AIS)){   //how often should I do this?
+            IncidentLog recentAis = incidentLogServiceBean.findLogWithTypeEntryFromTheLastHour(persisted.getId(), EventTypeEnum.RECEIVED_AIS_POSITION);
+            if(recentAis != null) {
+                recentAis.setCreateDate(Instant.now());
+                recentAis.setRelatedObjectId(UUID.fromString(ticket.getMovementId()));
+            }else{
+                incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_AIS_POSITION.getMessage(), EventTypeEnum.RECEIVED_AIS_POSITION, UUID.fromString(ticket.getMovementId()));
+            }
+        } else {
+            persisted.setStatus(StatusEnum.RESOLVED);
+            incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_VMS_POSITION.getMessage(), EventTypeEnum.RECEIVED_VMS_POSITION, UUID.fromString(ticket.getMovementId()));
+            incidentLogServiceBean.createIncidentLogForStatus(persisted, "Closing parked incident due to receiving VMS positions ", EventTypeEnum.INCIDENT_CLOSED, UUID.fromString(ticket.getMovementId()));
+
+        }
+    }
+
+    private void updateSeasonalFishing(IncidentTicketDto ticket, Incident persisted){
+        if(ticket.getMovementSource().equals(MovementSourceType.AIS)){   //how often should I do this?
+            IncidentLog recentAis = incidentLogServiceBean.findLogWithTypeEntryFromTheLastHour(persisted.getId(), EventTypeEnum.RECEIVED_AIS_POSITION);
+            if(recentAis != null) {
+                recentAis.setCreateDate(Instant.now());
+                recentAis.setRelatedObjectId(UUID.fromString(ticket.getMovementId()));
+            }else{
+                incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_AIS_POSITION.getMessage(), EventTypeEnum.RECEIVED_AIS_POSITION, UUID.fromString(ticket.getMovementId()));
+            }
+        } else {
+            persisted.setStatus(StatusEnum.RESOLVED);
+            incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_VMS_POSITION.getMessage(), EventTypeEnum.RECEIVED_VMS_POSITION, UUID.fromString(ticket.getMovementId()));
+            incidentLogServiceBean.createIncidentLogForStatus(persisted, "Closing seasonal fishing incident due to receiving VMS positions ", EventTypeEnum.INCIDENT_CLOSED, UUID.fromString(ticket.getMovementId()));
+        }
+    }
+
+    private void updateOwnerTransfer(IncidentTicketDto ticket, Incident persisted){
+        if(ticket.getMovementSource().equals(MovementSourceType.AIS)){   //how often should I do this?
+            IncidentLog recentAis = incidentLogServiceBean.findLogWithTypeEntryFromTheLastHour(persisted.getId(), EventTypeEnum.RECEIVED_AIS_POSITION);
+            if(recentAis != null) {
+                recentAis.setCreateDate(Instant.now());
+                recentAis.setRelatedObjectId(UUID.fromString(ticket.getMovementId()));
+            }else{
+                incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_AIS_POSITION.getMessage(), EventTypeEnum.RECEIVED_AIS_POSITION, UUID.fromString(ticket.getMovementId()));
+            }
+        } else {
+            incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_VMS_POSITION.getMessage(), EventTypeEnum.RECEIVED_VMS_POSITION, UUID.fromString(ticket.getMovementId()));
+        }
+    }
+
 
     public Incident updateIncidentStatus(long incidentId, StatusDto statusDto) {
         Incident persisted = incidentDao.findById(incidentId);
@@ -176,9 +251,9 @@ public class IncidentServiceBean {
     }
 
     public void upsertIncidentLackingTicketId(IncidentTicketDto ticketDto){
-        Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(UUID.fromString(ticketDto.getAssetId()), ticketDto.getType());
-        if(openByAssetAndType != null){
-            internalUpdateIncident(ticketDto, openByAssetAndType);
+        List<Incident> openByAsset = incidentDao.findOpenByAsset(UUID.fromString(ticketDto.getAssetId()));
+        if(openByAsset != null && !openByAsset.isEmpty()){
+            internalUpdateIncident(ticketDto, openByAsset.get(0));
         }else{
             internalCreateIncident(ticketDto);
         }

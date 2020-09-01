@@ -14,6 +14,7 @@ public class IncidentTicketDto implements Serializable {
     private String mobTermId;
     private String channelId;
     private String movementId;
+    private MovementSourceType movementSource;
     private String pollId;
 
     private String ruleGuid;
@@ -144,5 +145,13 @@ public class IncidentTicketDto implements Serializable {
 
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
+    }
+
+    public MovementSourceType getMovementSource() {
+        return movementSource;
+    }
+
+    public void setMovementSource(MovementSourceType movementSource) {
+        this.movementSource = movementSource;
     }
 }
