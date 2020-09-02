@@ -74,6 +74,24 @@ public class IncidentServiceBeanTest extends TransactionalTests {
 
     @Test
     @OperateOnDeployment("incident")
+    public void ignoreMessageWOOpenIncidentAndWoType() throws Exception {
+        AssetNotSendingDto before = incidentService.getAssetNotSendingList();
+
+        UUID assetId = UUID.randomUUID();
+        UUID movementId = UUID.randomUUID();
+        UUID mobTermId = UUID.randomUUID();
+        IncidentTicketDto ticket = TicketHelper.createTicket(assetId, movementId, mobTermId);
+        String asString = jsonb.toJson(ticket);
+        jmsHelper.sendMessageToIncidentQueue(asString, "IncidentUpdate");
+
+        LockSupport.parkNanos(2000000000L);
+
+        List<Incident> incidents = incidentDao.findByAssetId(assetId);
+        assertTrue(incidents.isEmpty());
+    }
+
+    @Test
+    @OperateOnDeployment("incident")
     public void getIncidentByTicketIdTest() throws Exception {
         UUID ticketId = UUID.randomUUID();
         UUID assetId = UUID.randomUUID();

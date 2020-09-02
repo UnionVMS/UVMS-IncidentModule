@@ -76,6 +76,10 @@ public class IncidentServiceBean {
 
     private void internalCreateIncident(IncidentTicketDto ticket){
         try {
+            if(ticket.getType() == null){
+                return;
+            }
+
             if(IncidentType.ASSET_NOT_SENDING.equals(ticket.getType())) {
                 String pollId = assetCommunication.createPollInternal(ticket);
                 ticket.setPollId(pollId);
@@ -200,6 +204,7 @@ public class IncidentServiceBean {
             }
         } else {
             persisted.setStatus(StatusEnum.RESOLVED);
+            assetCommunication.setAssetParkedStatus(persisted.getAssetId(), false);
             incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_VMS_POSITION.getMessage(), EventTypeEnum.RECEIVED_VMS_POSITION, UUID.fromString(ticket.getMovementId()));
             incidentLogServiceBean.createIncidentLogForStatus(persisted, "Closing parked incident due to receiving VMS positions ", EventTypeEnum.INCIDENT_CLOSED, UUID.fromString(ticket.getMovementId()));
 
@@ -218,6 +223,7 @@ public class IncidentServiceBean {
             }
         } else {
             persisted.setStatus(StatusEnum.RESOLVED);
+            assetCommunication.setAssetParkedStatus(persisted.getAssetId(), false);
             incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_VMS_POSITION.getMessage(), EventTypeEnum.RECEIVED_VMS_POSITION, UUID.fromString(ticket.getMovementId()));
             incidentLogServiceBean.createIncidentLogForStatus(persisted, "Closing seasonal fishing incident due to receiving VMS positions ", EventTypeEnum.INCIDENT_CLOSED, UUID.fromString(ticket.getMovementId()));
         }

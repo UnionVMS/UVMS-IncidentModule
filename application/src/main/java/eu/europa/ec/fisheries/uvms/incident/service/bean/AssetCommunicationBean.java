@@ -1,5 +1,9 @@
 package eu.europa.ec.fisheries.uvms.incident.service.bean;
 
+import eu.europa.ec.fisheries.uvms.asset.client.AssetClient;
+import eu.europa.ec.fisheries.uvms.asset.client.model.AssetBO;
+import eu.europa.ec.fisheries.uvms.asset.client.model.AssetDTO;
+import eu.europa.ec.fisheries.uvms.asset.client.model.AssetIdentifier;
 import eu.europa.ec.fisheries.uvms.asset.client.model.CreatePollResultDto;
 import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
@@ -11,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -19,6 +24,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.time.Instant;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Stateless
@@ -31,6 +37,9 @@ public class AssetCommunicationBean {
 
     @EJB
     private InternalRestTokenHandler tokenHandler;
+
+    @Inject
+    private AssetClient assetClient;
 
     public String createPollInternal(IncidentTicketDto dto) {
         try {
@@ -61,6 +70,16 @@ public class AssetCommunicationBean {
             LOG.error("Error while sending rule-triggered poll: ", e);
             return "NOK " + e.getMessage();
         }
+    }
+
+    public void setAssetParkedStatus(UUID assetId, boolean parked){
+        AssetDTO asset = assetClient.getAssetById(AssetIdentifier.GUID, assetId.toString());
+        asset.setParked(parked);
+        asset.setComment("Changing parked variable to " + parked);
+        asset.setUpdatedBy("Incident module");
+        AssetBO assetBO = new AssetBO();
+        assetBO.setAsset(asset);
+        assetClient.upsertAsset(assetBO);
     }
 
     private WebTarget getWebTarget() {
