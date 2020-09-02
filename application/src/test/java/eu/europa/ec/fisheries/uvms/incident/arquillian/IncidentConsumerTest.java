@@ -7,6 +7,7 @@ import eu.europa.ec.fisheries.uvms.incident.helper.TicketHelper;
 import eu.europa.ec.fisheries.uvms.incident.helper.TopicListener;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Before;
@@ -46,6 +47,7 @@ public class IncidentConsumerTest extends BuildIncidentTestDeployment {
         UUID movId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
         IncidentTicketDto ticket = TicketHelper.createTicket( assetId, movId, mobTermId);
+        ticket.setType(IncidentType.ASSET_NOT_SENDING);
 
         try (TopicListener listener = new TopicListener(jmsHelper.EVENT_STREAM, "")) {
             String asString = jsonb.toJson(ticket);
@@ -67,6 +69,7 @@ public class IncidentConsumerTest extends BuildIncidentTestDeployment {
         UUID movId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
         IncidentTicketDto ticket = TicketHelper.createTicket(assetId, movId, mobTermId);
+        ticket.setType(IncidentType.ASSET_NOT_SENDING);
 
         try (TopicListener listener = new TopicListener(jmsHelper.EVENT_STREAM, "")) {
             String asString = jsonb.toJson(ticket);

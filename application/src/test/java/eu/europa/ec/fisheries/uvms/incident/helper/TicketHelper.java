@@ -12,7 +12,7 @@ public class TicketHelper {
 
     public static IncidentTicketDto createTicket(UUID assetId, UUID movId, UUID mobTermId) {
         IncidentTicketDto ticket = new IncidentTicketDto();
-        ticket.setType(IncidentType.ASSET_NOT_SENDING);
+        ticket.setType(null);
         ticket.setAssetId(assetId.toString());
         ticket.setMovementId(movId.toString());
         ticket.setMobTermId(mobTermId.toString());

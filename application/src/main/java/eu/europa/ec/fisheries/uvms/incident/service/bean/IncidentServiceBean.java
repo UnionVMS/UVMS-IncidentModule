@@ -244,7 +244,7 @@ public class IncidentServiceBean {
             throw new IllegalArgumentException("Not allowed to change status on incident " + incidentId + " since it has status 'RESOLVED'");
         }
 
-        persisted.setStatus(statusDto.getStatus());
+        persisted.setStatus(statusDto.getStatus() != null ? statusDto.getStatus() : persisted.getStatus());
         Incident updated = incidentDao.update(persisted);
         updatedIncident.fire(updated);
         incidentLogServiceBean.createIncidentLogForStatus(updated, statusDto.getEventType().getMessage(),
@@ -259,7 +259,11 @@ public class IncidentServiceBean {
     public void upsertIncidentLackingTicketId(IncidentTicketDto ticketDto){
         List<Incident> openByAsset = incidentDao.findOpenByAsset(UUID.fromString(ticketDto.getAssetId()));
         if(openByAsset != null && !openByAsset.isEmpty()){
-            internalUpdateIncident(ticketDto, openByAsset.get(0));
+            if(ticketDto.getType() != null){
+                return;
+            }
+            Incident openIncident = openByAsset.get(0);
+            internalUpdateIncident(ticketDto, openIncident);
         }else{
             internalCreateIncident(ticketDto);
         }

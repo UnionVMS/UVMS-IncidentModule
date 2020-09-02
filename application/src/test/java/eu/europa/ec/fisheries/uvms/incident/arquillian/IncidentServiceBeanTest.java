@@ -62,6 +62,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID movementId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
         IncidentTicketDto ticket = TicketHelper.createTicket(assetId, movementId, mobTermId);
+        ticket.setType(IncidentType.ASSET_NOT_SENDING);
         String asString = jsonb.toJson(ticket);
         jmsHelper.sendMessageToIncidentQueue(asString, "IncidentUpdate");
 
@@ -79,6 +80,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID movementId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
         IncidentTicketDto ticket = TicketHelper.createTicket(assetId, movementId, mobTermId);
+        ticket.setType(IncidentType.ASSET_NOT_SENDING);
         ticket.setId(ticketId);
         String asString = jsonb.toJson(ticket);
         jmsHelper.sendMessageToIncidentQueue(asString, "Incident");
@@ -98,8 +100,10 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID movementId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
         IncidentTicketDto ticket = TicketHelper.createTicket(assetId, movementId, mobTermId);
+        ticket.setType(IncidentType.ASSET_NOT_SENDING);
         incidentService.createIncident(ticket);
 
+        ticket.setType(null);
         ticket.setMovementId(UUID.randomUUID().toString());
         ticket.setMovementSource(MovementSourceType.MANUAL);
         incidentService.updateIncident(ticket);
@@ -117,8 +121,10 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID movementId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
         IncidentTicketDto ticket = TicketHelper.createTicket(assetId, movementId, mobTermId);
+        ticket.setType(IncidentType.ASSET_NOT_SENDING);
         incidentService.createIncident(ticket);
 
+        ticket.setType(null);
         ticket.setMovementId(UUID.randomUUID().toString());
         ticket.setMovementSource(MovementSourceType.MANUAL);
         incidentService.updateIncident(ticket);
@@ -141,6 +147,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID movementId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
         IncidentTicketDto ticket = TicketHelper.createTicket(assetId, movementId, mobTermId);
+        ticket.setType(IncidentType.ASSET_NOT_SENDING);
         String asString = jsonb.toJson(ticket);
         jmsHelper.sendMessageToIncidentQueue(asString, "Incident");
 
@@ -201,6 +208,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         ticket.setMovementId(updatedMovement.toString());
         ticket.setMovementSource(MovementSourceType.AIS);
         ticket.setUpdated(Instant.now());
+        ticket.setType(null);
 
         incidentService.updateIncident(ticket);
 
@@ -231,6 +239,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         ticket.setMovementId(updatedMovement.toString());
         ticket.setMovementSource(MovementSourceType.NAF);
         ticket.setUpdated(Instant.now());
+        ticket.setType(null);
 
         incidentService.updateIncident(ticket);
         Incident updatedIncident = incidentDao.findById(openByAssetAndType.getId());
@@ -391,6 +400,35 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         assertEquals(2, incidentLogs.size());
         assertTrue(incidentLogs.stream().anyMatch(log -> log.getIncidentStatus().equals(StatusEnum.MANUAL_POSITION_MODE)));
         assertTrue(incidentLogs.stream().anyMatch(log -> log.getEventType().equals(EventTypeEnum.MANUAL_POSITION)));
+    }
+
+    @Test
+    @OperateOnDeployment("incident")
+    public void manualIncidentReceivesAssetNotSendingShouldDoNothing() {
+        UUID movementId = UUID.randomUUID();
+        UUID mobTermId = UUID.randomUUID();
+        IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
+        incidentDto.setType(IncidentType.MANUAL_MODE);
+
+        incidentDto = incidentService.createIncident(incidentDto, "Tester");
+
+        Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(incidentDto.getAssetId(), IncidentType.MANUAL_MODE);
+
+        assertNotNull(openByAssetAndType);
+
+        IncidentTicketDto ticket = TicketHelper.createTicket(incidentDto.getAssetId(), movementId, mobTermId);
+        ticket.setType(IncidentType.ASSET_NOT_SENDING);
+        ticket.setMovementSource(MovementSourceType.MANUAL);
+        ticket.setUpdated(Instant.now());
+
+        incidentService.updateIncident(ticket);
+
+        Incident updatedIncident = incidentDao.findById(openByAssetAndType.getId());
+        assertEquals(StatusEnum.MANUAL_POSITION_MODE, updatedIncident.getStatus());
+
+        List<IncidentLog> incidentLogs = incidentLogDao.findAllByIncidentId(openByAssetAndType.getId());
+        assertFalse(incidentLogs.isEmpty());
+        assertEquals(1, incidentLogs.size());
     }
 
     @Test
