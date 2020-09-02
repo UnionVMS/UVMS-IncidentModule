@@ -95,7 +95,7 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
     }
 
     public void createIncidentTest() {
-        IncidentDto incidentDto = TicketHelper.createIncidentDto();
+        IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
         Instant expiryDate = Instant.now().truncatedTo(ChronoUnit.MILLIS);
         incidentDto.setExpiryDate(expiryDate);
         IncidentDto createdIncident = getWebTarget()
@@ -115,7 +115,7 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
     @Test
     @OperateOnDeployment("incident")
     public void createIncidentLogCreatedTest() {
-        IncidentDto incidentDto = TicketHelper.createIncidentDto();
+        IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
         IncidentDto createdIncident = getWebTarget()
                 .path("incident")
                 .request(MediaType.APPLICATION_JSON)

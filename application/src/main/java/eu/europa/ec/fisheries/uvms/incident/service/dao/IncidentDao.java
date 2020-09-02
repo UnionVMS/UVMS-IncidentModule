@@ -91,8 +91,7 @@ public class IncidentDao {
 
     public List<Incident> findOpenByAsset(UUID assetId){
         try {
-
-            TypedQuery<Incident> query = em.createNamedQuery(Incident.FIND_BY_ASSET_TYPE_AND_EXCLUDE_STATUS, Incident.class);
+            TypedQuery<Incident> query = em.createNamedQuery(Incident.FIND_BY_ASSET_AND_EXCLUDE_STATUS, Incident.class);
             query.setParameter("status", ServiceConstants.RESOLVED_STATUS_LIST);
             query.setParameter("assetId", assetId);
             return query.getResultList();

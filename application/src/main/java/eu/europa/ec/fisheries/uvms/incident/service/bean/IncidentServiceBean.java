@@ -1,14 +1,12 @@
 package eu.europa.ec.fisheries.uvms.incident.service.bean;
 
-import eu.europa.ec.fisheries.schema.movement.v1.MovementSourceType;
-import eu.europa.ec.fisheries.schema.movementrules.ticket.v1.TicketStatusType;
-import eu.europa.ec.fisheries.uvms.asset.client.AssetClient;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.AssetNotSendingDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.StatusDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.EventTypeEnum;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.MovementSourceType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentDao;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentLogDao;
@@ -109,7 +107,7 @@ public class IncidentServiceBean {
 
     public IncidentDto createIncident(IncidentDto incidentDto, String user) {
         Incident incident = incidentHelper.incidentDtoToIncident(incidentDto);
-        incident.setStatus(StatusEnum.INCIDENT_CREATED);
+        incident.setStatus(incidentDto.getType().equals(IncidentType.MANUAL_MODE) ? StatusEnum.MANUAL_POSITION_MODE : StatusEnum.INCIDENT_CREATED);
         incident.setCreateDate(Instant.now());
         Incident persistedIncident = incidentDao.save(incident);
         incidentLogServiceBean.createIncidentLogForStatus(persistedIncident, "Incident created by " + user, EventTypeEnum.INCIDENT_CREATED, null);
@@ -215,6 +213,7 @@ public class IncidentServiceBean {
                 recentAis.setCreateDate(Instant.now());
                 recentAis.setRelatedObjectId(UUID.fromString(ticket.getMovementId()));
             }else{
+                persisted.setStatus(StatusEnum.RECEIVING_AIS_POSITIONS);
                 incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_AIS_POSITION.getMessage(), EventTypeEnum.RECEIVED_AIS_POSITION, UUID.fromString(ticket.getMovementId()));
             }
         } else {

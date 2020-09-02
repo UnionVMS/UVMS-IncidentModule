@@ -42,15 +42,14 @@ public class IncidentConsumerTest extends BuildIncidentTestDeployment {
     @Test
     @OperateOnDeployment("incident")
     public void consumeIncidentQueue() throws Exception {
-        UUID ticketId = UUID.randomUUID();
         UUID assetId = UUID.randomUUID();
         UUID movId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
-        IncidentTicketDto ticket = TicketHelper.createTicket(ticketId, assetId, movId, mobTermId);
+        IncidentTicketDto ticket = TicketHelper.createTicket( assetId, movId, mobTermId);
 
         try (TopicListener listener = new TopicListener(jmsHelper.EVENT_STREAM, "")) {
             String asString = jsonb.toJson(ticket);
-            jmsHelper.sendMessageToIncidentQueue(asString, "Incident");
+            jmsHelper.sendMessageToIncidentQueue(asString, "IncidentUpdate");
 
             Message message = listener.listenOnEventBus();
             TextMessage textMessage = (TextMessage) message;
@@ -67,7 +66,7 @@ public class IncidentConsumerTest extends BuildIncidentTestDeployment {
         UUID assetId = UUID.randomUUID();
         UUID movId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
-        IncidentTicketDto ticket = TicketHelper.createTicket(null, assetId, movId, mobTermId);
+        IncidentTicketDto ticket = TicketHelper.createTicket(assetId, movId, mobTermId);
 
         try (TopicListener listener = new TopicListener(jmsHelper.EVENT_STREAM, "")) {
             String asString = jsonb.toJson(ticket);

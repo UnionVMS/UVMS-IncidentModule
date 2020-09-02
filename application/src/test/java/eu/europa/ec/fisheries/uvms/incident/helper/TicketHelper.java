@@ -10,9 +10,8 @@ import java.util.UUID;
 
 public class TicketHelper {
 
-    public static IncidentTicketDto createTicket(UUID ticketId, UUID assetId, UUID movId, UUID mobTermId) {
+    public static IncidentTicketDto createTicket(UUID assetId, UUID movId, UUID mobTermId) {
         IncidentTicketDto ticket = new IncidentTicketDto();
-        ticket.setId(ticketId);
         ticket.setType(IncidentType.ASSET_NOT_SENDING);
         ticket.setAssetId(assetId.toString());
         ticket.setMovementId(movId.toString());
@@ -28,7 +27,7 @@ public class TicketHelper {
         return ticket;
     }
 
-    public static IncidentDto createIncidentDto() {
+    public static IncidentDto createBasicIncidentDto() {
         IncidentDto incidentDto = new IncidentDto();
         incidentDto.setAssetId(UUID.randomUUID());
         incidentDto.setAssetName("Test asset");
