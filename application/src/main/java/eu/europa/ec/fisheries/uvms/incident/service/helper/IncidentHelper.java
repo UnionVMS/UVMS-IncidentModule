@@ -63,7 +63,7 @@ public class IncidentHelper {
         incident.setIrcs(incidentDto.getAssetIrcs());
         incident.setExpiryDate(incidentDto.getExpiryDate());
         if (incidentDto.getLastKnownLocation() != null) {
-            incident.setMovementId(UUID.fromString(incidentDto.getLastKnownLocation().getId()));
+            incident.setMovementId(incidentDto.getLastKnownLocation().getId());
         }
         if (incidentDto.getStatus() != null) {
             incident.setStatus(StatusEnum.valueOf(incidentDto.getStatus()));
@@ -72,9 +72,9 @@ public class IncidentHelper {
     }
 
     public IncidentDto incidentEntityToDto(Incident incident) {
-        MicroMovement movement = null;
+        eu.europa.ec.fisheries.uvms.movement.model.dto.MovementDto movement = null;
         if(incident.getMovementId() != null) {
-            movement = movementClient.getMicroMovementById(incident.getMovementId());
+            movement = movementClient.getMovementById(incident.getMovementId());
         }
         return mapEntityToDto(incident, movement);
     }
@@ -83,15 +83,15 @@ public class IncidentHelper {
         List<UUID> movementIds = incidentList.stream()
                     .map(Incident::getMovementId)
                     .collect(Collectors.toList());
-        Map<String, MicroMovement> movementMap = movementClient.getMicroMovementByIdList(movementIds)
+        Map<UUID, eu.europa.ec.fisheries.uvms.movement.model.dto.MovementDto> movementMap = movementClient.getMovementDtoByIdList(movementIds)
                     .stream()
-                    .collect(Collectors.toMap(MicroMovement::getId, Function.identity()));
+                    .collect(Collectors.toMap(eu.europa.ec.fisheries.uvms.movement.model.dto.MovementDto::getId, Function.identity()));
         return incidentList
                     .stream()
-                    .collect(Collectors.toMap(Incident::getId, i -> mapEntityToDto(i, movementMap.get(i.getMovementId().toString()))));
+                    .collect(Collectors.toMap(Incident::getId, i -> mapEntityToDto(i, movementMap.get(i.getMovementId()))));
     }
     
-    private IncidentDto mapEntityToDto(Incident entity, MicroMovement micro) {
+    private IncidentDto mapEntityToDto(Incident entity, eu.europa.ec.fisheries.uvms.movement.model.dto.MovementDto move) {
         IncidentDto dto = new IncidentDto();
         dto.setId(entity.getId());
         dto.setAssetId(entity.getAssetId());
@@ -106,24 +106,36 @@ public class IncidentHelper {
         if (entity.getUpdateDate() != null) {
             dto.setUpdateDate(entity.getUpdateDate());
         }
-        if(entity.getMovementId() != null && micro != null) {
-            MicroMovementDto lastKnownLocation = new MicroMovementDto();
-
-            MovementPointDto location = new MovementPointDto();
-            location.setLatitude(micro.getLocation().getLatitude());
-            location.setLongitude(micro.getLocation().getLongitude());
-            if (micro.getLocation().getAltitude() != null) {
-                location.setAltitude(micro.getLocation().getAltitude());
-            }
-            lastKnownLocation.setLocation(location);
-            lastKnownLocation.setHeading(micro.getHeading());
-            lastKnownLocation.setId(micro.getId());
-            lastKnownLocation.setTimestamp(micro.getTimestamp());
-            lastKnownLocation.setSpeed(micro.getSpeed());
-            lastKnownLocation.setSource(MovementSourceType.fromValue(micro.getSource().name()));
-
-            dto.setLastKnownLocation(lastKnownLocation);
+        if(entity.getMovementId() != null && move != null) {
+            dto.setLastKnownLocation(mapMovementMovementToIncidentMovement(move));
         }
+        return dto;
+    }
+
+    private MovementDto mapMovementMovementToIncidentMovement(eu.europa.ec.fisheries.uvms.movement.model.dto.MovementDto move){
+        MovementDto dto = new MovementDto();
+
+        MovementPointDto location = new MovementPointDto();
+        location.setLatitude(move.getLocation().getLatitude());
+        location.setLongitude(move.getLocation().getLongitude());
+        dto.setLocation(location);
+
+        dto.setAisPositionAccuracy(move.getAisPositionAccuracy());
+        dto.setAsset(move.getAsset());
+        dto.setHeading(move.getHeading());
+        dto.setId(move.getId());
+        dto.setInternalReferenceNumber(move.getInternalReferenceNumber());
+        dto.setLesReportTime(move.getLesReportTime());
+        dto.setMovementType(move.getMovementType() != null ? move.getMovementType().value() : null);
+        dto.setSource(MovementSourceType.fromValue(move.getSource().value()));
+        dto.setSourceSatelliteId(move.getSourceSatelliteId() != null ? move.getSourceSatelliteId().name() : null);
+        dto.setSpeed(move.getSpeed());
+        dto.setStatus(move.getStatus());
+        dto.setTimestamp(move.getTimestamp());
+        dto.setTripNumber(move.getTripNumber());
+        dto.setUpdated(move.getUpdated());
+        dto.setUpdatedBy(move.getUpdatedBy());
+
         return dto;
     }
 
