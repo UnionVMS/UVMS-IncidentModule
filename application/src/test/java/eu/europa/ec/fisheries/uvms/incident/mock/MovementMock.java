@@ -32,6 +32,8 @@ public class MovementMock {
     }
 
     @GET
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("getMicroMovement/{id}")
     public Response getMicroMovement(@PathParam("id") UUID id) {
         MicroMovement movement = new MicroMovement();
@@ -52,6 +54,8 @@ public class MovementMock {
 
     @POST
     @Path("/getMicroMovementList")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     @RequiresFeature(UnionVMSFeature.manageInternalRest)
     public Response getMicroMovementByIdList(List<UUID> moveIds) {
         List<MicroMovement> responseList = new ArrayList<>();
