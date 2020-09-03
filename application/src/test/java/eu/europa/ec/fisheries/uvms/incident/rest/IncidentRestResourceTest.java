@@ -7,6 +7,9 @@ import eu.europa.ec.fisheries.uvms.incident.model.dto.AssetNotSendingDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentLogDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
+import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;
@@ -21,12 +24,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 @RunWith(Arquillian.class)
 public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
@@ -69,8 +72,30 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
 
     @Test
     @OperateOnDeployment("incident")
+    public void getStatuseThatCountAsResolved() {
+        List<StatusEnum> response = getWebTarget()
+                .path("incident/resolvedStatuses")
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .get(new GenericType<List<StatusEnum>>() {});
+        assertNotNull(response);
+        assertEquals(ServiceConstants.RESOLVED_STATUS_LIST, response);
+    }
+
+    @Test
+    @OperateOnDeployment("incident")
+    public void getIncidentTypes() {
+        List<IncidentType> response = getWebTarget()
+                .path("incident/incidentTypes")
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .get(new GenericType<List<IncidentType>>() {});
+        assertNotNull(response);
+        assertEquals(Arrays.asList(IncidentType.values()), response);
+    }
+
     public void createIncidentTest() {
-        IncidentDto incidentDto = TicketHelper.createIncidentDto();
+        IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
         Instant expiryDate = Instant.now().truncatedTo(ChronoUnit.MILLIS);
         incidentDto.setExpiryDate(expiryDate);
         IncidentDto createdIncident = getWebTarget()
@@ -90,7 +115,7 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
     @Test
     @OperateOnDeployment("incident")
     public void createIncidentLogCreatedTest() {
-        IncidentDto incidentDto = TicketHelper.createIncidentDto();
+        IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
         IncidentDto createdIncident = getWebTarget()
                 .path("incident")
                 .request(MediaType.APPLICATION_JSON)

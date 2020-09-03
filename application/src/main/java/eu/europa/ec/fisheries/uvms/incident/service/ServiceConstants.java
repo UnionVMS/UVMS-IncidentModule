@@ -1,5 +1,6 @@
 package eu.europa.ec.fisheries.uvms.incident.service;
 
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 
 import java.util.Arrays;
@@ -7,6 +8,6 @@ import java.util.List;
 
 public class ServiceConstants {
 
-    public static final List<StatusEnum> RESOLVED_STATUS_LIST = Arrays.asList(StatusEnum.LONG_TERM_PARKED, StatusEnum.RESOLVED, StatusEnum.SYSTEM_AUTO_RESOLVED);
-    public static final List<StatusEnum> SOFT_RESOLVED_STATUS_LIST = Arrays.asList(StatusEnum.LONG_TERM_PARKED, StatusEnum.RESOLVED);
+    public static final List<StatusEnum> RESOLVED_STATUS_LIST = Arrays.asList(StatusEnum.RESOLVED);
+    public static final List<IncidentType> REACT_ON_RECENT_AIS = Arrays.asList(IncidentType.MANUAL_MODE, IncidentType.OWNER_TRANSFER, IncidentType.PARKED, IncidentType.SEASONAL_FISHING);
 }
