@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.7.xsd"
+                   logicalFilePath="changelog/v0.4.1/db-changelog-remap-removed-status-codes.xml">
+
+    <changeSet id="Change away from statuses that has been removed or changed" author="joemat">
+        <update  tableName="incident">
+            <column  name="status" value="PARKED"/>
+            <where>status='LONG_TERM_PARKED'</where>
+        </update>
+
+        <update  tableName="incident">
+            <column  name="status" value="RESOLVED"/>
+            <where>status='SYSTEM_AUTO_RESOLVED'</where>
+        </update>
+
+        <update  tableName="incident_log">
+            <column  name="incident_status" value="RESOLVED"/>
+            <where>incident_status='SYSTEM_AUTO_RESOLVED'</where>
+        </update>
+
+        <update  tableName="incident_log">
+            <column  name="incident_status" value="PARKED"/>
+            <where>incident_status='LONG_TERM_PARKED'</where>
+        </update>
+
+    </changeSet>
+
+
+</databaseChangeLog>
