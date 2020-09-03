@@ -13,8 +13,10 @@ package eu.europa.ec.fisheries.uvms.incident.service.bean;
 
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.EventTypeEnum;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
+import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentDao;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
+import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.IncidentLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +52,24 @@ public class IncidentTimerBean {
             }
         } catch (Exception e) {
             LOG.error("[ Error when running manualPositionsTimer. ] {}", e);
+        }
+    }
+
+    @Schedule(minute = "*/5", hour = "*", persistent = false)
+    public void recentAisTimer() {
+        try {
+            List<Incident> incidentsThatReactOnRecentAIS = incidentDao.findOpenByTypes(ServiceConstants.REACT_ON_RECENT_AIS);
+            for (Incident incident : incidentsThatReactOnRecentAIS) {
+                if (incident.getStatus().equals(StatusEnum.RECEIVING_AIS_POSITIONS)) {
+                    IncidentLog recentAisLog = incidentLogServiceBean.findLogWithTypeEntryFromTheLastHour(incident.getId(), EventTypeEnum.RECEIVED_AIS_POSITION);
+                    if (recentAisLog == null) {
+                        incident.setStatus(StatusEnum.PARKED);
+                        incidentLogServiceBean.createIncidentLogForStatus(incident, "Incident status updated to " + incident.getStatus(), EventTypeEnum.INCIDENT_STATUS, null);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("[ Error when running recentAisTimer. ] {}", e);
         }
     }
 

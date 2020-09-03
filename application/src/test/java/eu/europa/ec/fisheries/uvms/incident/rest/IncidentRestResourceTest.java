@@ -2,10 +2,14 @@ package eu.europa.ec.fisheries.uvms.incident.rest;
 
 import eu.europa.ec.fisheries.uvms.incident.BuildIncidentTestDeployment;
 import eu.europa.ec.fisheries.uvms.incident.helper.JMSHelper;
+import eu.europa.ec.fisheries.uvms.incident.helper.TicketHelper;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.AssetNotSendingDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentLogDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
+import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;
@@ -13,15 +17,19 @@ import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
 import javax.json.bind.Jsonb;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 @RunWith(Arquillian.class)
 public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
@@ -38,8 +46,6 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
     @Inject
     private JMSHelper jmsHelper;
 
-    //For some reason I can not get jsonb.toJson to work, it only gives me abstract method error
-    // so the below tests just check that the endpoints are reached and dont return exceptions
     /*@Before
     public void consumeIncidentQueue() throws Exception {
         jmsHelper.clearQueue(jmsHelper.QUEUE_NAME);
@@ -63,6 +69,70 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
             incident = jsonb.fromJson(text, IncidentDto.class);
         }
     }*/
+
+    @Test
+    @OperateOnDeployment("incident")
+    public void getStatuseThatCountAsResolved() {
+        List<StatusEnum> response = getWebTarget()
+                .path("incident/resolvedStatuses")
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .get(new GenericType<List<StatusEnum>>() {});
+        assertNotNull(response);
+        assertEquals(ServiceConstants.RESOLVED_STATUS_LIST, response);
+    }
+
+    @Test
+    @OperateOnDeployment("incident")
+    public void getIncidentTypes() {
+        List<IncidentType> response = getWebTarget()
+                .path("incident/incidentTypes")
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .get(new GenericType<List<IncidentType>>() {});
+        assertNotNull(response);
+        assertEquals(Arrays.asList(IncidentType.values()), response);
+    }
+
+    public void createIncidentTest() {
+        IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
+        Instant expiryDate = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+        incidentDto.setExpiryDate(expiryDate);
+        IncidentDto createdIncident = getWebTarget()
+                .path("incident")
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .post(Entity.json(incidentDto), IncidentDto.class);
+
+        assertNotNull(createdIncident.getId());
+        assertEquals(incidentDto.getAssetId(), createdIncident.getAssetId());
+        assertEquals(incidentDto.getType(), createdIncident.getType());
+        assertEquals(expiryDate, createdIncident.getExpiryDate());
+        assertNotNull(createdIncident.getUpdateDate());
+        assertNotNull(createdIncident.getCreateDate());
+    }
+
+    @Test
+    @OperateOnDeployment("incident")
+    public void createIncidentLogCreatedTest() {
+        IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
+        IncidentDto createdIncident = getWebTarget()
+                .path("incident")
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .post(Entity.json(incidentDto), IncidentDto.class);
+
+        Map<Long, IncidentLogDto> logs = getWebTarget()
+                .path("incident/incidentLogForIncident")
+                .path(createdIncident.getId().toString())
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .get(new GenericType<Map<Long, IncidentLogDto>>() {});
+
+        assertEquals(1, logs.size());
+        assertTrue(logs.values().stream()
+                .anyMatch(log -> log.getMessage().contains(BuildIncidentTestDeployment.USER_NAME)));
+    }
 
     @Test
     @OperateOnDeployment("incident")

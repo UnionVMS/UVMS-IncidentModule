@@ -1,9 +1,9 @@
 package eu.europa.ec.fisheries.uvms.incident.service.dao;
 
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
-import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +77,26 @@ public class IncidentDao {
             query.setParameter("assetId", assetId);
             return query.getSingleResult();
         }catch (NoResultException e) {
-            LOG.debug("No incident found for asset {} and type {}", assetId, type);
+            LOG.debug("No open incident found for asset {} and type {}", assetId, type);
+            return null;
+        }
+    }
+
+    public List<Incident> findOpenByTypes(List<IncidentType> type){
+        TypedQuery<Incident> query = em.createNamedQuery(Incident.FIND_BY_TYPES_AND_EXCLUDE_STATUS, Incident.class);
+        query.setParameter("type", type);
+        query.setParameter("status", ServiceConstants.RESOLVED_STATUS_LIST);
+        return query.getResultList();
+    }
+
+    public List<Incident> findOpenByAsset(UUID assetId){
+        try {
+            TypedQuery<Incident> query = em.createNamedQuery(Incident.FIND_BY_ASSET_AND_EXCLUDE_STATUS, Incident.class);
+            query.setParameter("status", ServiceConstants.RESOLVED_STATUS_LIST);
+            query.setParameter("assetId", assetId);
+            return query.getResultList();
+        }catch (NoResultException e) {
+            LOG.debug("No open incident found for asset {}", assetId);
             return null;
         }
     }

@@ -13,9 +13,11 @@ import eu.europa.ec.fisheries.uvms.movement.client.model.MicroMovement;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-
 import java.time.Instant;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -51,6 +53,24 @@ public class IncidentHelper {
         }
     }
 
+    public Incident incidentDtoToIncident(IncidentDto incidentDto) {
+        Incident incident = new Incident();
+        incident.setAssetId(incidentDto.getAssetId());
+        incident.setMobileTerminalId(incidentDto.getMobileTerminalId());
+        incident.setTicketId(incidentDto.getTicketId());
+        incident.setType(incidentDto.getType());
+        incident.setAssetName(incidentDto.getAssetName());
+        incident.setIrcs(incidentDto.getAssetIrcs());
+        incident.setExpiryDate(incidentDto.getExpiryDate());
+        if (incidentDto.getLastKnownLocation() != null) {
+            incident.setMovementId(UUID.fromString(incidentDto.getLastKnownLocation().getId()));
+        }
+        if (incidentDto.getStatus() != null) {
+            incident.setStatus(StatusEnum.valueOf(incidentDto.getStatus()));
+        }
+        return incident;
+    }
+
     public IncidentDto incidentEntityToDto(Incident incident) {
         MicroMovement movement = null;
         if(incident.getMovementId() != null) {
@@ -82,6 +102,7 @@ public class IncidentHelper {
         dto.setAssetIrcs(entity.getIrcs());
         dto.setStatus(entity.getStatus().name());
         dto.setCreateDate(entity.getCreateDate());
+        dto.setExpiryDate(entity.getExpiryDate());
         if (entity.getUpdateDate() != null) {
             dto.setUpdateDate(entity.getUpdateDate());
         }

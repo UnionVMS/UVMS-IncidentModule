@@ -19,6 +19,7 @@ public class IncidentDto implements Serializable {
     private Instant createDate;
     private Instant updateDate;
     private MicroMovementDto lastKnownLocation;
+    private Instant expiryDate;
 
     public Long getId() {
         return id;
@@ -106,5 +107,13 @@ public class IncidentDto implements Serializable {
 
     public void setUpdateDate(Instant updateDate) {
         this.updateDate = updateDate;
+    }
+
+    public Instant getExpiryDate() {
+        return expiryDate;
+    }
+
+    public void setExpiryDate(Instant expiryDate) {
+        this.expiryDate = expiryDate;
     }
 }

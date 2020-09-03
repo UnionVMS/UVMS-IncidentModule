@@ -2,14 +2,12 @@ package eu.europa.ec.fisheries.uvms.incident.model.dto.enums;
 
 public enum  StatusEnum {
     INCIDENT_CREATED,
-    POLL_INITIATED,
-    NOTE_ADDED,
     ATTEMPTED_CONTACT,
     MANUAL_POSITION_MODE,
     MANUAL_POSITION_LATE,
-    LONG_TERM_PARKED,
-    TECHNICAL_ISSUE,
+    PARKED,
     RESOLVED,
-    SYSTEM_AUTO_RESOLVED,
+    RECEIVING_VMS_POSITIONS,
+    RECEIVING_AIS_POSITIONS,
     INCIDENT_AUTO_UPDATED;
 }

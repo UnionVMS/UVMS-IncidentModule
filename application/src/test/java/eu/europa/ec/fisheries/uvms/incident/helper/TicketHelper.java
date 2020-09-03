@@ -1,17 +1,18 @@
 package eu.europa.ec.fisheries.uvms.incident.helper;
 
 import eu.europa.ec.fisheries.schema.movementrules.ticket.v1.TicketStatusType;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
+
 import java.time.Instant;
 import java.util.UUID;
 
 public class TicketHelper {
 
-    public static IncidentTicketDto createTicket(UUID ticketId, UUID assetId, UUID movId, UUID mobTermId) {
+    public static IncidentTicketDto createTicket(UUID assetId, UUID movId, UUID mobTermId) {
         IncidentTicketDto ticket = new IncidentTicketDto();
-        ticket.setId(ticketId);
-        ticket.setType(IncidentType.ASSET_NOT_SENDING);
+        ticket.setType(null);
         ticket.setAssetId(assetId.toString());
         ticket.setMovementId(movId.toString());
         ticket.setMobTermId(mobTermId.toString());
@@ -24,5 +25,14 @@ public class TicketHelper {
         ticket.setCreatedDate(date);
         ticket.setUpdated(date);
         return ticket;
+    }
+
+    public static IncidentDto createBasicIncidentDto() {
+        IncidentDto incidentDto = new IncidentDto();
+        incidentDto.setAssetId(UUID.randomUUID());
+        incidentDto.setAssetName("Test asset");
+        incidentDto.setStatus("INCIDENT_CREATED");
+        incidentDto.setType(IncidentType.PARKED);
+        return incidentDto;
     }
 }

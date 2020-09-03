@@ -16,6 +16,7 @@ import eu.europa.ec.fisheries.uvms.incident.model.dto.AssetNotSendingDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentLogDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.StatusDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentLogServiceBean;
 import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentServiceBean;
@@ -70,6 +71,9 @@ public class IncidentRestResource {
     @Inject
     private IncidentLogDao incidentLogDao;
 
+    @Context
+    private HttpServletRequest request;
+
     private Jsonb jsonb;
 
     @PostConstruct
@@ -77,11 +81,25 @@ public class IncidentRestResource {
         jsonb = new JsonBConfigurator().getContext(null);
     }
 
+    @POST
+    @RequiresFeature(UnionVMSFeature.manageAlarmsOpenTickets)
+    public Response createIncident(IncidentDto incidentDto) {
+        IncidentDto createdIncident = incidentServiceBean.createIncident(incidentDto, request.getRemoteUser());
+        return Response.ok(createdIncident).build();
+    }
+
     @GET
     @Path("resolvedStatuses")
     @RequiresFeature(UnionVMSFeature.viewAlarmsOpenTickets)
     public Response getStatuseThatCountAsResolved() {
         return Response.ok(ServiceConstants.RESOLVED_STATUS_LIST).build();
+    }
+
+    @GET
+    @Path("incidentTypes")
+    @RequiresFeature(UnionVMSFeature.viewAlarmsOpenTickets)
+    public Response getIncidentTypes() {
+        return Response.ok(IncidentType.values()).build();
     }
 
 
