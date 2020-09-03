@@ -12,7 +12,7 @@ details. You should have received a copy of the GNU General Public License along
 package eu.europa.ec.fisheries.uvms.incident.rest;
 
 import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
-import eu.europa.ec.fisheries.uvms.incident.model.dto.AssetNotSendingDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.OpenAndRecentlyResolvedIncidentsDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentLogDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.StatusDto;
@@ -104,15 +104,15 @@ public class IncidentRestResource {
 
 
     @GET
-    @Path("assetNotSending")
+    @Path("allOpenIncidents")
     @RequiresFeature(UnionVMSFeature.viewAlarmsOpenTickets)
-    public Response getAssetNotSendingEvents() {
+    public Response getAllOpenAndRecentlyResolvedIncidents() {
         try {
-            AssetNotSendingDto notSendingDto = incidentServiceBean.getAssetNotSendingList();
+            OpenAndRecentlyResolvedIncidentsDto notSendingDto = incidentServiceBean.getAllOpenAndRecentlyResolvedIncidents();
             String response = jsonb.toJson(notSendingDto);
             return Response.ok(response).build();
         } catch (Exception e) {
-            LOG.error("Error while fetching AssetNotSending List", e);
+            LOG.error("Error while fetching all open and recently resolved incidents", e);
             throw e;
         }
     }
@@ -206,7 +206,7 @@ public class IncidentRestResource {
             String response = jsonb.toJson(dto);
             return Response.ok(response).build();
         } catch (Exception e) {
-            LOG.error("Error while fetching AssetNotSending List", e);
+            LOG.error("Error while updating incident status", e);
             throw e;
         }
     }

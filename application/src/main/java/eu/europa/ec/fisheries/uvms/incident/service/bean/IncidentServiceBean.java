@@ -1,6 +1,6 @@
 package eu.europa.ec.fisheries.uvms.incident.service.bean;
 
-import eu.europa.ec.fisheries.uvms.incident.model.dto.AssetNotSendingDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.OpenAndRecentlyResolvedIncidentsDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.StatusDto;
@@ -22,6 +22,7 @@ import javax.ejb.Stateless;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -55,12 +56,12 @@ public class IncidentServiceBean {
     @Inject
     private IncidentLogDao incidentLogDao;
 
-    public AssetNotSendingDto getAssetNotSendingList() {
-        AssetNotSendingDto dto = new AssetNotSendingDto();
-        List<Incident> unresolvedIncidents = incidentDao.findUnresolvedIncidents(IncidentType.ASSET_NOT_SENDING);
+    public OpenAndRecentlyResolvedIncidentsDto getAllOpenAndRecentlyResolvedIncidents() {
+        OpenAndRecentlyResolvedIncidentsDto dto = new OpenAndRecentlyResolvedIncidentsDto();
+        List<Incident> unresolvedIncidents = incidentDao.findOpenByTypes(Arrays.asList(IncidentType.values()));
         dto.setUnresolved(incidentHelper.incidentToDtoMap(unresolvedIncidents));
 
-        List<Incident> resolvedSinceLast12Hours = incidentDao.findByStatusAndUpdatedSince12Hours(IncidentType.ASSET_NOT_SENDING);
+        List<Incident> resolvedSinceLast12Hours = incidentDao.findByStatusAndUpdatedSince12Hours(Arrays.asList(IncidentType.values()));
         dto.setRecentlyResolved(incidentHelper.incidentToDtoMap(resolvedSinceLast12Hours));
         return dto;
     }
