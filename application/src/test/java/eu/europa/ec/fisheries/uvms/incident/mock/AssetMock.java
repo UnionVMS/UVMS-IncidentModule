@@ -20,6 +20,7 @@ public class AssetMock {
     @GET
     @Path("asset/guid/{id}")
     public Response getMicroMovement(@PathParam("id") UUID id) {
+        System.setProperty("GET_ASSET_REACHED", "true");
         AssetDTO asset = new AssetDTO();
         asset.setId(id);
         asset.setName("Asset");
@@ -35,18 +36,8 @@ public class AssetMock {
         return Response.ok().entity(Boolean.TRUE).build();
     }
 
-    @GET
-    @Path("internal/asset/guid/{id}")
-    @RequiresFeature(UnionVMSFeature.manageInternalRest)
-    public Response getAssetById(@PathParam("id") String id) {
-        System.setProperty("GET_ASSET_REACHED", "true");
-        AssetDTO asset = new AssetDTO();
-        asset.setId(UUID.fromString(id));
-        return Response.ok(asset).build();
-    }
-
     @POST
-    @Path("internal/asset")
+    @Path("/asset")
     @RequiresFeature(UnionVMSFeature.manageInternalRest)
     public Response upsertAsset(AssetBO assetBo) {
         System.setProperty("UPDATE_ASSET_REACHED", "true");
