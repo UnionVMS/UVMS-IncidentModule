@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.UUID;
 
 @Path("movement/rest/internal")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 @Stateless
 public class MovementMock {
 
@@ -31,8 +33,6 @@ public class MovementMock {
 
     @GET
     @Path("getMicroMovement/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response getMicroMovement(@PathParam("id") UUID id) {
         MicroMovement movement = new MicroMovement();
         movement.setId(id.toString());
