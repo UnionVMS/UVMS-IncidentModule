@@ -198,7 +198,6 @@ public class IncidentRestResource {
     }
 
     @POST
-    //@Path("updateStatusForIncident/{incidentId}")
     @Path("addEventToIncident/{incidentId}")
     @RequiresFeature(UnionVMSFeature.manageAlarmsOpenTickets)
     public Response addEventToIncident(@PathParam("incidentId") long incidentId, EventCreationDto status) {
