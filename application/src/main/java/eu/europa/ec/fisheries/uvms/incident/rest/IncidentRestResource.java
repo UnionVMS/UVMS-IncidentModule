@@ -15,7 +15,7 @@ import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.OpenAndRecentlyResolvedIncidentsDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentLogDto;
-import eu.europa.ec.fisheries.uvms.incident.model.dto.StatusDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.EventCreationDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentLogServiceBean;
@@ -29,6 +29,7 @@ import eu.europa.ec.fisheries.uvms.rest.security.RequiresFeature;
 import eu.europa.ec.fisheries.uvms.rest.security.UnionVMSFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Stateless;
@@ -85,7 +86,7 @@ public class IncidentRestResource {
     @RequiresFeature(UnionVMSFeature.manageAlarmsOpenTickets)
     public Response createIncident(IncidentDto incidentDto) {
         IncidentDto createdIncident = incidentServiceBean.createIncident(incidentDto, request.getRemoteUser());
-        return Response.ok(createdIncident).build();
+        return Response.ok(createdIncident).header("MDC", MDC.get("requestId")).build();
     }
 
     @PUT
@@ -99,14 +100,14 @@ public class IncidentRestResource {
     @Path("resolvedStatuses")
     @RequiresFeature(UnionVMSFeature.viewAlarmsOpenTickets)
     public Response getStatuseThatCountAsResolved() {
-        return Response.ok(ServiceConstants.RESOLVED_STATUS_LIST).build();
+        return Response.ok(ServiceConstants.RESOLVED_STATUS_LIST).header("MDC", MDC.get("requestId")).build();
     }
 
     @GET
     @Path("incidentTypes")
     @RequiresFeature(UnionVMSFeature.viewAlarmsOpenTickets)
     public Response getIncidentTypes() {
-        return Response.ok(IncidentType.values()).build();
+        return Response.ok(IncidentType.values()).header("MDC", MDC.get("requestId")).build();
     }
 
 
@@ -117,7 +118,7 @@ public class IncidentRestResource {
         try {
             OpenAndRecentlyResolvedIncidentsDto notSendingDto = incidentServiceBean.getAllOpenAndRecentlyResolvedIncidents();
             String response = jsonb.toJson(notSendingDto);
-            return Response.ok(response).build();
+            return Response.ok(response).header("MDC", MDC.get("requestId")).build();
         } catch (Exception e) {
             LOG.error("Error while fetching all open and recently resolved incidents", e);
             throw e;
@@ -132,7 +133,7 @@ public class IncidentRestResource {
             Incident incident = incidentServiceBean.findByTicketId(ticketId);
             IncidentDto dto = incidentHelper.incidentEntityToDto(incident);
             String response = jsonb.toJson(dto);
-            return Response.ok(response).build();
+            return Response.ok(response).header("MDC", MDC.get("requestId")).build();
         } catch (Exception e) {
             LOG.error("Error while fetching incident by ticketId.", e);
             throw e;
@@ -146,7 +147,7 @@ public class IncidentRestResource {
         try {
             Incident incident = incidentDao.findById(incidentId);
             IncidentDto incidentDto = incidentHelper.incidentEntityToDto(incident);
-            return Response.ok(incidentDto).build();
+            return Response.ok(incidentDto).header("MDC", MDC.get("requestId")).build();
         } catch (Exception e) {
             LOG.error("Error while fetching incident by id", e);
             throw e;
@@ -161,7 +162,7 @@ public class IncidentRestResource {
             List<IncidentLog> incidentLogs = incidentLogServiceBean.getIncidentLogByIncidentId(incidentId);
             Map<Long, IncidentLogDto> dtoList = incidentHelper.incidentLogToDtoMap(incidentLogs);
             String response = jsonb.toJson(dtoList);
-            return Response.ok(response).build();
+            return Response.ok(response).header("MDC", MDC.get("requestId")).build();
         } catch (Exception e) {
             LOG.error("Error while fetching incident log for incident {} ", incidentId, e);
             throw e;
@@ -176,7 +177,7 @@ public class IncidentRestResource {
             List<Incident> incidents = incidentDao.findByAssetId(UUID.fromString(assetId));
             Map<Long, IncidentDto> dtoList = incidentHelper.incidentToDtoMap(incidents);
             String response = jsonb.toJson(dtoList);
-            return Response.ok(response).build();
+            return Response.ok(response).header("MDC", MDC.get("requestId")).build();
         } catch (Exception e) {
             LOG.error("Error while fetching incidents for asset id {} ", assetId, e);
             throw e;
@@ -196,7 +197,7 @@ public class IncidentRestResource {
             }
             Map<Long, IncidentLogDto> dtoList = incidentHelper.incidentLogToDtoMap(incidentLogs);
             String response = jsonb.toJson(dtoList);
-            return Response.ok(response).build();
+            return Response.ok(response).header("MDC", MDC.get("requestId")).build();
         } catch (Exception e) {
             LOG.error("Error while fetching incidents for asset id {} ", assetId, e);
             throw e;
@@ -204,16 +205,14 @@ public class IncidentRestResource {
     }
 
     @POST
-    @Path("updateStatusForIncident/{incidentId}")
+    @Path("addEventToIncident/{incidentId}")
     @RequiresFeature(UnionVMSFeature.manageAlarmsOpenTickets)
-    public Response updateIncident(@PathParam("incidentId") long incidentId, StatusDto status) {
+    public Response addEventToIncident(@PathParam("incidentId") long incidentId, EventCreationDto status) {
         try {
-            Incident updated = incidentServiceBean.updateIncidentStatus(incidentId, status);
-            IncidentDto dto = incidentHelper.incidentEntityToDto(updated);
-            String response = jsonb.toJson(dto);
-            return Response.ok(response).build();
+            incidentServiceBean.addEventToIncident(incidentId, status);
+            return Response.ok().header("MDC", MDC.get("requestId")).build();
         } catch (Exception e) {
-            LOG.error("Error while updating incident status", e);
+            LOG.error("Error adding a new event to incident", e);
             throw e;
         }
     }

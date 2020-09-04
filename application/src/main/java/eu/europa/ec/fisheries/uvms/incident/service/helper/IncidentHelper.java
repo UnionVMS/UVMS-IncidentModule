@@ -50,6 +50,8 @@ public class IncidentHelper {
             incident.setAssetId(asset.getId());
             incident.setAssetName(asset.getName());
             incident.setIrcs(asset.getIrcs());
+        }else{
+            throw new IllegalArgumentException("Trying to create an incident for an assetGuid that does not exist. Guid: " + assetId);
         }
     }
 
