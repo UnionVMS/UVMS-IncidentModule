@@ -4,6 +4,7 @@ import eu.europa.ec.fisheries.schema.movement.v1.MovementPoint;
 import eu.europa.ec.fisheries.schema.movement.v1.MovementSourceType;
 import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
 import eu.europa.ec.fisheries.uvms.movement.client.model.MicroMovement;
+import eu.europa.ec.fisheries.uvms.movement.model.dto.MovementDto;
 import eu.europa.ec.fisheries.uvms.rest.security.RequiresFeature;
 import eu.europa.ec.fisheries.uvms.rest.security.UnionVMSFeature;
 
@@ -32,12 +33,12 @@ public class MovementMock {
     }
 
     @GET
+    @Path("getMovement/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("getMicroMovement/{id}")
-    public Response getMicroMovement(@PathParam("id") UUID id) {
-        MicroMovement movement = new MicroMovement();
-        movement.setId(id.toString());
+    public Response getMovement(@PathParam("id") UUID id) {
+        MovementDto movement = new MovementDto();
+        movement.setId(id);
         MovementPoint point = new MovementPoint();
         point.setLatitude(123d);
         point.setLongitude(123d);
@@ -46,22 +47,22 @@ public class MovementMock {
 
         movement.setSource(id.getMostSignificantBits() == 0l ? MovementSourceType.NAF : MovementSourceType.MANUAL);
         movement.setTimestamp(Instant.now());
-        movement.setSpeed(122d);
-        movement.setHeading(123d);
+        movement.setSpeed((float)122d);
+        movement.setHeading((float)123d);
         String response = jsonb.toJson(movement);
         return Response.ok(response).build();
     }
 
     @POST
-    @Path("/getMicroMovementList")
+    @Path("/getMovementList")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @RequiresFeature(UnionVMSFeature.manageInternalRest)
     public Response getMicroMovementByIdList(List<UUID> moveIds) {
-        List<MicroMovement> responseList = new ArrayList<>();
+        List<MovementDto> responseList = new ArrayList<>();
         for (UUID uuid : moveIds) {
-            MicroMovement movement = new MicroMovement();
-            movement.setId(uuid.toString());
+            MovementDto movement = new MovementDto();
+            movement.setId(uuid);
             MovementPoint point = new MovementPoint();
             point.setLatitude(123d);
             point.setLongitude(123d);
@@ -70,8 +71,8 @@ public class MovementMock {
 
             movement.setSource(uuid.getMostSignificantBits() == 0l ? MovementSourceType.NAF : MovementSourceType.MANUAL);
             movement.setTimestamp(Instant.now());
-            movement.setSpeed(122d);
-            movement.setHeading(123d);
+            movement.setSpeed((float)122d);
+            movement.setHeading((float)123d);
 
             responseList.add(movement);
         }
