@@ -125,10 +125,10 @@ public class IncidentServiceBean {
         if(incident.getStatus().equals(StatusEnum.RESOLVED)){
             throw new IllegalArgumentException("Not allowed to update incident " + incident.getId() + " since it has status 'RESOLVED'");
         }
+        EventTypeEnum eventType = mapEventType(incident, incidentDto);
         incidentHelper.populateIncident(incident, incidentDto);
         Incident updated = incidentDao.update(incident);
         updatedIncident.fire(updated);
-        EventTypeEnum eventType = mapEventType(updated, incidentDto);
         incidentLogServiceBean.createIncidentLogForStatus(updated, "Incident updated by " + user, eventType, null);
         return incidentHelper.incidentEntityToDto(incident);
     }
