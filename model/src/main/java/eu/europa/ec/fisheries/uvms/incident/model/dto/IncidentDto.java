@@ -18,7 +18,7 @@ public class IncidentDto implements Serializable {
     private String status;
     private Instant createDate;
     private Instant updateDate;
-    private MicroMovementDto lastKnownLocation;
+    private MovementDto lastKnownLocation;
     private Instant expiryDate;
 
     public Long getId() {
@@ -85,11 +85,11 @@ public class IncidentDto implements Serializable {
         this.status = status;
     }
 
-    public MicroMovementDto getLastKnownLocation() {
+    public MovementDto getLastKnownLocation() {
         return lastKnownLocation;
     }
 
-    public void setLastKnownLocation(MicroMovementDto lastKnownLocation) {
+    public void setLastKnownLocation(MovementDto lastKnownLocation) {
         this.lastKnownLocation = lastKnownLocation;
     }
 
