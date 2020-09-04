@@ -4,27 +4,17 @@ import java.io.Serializable;
 import java.util.UUID;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.*;
 
-public class StatusDto implements Serializable {
+public class EventCreationDto implements Serializable {
 
-    private StatusEnum status;
     private EventTypeEnum eventType;
     private UUID relatedObjectId;
 
-    public StatusDto() {
+    public EventCreationDto() {
     }
 
-    public StatusDto(StatusEnum status, EventTypeEnum eventType, UUID relatedObjectId) {
-        this.status = status;
+    public EventCreationDto(EventTypeEnum eventType, UUID relatedObjectId) {
         this.eventType = eventType;
         this.relatedObjectId = relatedObjectId;
-    }
-
-    public StatusEnum getStatus() {
-        return status;
-    }
-
-    public void setStatus(StatusEnum status) {
-        this.status = status;
     }
 
     public EventTypeEnum getEventType() {

@@ -3,7 +3,7 @@ package eu.europa.ec.fisheries.uvms.incident.service.bean;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.OpenAndRecentlyResolvedIncidentsDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
-import eu.europa.ec.fisheries.uvms.incident.model.dto.StatusDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.EventCreationDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.EventTypeEnum;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.MovementSourceType;
@@ -246,18 +246,14 @@ public class IncidentServiceBean {
     }
 
 
-    public Incident updateIncidentStatus(long incidentId, StatusDto statusDto) {
+    public void addEventToIncident(long incidentId, EventCreationDto eventCreationDto) {
         Incident persisted = incidentDao.findById(incidentId);
         if(persisted.getStatus().equals(StatusEnum.RESOLVED)){
-            throw new IllegalArgumentException("Not allowed to change status on incident " + incidentId + " since it has status 'RESOLVED'");
+            throw new IllegalArgumentException("Not allowed to add event to incident " + incidentId + " since it has status 'RESOLVED'");
         }
 
-        persisted.setStatus(statusDto.getStatus() != null ? statusDto.getStatus() : persisted.getStatus());
-        Incident updated = incidentDao.update(persisted);
-        updatedIncident.fire(updated);
-        incidentLogServiceBean.createIncidentLogForStatus(updated, statusDto.getEventType().getMessage(),
-                statusDto.getEventType(), statusDto.getRelatedObjectId());
-        return updated;
+        incidentLogServiceBean.createIncidentLogForStatus(persisted, eventCreationDto.getEventType().getMessage(),
+                eventCreationDto.getEventType(), eventCreationDto.getRelatedObjectId());
     }
 
     public Incident findByTicketId(UUID ticketId) {
