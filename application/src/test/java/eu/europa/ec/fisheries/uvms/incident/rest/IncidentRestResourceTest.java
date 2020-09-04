@@ -3,7 +3,7 @@ package eu.europa.ec.fisheries.uvms.incident.rest;
 import eu.europa.ec.fisheries.uvms.incident.BuildIncidentTestDeployment;
 import eu.europa.ec.fisheries.uvms.incident.helper.JMSHelper;
 import eu.europa.ec.fisheries.uvms.incident.helper.TicketHelper;
-import eu.europa.ec.fisheries.uvms.incident.model.dto.AssetNotSendingDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.OpenAndRecentlyResolvedIncidentsDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentLogDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
@@ -136,12 +136,12 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
 
     @Test
     @OperateOnDeployment("incident")
-    public void assetNotSendingTest() {
-        AssetNotSendingDto response = getWebTarget()
-                .path("incident/assetNotSending")
+    public void openIncidentsTest() {
+        OpenAndRecentlyResolvedIncidentsDto response = getWebTarget()
+                .path("incident/allOpenIncidents")
                 .request(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, getToken())
-                .get(AssetNotSendingDto.class);
+                .get(OpenAndRecentlyResolvedIncidentsDto.class);
         assertNotNull(response);
     }
 
@@ -149,7 +149,7 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
     @OperateOnDeployment("incident")
     public void noAuthTest() {
         Response response = getWebTarget()
-                .path("incident/assetNotSending")
+                .path("incident/allOpenIncidents")
                 .request(MediaType.APPLICATION_JSON)
                 .get(Response.class);
         assertNotNull(response);

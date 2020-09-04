@@ -4,7 +4,7 @@ import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
 import eu.europa.ec.fisheries.uvms.incident.TransactionalTests;
 import eu.europa.ec.fisheries.uvms.incident.helper.JMSHelper;
 import eu.europa.ec.fisheries.uvms.incident.helper.TicketHelper;
-import eu.europa.ec.fisheries.uvms.incident.model.dto.AssetNotSendingDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.OpenAndRecentlyResolvedIncidentsDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.StatusDto;
@@ -55,8 +55,8 @@ public class IncidentServiceBeanTest extends TransactionalTests {
 
     @Test
     @OperateOnDeployment("incident")
-    public void getAssetNotSendingListTest() throws Exception {
-        AssetNotSendingDto before = incidentService.getAssetNotSendingList();
+    public void getAllOpenIncidentsTest() throws Exception {
+        OpenAndRecentlyResolvedIncidentsDto before = incidentService.getAllOpenAndRecentlyResolvedIncidents();
 
         UUID assetId = UUID.randomUUID();
         UUID movementId = UUID.randomUUID();
@@ -68,14 +68,35 @@ public class IncidentServiceBeanTest extends TransactionalTests {
 
         LockSupport.parkNanos(2000000000L);
 
-        AssetNotSendingDto after = incidentService.getAssetNotSendingList();
+        OpenAndRecentlyResolvedIncidentsDto after = incidentService.getAllOpenAndRecentlyResolvedIncidents();
         assertEquals(before.getUnresolved().size() + 1, after.getUnresolved().size());
     }
 
     @Test
     @OperateOnDeployment("incident")
+    public void getAllOpenIncidentsSeveralIncidentTypesTest() throws Exception {
+        OpenAndRecentlyResolvedIncidentsDto before = incidentService.getAllOpenAndRecentlyResolvedIncidents();
+
+        IncidentTicketDto ticket = TicketHelper.createTicket(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
+        ticket.setType(IncidentType.ASSET_NOT_SENDING);
+        String asString = jsonb.toJson(ticket);
+        jmsHelper.sendMessageToIncidentQueue(asString, "IncidentUpdate");
+
+        ticket = TicketHelper.createTicket(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
+        ticket.setType(IncidentType.PARKED);
+        asString = jsonb.toJson(ticket);
+        jmsHelper.sendMessageToIncidentQueue(asString, "IncidentUpdate");
+
+        LockSupport.parkNanos(2000000000L);
+
+        OpenAndRecentlyResolvedIncidentsDto after = incidentService.getAllOpenAndRecentlyResolvedIncidents();
+        assertEquals(before.getUnresolved().size() + 2, after.getUnresolved().size());
+    }
+
+    @Test
+    @OperateOnDeployment("incident")
     public void ignoreMessageWOOpenIncidentAndWoType() throws Exception {
-        AssetNotSendingDto before = incidentService.getAssetNotSendingList();
+        OpenAndRecentlyResolvedIncidentsDto before = incidentService.getAllOpenAndRecentlyResolvedIncidents();
 
         UUID assetId = UUID.randomUUID();
         UUID movementId = UUID.randomUUID();

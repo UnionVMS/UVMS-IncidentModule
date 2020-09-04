@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.UUID;
 
 @Path("movement/rest/internal")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 @Stateless
 public class MovementMock {
 
@@ -32,21 +34,21 @@ public class MovementMock {
 
     @GET
     @Path("getMovement/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response getMovement(@PathParam("id") UUID id) {
         MovementDto movement = new MovementDto();
-        movement.setId(id);
-        MovementPoint point = new MovementPoint();
-        point.setLatitude(123d);
-        point.setLongitude(123d);
-        point.setAltitude(0d);
-        movement.setLocation(point);
+        if(id != null) {
+            movement.setId(id);
+            MovementPoint point = new MovementPoint();
+            point.setLatitude(123d);
+            point.setLongitude(123d);
+            point.setAltitude(0d);
+            movement.setLocation(point);
 
-        movement.setSource(id.getMostSignificantBits() == 0l ? MovementSourceType.NAF : MovementSourceType.MANUAL);
-        movement.setTimestamp(Instant.now());
-        movement.setSpeed((float)122d);
-        movement.setHeading((float)123d);
+            movement.setSource(id.getMostSignificantBits() == 0l ? MovementSourceType.NAF : MovementSourceType.MANUAL);
+            movement.setTimestamp(Instant.now());
+            movement.setSpeed((float) 122d);
+            movement.setHeading((float) 123d);
+        }
         String response = jsonb.toJson(movement);
         return Response.ok(response).build();
     }
@@ -57,6 +59,9 @@ public class MovementMock {
     public Response getMicroMovementByIdList(List<UUID> moveIds) {
         List<MovementDto> responseList = new ArrayList<>();
         for (UUID uuid : moveIds) {
+            if(uuid == null){
+                continue;
+            }
             MovementDto movement = new MovementDto();
             movement.setId(uuid);
             MovementPoint point = new MovementPoint();
