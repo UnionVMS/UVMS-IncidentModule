@@ -39,20 +39,15 @@ public class IncidentConsumer implements MessageListener {
         try {
             TextMessage tm = (TextMessage) message;
             String json = tm.getBody(String.class);
-            try {
-                IncidentTicketDto ticket = jsonb.fromJson(json, IncidentTicketDto.class);
-                String eventType = message.getStringProperty("eventName");
-                switch (eventType) {
-                    case "Incident":
-                        incidentServiceBean.createIncident(ticket);
-                        break;
-                    case "IncidentUpdate":
-                        incidentServiceBean.updateIncident(ticket);
-                        break;
-                }
-            }catch (Exception e){
-                LOG.error("Error In incoming message. Message json: {}", json);
-                throw e;
+            IncidentTicketDto ticket = jsonb.fromJson(json, IncidentTicketDto.class);
+            String eventType = message.getStringProperty("eventName");
+            switch (eventType) {
+                case "Incident":
+                    incidentServiceBean.createIncident(ticket);
+                    break;
+                case "IncidentUpdate":
+                    incidentServiceBean.updateIncident(ticket);
+                    break;
             }
         } catch (Exception e) {
             LOG.error("Error while reading from Incident Queue", e);
