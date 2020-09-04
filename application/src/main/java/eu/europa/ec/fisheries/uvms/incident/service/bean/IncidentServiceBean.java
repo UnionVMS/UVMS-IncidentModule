@@ -120,6 +120,28 @@ public class IncidentServiceBean {
         return incidentHelper.incidentEntityToDto(persistedIncident);
     }
 
+    public IncidentDto updateIncident(IncidentDto incidentDto, String user) {
+        Incident incident = incidentDao.findById(incidentDto.getId());
+        if(incident.getStatus().equals(StatusEnum.RESOLVED)){
+            throw new IllegalArgumentException("Not allowed to update incident " + incident.getId() + " since it has status 'RESOLVED'");
+        }
+        EventTypeEnum eventType = mapEventType(incident, incidentDto);
+        incidentHelper.populateIncident(incident, incidentDto);
+        Incident updated = incidentDao.update(incident);
+        updatedIncident.fire(updated);
+        incidentLogServiceBean.createIncidentLogForStatus(updated, "Incident updated by " + user, eventType, null);
+        return incidentHelper.incidentEntityToDto(incident);
+    }
+
+    private EventTypeEnum mapEventType(Incident incident, IncidentDto incidentDto) {
+        if (!incident.getType().equals(incidentDto.getType())) {
+            return EventTypeEnum.INCIDENT_TYPE;
+        } else if (!incident.getStatus().toString().equals(incidentDto.getStatus())) {
+            return EventTypeEnum.INCIDENT_STATUS;
+        }
+        return EventTypeEnum.INCIDENT_UPDATED;
+    }
+
     public void updateIncident(IncidentTicketDto ticket) {
         if(ticket.getId() == null){
             upsertIncidentLackingTicketId(ticket);

@@ -57,6 +57,10 @@ public class IncidentHelper {
 
     public Incident incidentDtoToIncident(IncidentDto incidentDto) {
         Incident incident = new Incident();
+        return populateIncident(incident, incidentDto);
+    }
+
+    public Incident populateIncident(Incident incident, IncidentDto incidentDto) {
         incident.setAssetId(incidentDto.getAssetId());
         incident.setMobileTerminalId(incidentDto.getMobileTerminalId());
         incident.setTicketId(incidentDto.getTicketId());

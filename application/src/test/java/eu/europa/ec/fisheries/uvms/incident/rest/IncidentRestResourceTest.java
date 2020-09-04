@@ -167,6 +167,59 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
                 .anyMatch(log -> creationDto.getRelatedObjectId().equals(log.getRelatedObjectId())));
     }
 
+    public void updateIncidentTest() {
+        IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
+        IncidentDto createdIncident = getWebTarget()
+                .path("incident")
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .post(Entity.json(incidentDto), IncidentDto.class);
+
+        createdIncident.setType(IncidentType.PARKED);
+        Instant expiryDate = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+        incidentDto.setExpiryDate(expiryDate);
+        IncidentDto updatedIncident = getWebTarget()
+                .path("incident")
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .put(Entity.json(incidentDto), IncidentDto.class);
+
+        assertNotNull(updatedIncident.getId());
+        assertEquals(incidentDto.getAssetId(), updatedIncident.getAssetId());
+        assertEquals(IncidentType.PARKED, updatedIncident.getType());
+        assertEquals(expiryDate, updatedIncident.getExpiryDate());
+    }
+
+    public void updateIncidentLogCreatedTest() {
+        IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
+        IncidentDto createdIncident = getWebTarget()
+                .path("incident")
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .post(Entity.json(incidentDto), IncidentDto.class);
+
+        createdIncident.setType(IncidentType.PARKED);
+        Instant expiryDate = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+        incidentDto.setExpiryDate(expiryDate);
+        IncidentDto updatedIncident = getWebTarget()
+                .path("incident")
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .put(Entity.json(incidentDto), IncidentDto.class);
+
+        Map<Long, IncidentLogDto> logs = getWebTarget()
+                .path("incident/incidentLogForIncident")
+                .path(updatedIncident.getId().toString())
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .get(new GenericType<Map<Long, IncidentLogDto>>() {});
+
+        assertEquals(1, logs.size());
+        IncidentLogDto incidentLog = logs.values().stream().findFirst().get();
+        assertEquals(EventTypeEnum.INCIDENT_TYPE, incidentLog.getEventType());
+    }
+
+
     @Test
     @OperateOnDeployment("incident")
     public void openIncidentsTest() {
