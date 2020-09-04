@@ -88,6 +88,13 @@ public class IncidentRestResource {
         return Response.ok(createdIncident).build();
     }
 
+    @PUT
+    @RequiresFeature(UnionVMSFeature.manageAlarmsOpenTickets)
+    public Response updateIncident(IncidentDto incidentDto) {
+        IncidentDto createdIncident = incidentServiceBean.updateIncident(incidentDto, request.getRemoteUser());
+        return Response.ok(createdIncident).build();
+    }
+
     @GET
     @Path("resolvedStatuses")
     @RequiresFeature(UnionVMSFeature.viewAlarmsOpenTickets)

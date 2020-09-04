@@ -134,6 +134,29 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
                 .anyMatch(log -> log.getMessage().contains(BuildIncidentTestDeployment.USER_NAME)));
     }
 
+    public void updateIncidentTest() {
+        IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
+        IncidentDto createdIncident = getWebTarget()
+                .path("incident")
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .post(Entity.json(incidentDto), IncidentDto.class);
+
+        createdIncident.setType(IncidentType.PARKED);
+        Instant expiryDate = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+        incidentDto.setExpiryDate(expiryDate);
+        IncidentDto updatedIncident = getWebTarget()
+                .path("incident")
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .put(Entity.json(incidentDto), IncidentDto.class);
+
+        assertNotNull(updatedIncident.getId());
+        assertEquals(incidentDto.getAssetId(), updatedIncident.getAssetId());
+        assertEquals(IncidentType.PARKED, updatedIncident.getType());
+        assertEquals(expiryDate, updatedIncident.getExpiryDate());
+    }
+
     @Test
     @OperateOnDeployment("incident")
     public void openIncidentsTest() {
