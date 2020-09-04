@@ -7,6 +7,7 @@ import eu.europa.ec.fisheries.uvms.incident.model.dto.OpenAndRecentlyResolvedInc
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentLogDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.EventTypeEnum;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
@@ -156,6 +157,36 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
         assertEquals(IncidentType.PARKED, updatedIncident.getType());
         assertEquals(expiryDate, updatedIncident.getExpiryDate());
     }
+
+    public void updateIncidentLogCreatedTest() {
+        IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
+        IncidentDto createdIncident = getWebTarget()
+                .path("incident")
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .post(Entity.json(incidentDto), IncidentDto.class);
+
+        createdIncident.setType(IncidentType.PARKED);
+        Instant expiryDate = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+        incidentDto.setExpiryDate(expiryDate);
+        IncidentDto updatedIncident = getWebTarget()
+                .path("incident")
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .put(Entity.json(incidentDto), IncidentDto.class);
+
+        Map<Long, IncidentLogDto> logs = getWebTarget()
+                .path("incident/incidentLogForIncident")
+                .path(updatedIncident.getId().toString())
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .get(new GenericType<Map<Long, IncidentLogDto>>() {});
+
+        assertEquals(1, logs.size());
+        IncidentLogDto incidentLog = logs.values().stream().findFirst().get();
+        assertEquals(EventTypeEnum.INCIDENT_STATUS, incidentLog.getEventType());
+    }
+
 
     @Test
     @OperateOnDeployment("incident")
