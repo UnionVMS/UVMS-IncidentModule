@@ -4,6 +4,7 @@ import eu.europa.ec.fisheries.schema.movementrules.ticket.v1.TicketStatusType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -31,7 +32,7 @@ public class TicketHelper {
         IncidentDto incidentDto = new IncidentDto();
         incidentDto.setAssetId(UUID.randomUUID());
         incidentDto.setAssetName("Test asset");
-        incidentDto.setStatus("INCIDENT_CREATED");
+        incidentDto.setStatus(StatusEnum.INCIDENT_CREATED);
         incidentDto.setType(IncidentType.PARKED);
         return incidentDto;
     }
