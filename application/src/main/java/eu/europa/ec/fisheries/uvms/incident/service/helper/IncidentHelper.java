@@ -71,9 +71,7 @@ public class IncidentHelper {
         if (incidentDto.getLastKnownLocation() != null) {
             incident.setMovementId(incidentDto.getLastKnownLocation().getId());
         }
-        if (incidentDto.getStatus() != null) {
-            incident.setStatus(StatusEnum.valueOf(incidentDto.getStatus()));
-        }
+        incident.setStatus(incidentDto.getStatus());
         return incident;
     }
 
@@ -81,6 +79,7 @@ public class IncidentHelper {
         eu.europa.ec.fisheries.uvms.movement.model.dto.MovementDto movement = null;
         if(incident.getMovementId() != null) {
             movement = movementClient.getMovementById(incident.getMovementId());
+            movement = movement.getId() != null ? movement : null ;    //for the sole reason that getMovementById returns an empty object if that move id does not exist
         }
         return mapEntityToDto(incident, movement);
     }
@@ -106,7 +105,7 @@ public class IncidentHelper {
         dto.setType(entity.getType());
         dto.setAssetName(entity.getAssetName());
         dto.setAssetIrcs(entity.getIrcs());
-        dto.setStatus(entity.getStatus().name());
+        dto.setStatus(entity.getStatus());
         dto.setCreateDate(entity.getCreateDate());
         dto.setExpiryDate(entity.getExpiryDate());
         if (entity.getUpdateDate() != null) {

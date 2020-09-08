@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 
 public class IncidentDto implements Serializable {
     private final static long serialVersionUID = 1L;
@@ -15,7 +16,7 @@ public class IncidentDto implements Serializable {
     private IncidentType type;
     private String assetName;
     private String assetIrcs;
-    private String status;
+    private StatusEnum status;
     private Instant createDate;
     private Instant updateDate;
     private MovementDto lastKnownLocation;
@@ -77,11 +78,11 @@ public class IncidentDto implements Serializable {
         this.assetIrcs = assetIrcs;
     }
 
-    public String getStatus() {
+    public StatusEnum getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(StatusEnum status) {
         this.status = status;
     }
 
