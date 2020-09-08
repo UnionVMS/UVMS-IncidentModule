@@ -29,6 +29,7 @@
         <movement.rules.version>2.4.0</movement.rules.version>
         <asset.version>6.7.20</asset.version>
         <exchange.module>5.3.2-UVMS</exchange.module>
+        <spatial.version>2.2.3-UVMS</spatial.version>
         <usm4uvms.version>4.1.1</usm4uvms.version>
         <uvms.pom>3.3</uvms.pom>
     </properties>

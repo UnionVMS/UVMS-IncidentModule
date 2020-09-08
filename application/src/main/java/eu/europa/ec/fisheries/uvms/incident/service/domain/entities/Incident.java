@@ -1,6 +1,7 @@
 package eu.europa.ec.fisheries.uvms.incident.service.domain.entities;
 
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.RiskLevel;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 
 import javax.persistence.*;
@@ -71,6 +72,10 @@ public class Incident {
     @Column(name = "status")
     @Enumerated(value = EnumType.STRING)
     private StatusEnum status;
+
+    @Column(name = "risk")
+    @Enumerated(value = EnumType.STRING)
+    private RiskLevel risk;
 
     @NotNull
     @Column(name = "create_date")
@@ -182,6 +187,14 @@ public class Incident {
 
     public void setExpiryDate(Instant expiryDate) {
         this.expiryDate = expiryDate;
+    }
+
+    public RiskLevel getRisk() {
+        return risk;
+    }
+
+    public void setRisk(RiskLevel risk) {
+        this.risk = risk;
     }
 
     @Override

@@ -61,6 +61,11 @@
             <version>${movement.rules.version}</version>
         </dependency>
         <dependency>
+            <groupId>eu.europa.ec.fisheries.uvms.spatialSwe</groupId>
+            <artifactId>spatial-model</artifactId>
+            <version>${spatial.version}</version>
+        </dependency>
+        <dependency>
             <groupId>eu.europa.ec.fisheries.uvms.commons</groupId>
             <artifactId>uvms-commons-message</artifactId>
             <version>${uvms.common.version}</version>

@@ -9,7 +9,6 @@ import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.IncidentLog;
 import eu.europa.ec.fisheries.uvms.movement.client.MovementRestClient;
-import eu.europa.ec.fisheries.uvms.movement.client.model.MicroMovement;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -72,6 +71,7 @@ public class IncidentHelper {
             incident.setMovementId(incidentDto.getLastKnownLocation().getId());
         }
         incident.setStatus(incidentDto.getStatus());
+        incident.setRisk(incidentDto.getRisk());
         return incident;
     }
 
@@ -106,6 +106,7 @@ public class IncidentHelper {
         dto.setAssetName(entity.getAssetName());
         dto.setAssetIrcs(entity.getIrcs());
         dto.setStatus(entity.getStatus());
+        dto.setRisk(entity.getRisk());
         dto.setCreateDate(entity.getCreateDate());
         dto.setExpiryDate(entity.getExpiryDate());
         if (entity.getUpdateDate() != null) {

@@ -85,6 +85,8 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
         assertEquals(Arrays.asList(IncidentType.values()), response);
     }
 
+    @Test
+    @OperateOnDeployment("incident")
     public void createIncidentTest() {
         IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
         Instant expiryDate = Instant.now().truncatedTo(ChronoUnit.MILLIS);
@@ -167,6 +169,8 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
                 .anyMatch(log -> creationDto.getRelatedObjectId().equals(log.getRelatedObjectId())));
     }
 
+    @Test
+    @OperateOnDeployment("incident")
     public void updateIncidentTest() {
         IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
         IncidentDto createdIncident = getWebTarget()
@@ -190,6 +194,8 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
         assertEquals(expiryDate, updatedIncident.getExpiryDate());
     }
 
+    @Test
+    @OperateOnDeployment("incident")
     public void updateIncidentLogCreatedTest() {
         IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
         IncidentDto createdIncident = getWebTarget()
