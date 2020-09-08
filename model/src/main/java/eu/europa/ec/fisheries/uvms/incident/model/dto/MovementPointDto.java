@@ -7,7 +7,6 @@ public class MovementPointDto implements Serializable {
 
     protected double longitude;
     protected double latitude;
-    protected double altitude;
 
     public Double getLongitude() {
         return longitude;
@@ -25,11 +24,4 @@ public class MovementPointDto implements Serializable {
         this.latitude = latitude;
     }
 
-    public Double getAltitude() {
-        return altitude;
-    }
-
-    public void setAltitude(double altitude) {
-        this.altitude = altitude;
-    }
 }

@@ -43,7 +43,7 @@ public class IncidentDao {
         return query.getResultList();
     }
 
-    public List<Incident> findByStatusAndUpdatedSince12Hours(IncidentType type) {
+    public List<Incident> findByStatusAndUpdatedSince12Hours(List<IncidentType> type) {
         TypedQuery<Incident> query = em.createNamedQuery(Incident.FIND_BY_STATUS_AND_UPDATED_SINCE, Incident.class);
         query.setParameter("type", type);
         query.setParameter("status", ServiceConstants.RESOLVED_STATUS_LIST);

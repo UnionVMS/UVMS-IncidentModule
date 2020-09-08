@@ -2,7 +2,7 @@ package eu.europa.ec.fisheries.uvms.incident.model.dto;
 
 import java.util.Map;
 
-public class AssetNotSendingDto {
+public class OpenAndRecentlyResolvedIncidentsDto {
 
     Map<Long, IncidentDto> unresolved;
 

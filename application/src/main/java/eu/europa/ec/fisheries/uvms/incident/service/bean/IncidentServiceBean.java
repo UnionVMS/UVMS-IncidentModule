@@ -1,9 +1,9 @@
 package eu.europa.ec.fisheries.uvms.incident.service.bean;
 
-import eu.europa.ec.fisheries.uvms.incident.model.dto.AssetNotSendingDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.OpenAndRecentlyResolvedIncidentsDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
-import eu.europa.ec.fisheries.uvms.incident.model.dto.StatusDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.EventCreationDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.EventTypeEnum;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.MovementSourceType;
@@ -22,6 +22,7 @@ import javax.ejb.Stateless;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -55,12 +56,12 @@ public class IncidentServiceBean {
     @Inject
     private IncidentLogDao incidentLogDao;
 
-    public AssetNotSendingDto getAssetNotSendingList() {
-        AssetNotSendingDto dto = new AssetNotSendingDto();
-        List<Incident> unresolvedIncidents = incidentDao.findUnresolvedIncidents(IncidentType.ASSET_NOT_SENDING);
+    public OpenAndRecentlyResolvedIncidentsDto getAllOpenAndRecentlyResolvedIncidents() {
+        OpenAndRecentlyResolvedIncidentsDto dto = new OpenAndRecentlyResolvedIncidentsDto();
+        List<Incident> unresolvedIncidents = incidentDao.findOpenByTypes(Arrays.asList(IncidentType.values()));
         dto.setUnresolved(incidentHelper.incidentToDtoMap(unresolvedIncidents));
 
-        List<Incident> resolvedSinceLast12Hours = incidentDao.findByStatusAndUpdatedSince12Hours(IncidentType.ASSET_NOT_SENDING);
+        List<Incident> resolvedSinceLast12Hours = incidentDao.findByStatusAndUpdatedSince12Hours(Arrays.asList(IncidentType.values()));
         dto.setRecentlyResolved(incidentHelper.incidentToDtoMap(resolvedSinceLast12Hours));
         return dto;
     }
@@ -117,6 +118,28 @@ public class IncidentServiceBean {
         incidentLogServiceBean.createIncidentLogForStatus(persistedIncident, "Incident created by " + user, EventTypeEnum.INCIDENT_CREATED, null);
         createdIncident.fire(persistedIncident);
         return incidentHelper.incidentEntityToDto(persistedIncident);
+    }
+
+    public IncidentDto updateIncident(IncidentDto incidentDto, String user) {
+        Incident incident = incidentDao.findById(incidentDto.getId());
+        if(incident.getStatus().equals(StatusEnum.RESOLVED)){
+            throw new IllegalArgumentException("Not allowed to update incident " + incident.getId() + " since it has status 'RESOLVED'");
+        }
+        EventTypeEnum eventType = mapEventType(incident, incidentDto);
+        incidentHelper.populateIncident(incident, incidentDto);
+        Incident updated = incidentDao.update(incident);
+        updatedIncident.fire(updated);
+        incidentLogServiceBean.createIncidentLogForStatus(updated, "Incident updated by " + user, eventType, null);
+        return incidentHelper.incidentEntityToDto(incident);
+    }
+
+    private EventTypeEnum mapEventType(Incident incident, IncidentDto incidentDto) {
+        if (!incident.getType().equals(incidentDto.getType())) {
+            return EventTypeEnum.INCIDENT_TYPE;
+        } else if (!incident.getStatus().toString().equals(incidentDto.getStatus())) {
+            return EventTypeEnum.INCIDENT_STATUS;
+        }
+        return EventTypeEnum.INCIDENT_UPDATED;
     }
 
     public void updateIncident(IncidentTicketDto ticket) {
@@ -245,18 +268,14 @@ public class IncidentServiceBean {
     }
 
 
-    public Incident updateIncidentStatus(long incidentId, StatusDto statusDto) {
+    public void addEventToIncident(long incidentId, EventCreationDto eventCreationDto) {
         Incident persisted = incidentDao.findById(incidentId);
         if(persisted.getStatus().equals(StatusEnum.RESOLVED)){
-            throw new IllegalArgumentException("Not allowed to change status on incident " + incidentId + " since it has status 'RESOLVED'");
+            throw new IllegalArgumentException("Not allowed to add event to incident " + incidentId + " since it has status 'RESOLVED'");
         }
 
-        persisted.setStatus(statusDto.getStatus() != null ? statusDto.getStatus() : persisted.getStatus());
-        Incident updated = incidentDao.update(persisted);
-        updatedIncident.fire(updated);
-        incidentLogServiceBean.createIncidentLogForStatus(updated, statusDto.getEventType().getMessage(),
-                statusDto.getEventType(), statusDto.getRelatedObjectId());
-        return updated;
+        incidentLogServiceBean.createIncidentLogForStatus(persisted, eventCreationDto.getEventType().getMessage(),
+                eventCreationDto.getEventType(), eventCreationDto.getRelatedObjectId());
     }
 
     public Incident findByTicketId(UUID ticketId) {
