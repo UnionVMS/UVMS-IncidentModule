@@ -113,8 +113,8 @@ public class IncidentServiceBean {
     }
 
     public IncidentDto createIncident(IncidentDto incidentDto, String user) {
+        incidentDto = incidentHelper.checkIncidentIntegrity(incidentDto);
         Incident incident = incidentHelper.incidentDtoToIncident(incidentDto);
-        incident.setStatus(incidentDto.getType().equals(IncidentType.MANUAL_MODE) ? StatusEnum.MANUAL_POSITION_MODE : StatusEnum.INCIDENT_CREATED);
         incident.setCreateDate(Instant.now());
         Incident persistedIncident = incidentDao.save(incident);
         incidentLogServiceBean.createIncidentLogForStatus(persistedIncident, "Incident created by " + user, EventTypeEnum.INCIDENT_CREATED, null);
@@ -123,6 +123,7 @@ public class IncidentServiceBean {
     }
 
     public IncidentDto updateIncident(IncidentDto incidentDto, String user) {
+        incidentDto = incidentHelper.checkIncidentIntegrity(incidentDto);
         Incident incident = incidentDao.findById(incidentDto.getId());
         if(incident.getStatus().equals(StatusEnum.RESOLVED)){
             throw new IllegalArgumentException("Not allowed to update incident " + incident.getId() + " since it has status 'RESOLVED'");

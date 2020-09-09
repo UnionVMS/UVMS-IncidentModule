@@ -4,6 +4,7 @@ import eu.europa.ec.fisheries.uvms.asset.client.AssetClient;
 import eu.europa.ec.fisheries.uvms.asset.client.model.AssetDTO;
 import eu.europa.ec.fisheries.uvms.asset.client.model.AssetIdentifier;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.*;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.MovementSourceType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
@@ -160,5 +161,25 @@ public class IncidentHelper {
             retVal.put(dto.getId(), dto);
         }
         return retVal;
+    }
+
+    public IncidentDto checkIncidentIntegrity(IncidentDto incident){
+
+        if(incident.getStatus() == null){
+            incident.setStatus(incident.getType().getValidStatuses().get(0));
+
+        } else if(!incident.getType().getValidStatuses().contains(incident.getStatus())){
+            throw new IllegalArgumentException("Incident type " + incident.getType() + " does not support being placed in status " + incident.getStatus());
+        }
+
+        if(incident.getType().equals(IncidentType.ASSET_NOT_SENDING) || incident.getType().equals(IncidentType.MANUAL_MODE)){
+            if(incident.getExpiryDate() != null){
+                throw new IllegalArgumentException(incident.getType() + " does not support having a expiry date");
+            }
+        } else {
+            //maybe do something if type is one of the parked statuses
+        }
+
+        return incident;
     }
 }
