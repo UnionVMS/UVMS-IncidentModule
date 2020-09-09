@@ -3,6 +3,7 @@ package eu.europa.ec.fisheries.uvms.incident;
 import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
 import eu.europa.ec.fisheries.uvms.incident.mock.AssetMock;
 import eu.europa.ec.fisheries.uvms.incident.mock.MovementMock;
+import eu.europa.ec.fisheries.uvms.incident.mock.SpatialModuleMock;
 import eu.europa.ec.fisheries.uvms.incident.mock.UnionVMSRestMock;
 import eu.europa.ec.fisheries.uvms.rest.security.UnionVMSFeature;
 import eu.europa.ec.mare.usm.jwt.JwtTokenHandler;
@@ -56,6 +57,7 @@ public abstract class BuildIncidentTestDeployment {
                 .withTransitivity().asFile();
         testWar.addAsLibraries(files);
 
+        testWar.addClass(SpatialModuleMock.class);
         testWar.addClass(UnionVMSRestMock.class);
         testWar.addClass(MovementMock.class);
         testWar.addClass(AssetMock.class);

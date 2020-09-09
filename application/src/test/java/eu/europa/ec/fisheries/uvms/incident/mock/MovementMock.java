@@ -33,6 +33,27 @@ public class MovementMock {
     }
 
     @GET
+    @Path("getMicroMovement/{id}")
+    public Response getMicroMovement(@PathParam("id") UUID id) {
+        MicroMovement movement = new MicroMovement();
+        if(id != null) {
+            movement.setId(id.toString());
+            MovementPoint point = new MovementPoint();
+            point.setLatitude(123d);
+            point.setLongitude(123d);
+            point.setAltitude(0d);
+            movement.setLocation(point);
+
+            movement.setSource(id.getMostSignificantBits() == 0l ? MovementSourceType.NAF : MovementSourceType.MANUAL);
+            movement.setTimestamp(Instant.now());
+            movement.setSpeed(122d);
+            movement.setHeading(123d);
+        }
+        String response = jsonb.toJson(movement);
+        return Response.ok(response).build();
+    }
+
+    @GET
     @Path("getMovement/{id}")
     public Response getMovement(@PathParam("id") UUID id) {
         MovementDto movement = new MovementDto();

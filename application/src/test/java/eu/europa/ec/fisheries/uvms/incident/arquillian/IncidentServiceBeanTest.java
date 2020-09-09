@@ -17,6 +17,7 @@ import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentDao;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentLogDao;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.IncidentLog;
+import eu.europa.ec.fisheries.uvms.incident.service.helper.IncidentHelper;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Ignore;
@@ -180,8 +181,10 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         assertEquals(EventTypeEnum.MANUAL_POSITION, manualMovementLog.getEventType());
     }
 
+    @Inject
+    IncidentHelper incidentHelper;
+
     @Test
-    @Ignore("Rewrite this when we have a proper update incident function")
     @OperateOnDeployment("incident")
     public void updateIncidentTest() throws Exception {
         UUID assetId = UUID.randomUUID();
@@ -194,17 +197,20 @@ public class IncidentServiceBeanTest extends TransactionalTests {
 
         LockSupport.parkNanos(2000000000L);
 
-        /*Incident created = incidentDao.findOpenByAsset(assetId).get(0);
+        Incident created = incidentDao.findOpenByAsset(assetId).get(0);
         assertNotNull(created);
         assertEquals(StatusEnum.INCIDENT_CREATED, created.getStatus());
 
-        EventCreationDto status = new EventCreationDto();
-        status.setStatus(StatusEnum.RESOLVED);
-        status.setEventType(EventTypeEnum.INCIDENT_CLOSED);
-        incidentService.addEventToIncident(created.getId(), status);
+        IncidentDto incidentDto = incidentHelper.incidentEntityToDto(created);
+        incidentDto.setStatus(StatusEnum.RESOLVED);
+        IncidentDto updatedDto = incidentService.updateIncident(incidentDto, "Test user");
 
         Incident updated = incidentDao.findById(created.getId());
-        assertEquals(updated.getStatus(), StatusEnum.RESOLVED);*/
+        assertEquals(updated.getStatus(), StatusEnum.RESOLVED);
+
+        List<IncidentLog> incidentLogs = incidentLogDao.findAllByIncidentId(updated.getId());
+        assertTrue(incidentLogs.stream().anyMatch(log -> log.getEventType().equals(EventTypeEnum.INCIDENT_CLOSED)));
+
     }
 
     @Test
