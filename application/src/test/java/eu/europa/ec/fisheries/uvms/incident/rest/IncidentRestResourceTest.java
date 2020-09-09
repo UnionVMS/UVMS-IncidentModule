@@ -7,6 +7,7 @@ import eu.europa.ec.fisheries.uvms.incident.model.dto.*;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.EventTypeEnum;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
+import eu.europa.ec.fisheries.uvms.incident.rest.filters.AppError;
 import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -63,14 +64,16 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
 
     @Test
     @OperateOnDeployment("incident")
-    public void getStatuseThatCountAsResolved() {
-        List<StatusEnum> response = getWebTarget()
-                .path("incident/resolvedStatuses")
+    public void getValidStatusForTypes() {
+        Map<IncidentType, List<StatusEnum>> response = getWebTarget()
+                .path("incident/validStatusForTypes")
                 .request(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, getToken())
-                .get(new GenericType<List<StatusEnum>>() {});
+                .get(new GenericType<Map<IncidentType, List<StatusEnum>>>() {});
         assertNotNull(response);
-        assertEquals(ServiceConstants.RESOLVED_STATUS_LIST, response);
+        for (IncidentType value : IncidentType.values()) {
+            assertTrue(value.name(), value.getValidStatuses().equals(response.get(value.name())));
+        }
     }
 
     @Test
@@ -91,11 +94,8 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
         IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
         Instant expiryDate = Instant.now().truncatedTo(ChronoUnit.MILLIS);
         incidentDto.setExpiryDate(expiryDate);
-        IncidentDto createdIncident = getWebTarget()
-                .path("incident")
-                .request(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, getToken())
-                .post(Entity.json(incidentDto), IncidentDto.class);
+
+        IncidentDto createdIncident = createIncident(incidentDto);
 
         assertNotNull(createdIncident.getId());
         assertEquals(incidentDto.getAssetId(), createdIncident.getAssetId());
@@ -103,6 +103,39 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
         assertEquals(expiryDate, createdIncident.getExpiryDate());
         assertNotNull(createdIncident.getUpdateDate());
         assertNotNull(createdIncident.getCreateDate());
+    }
+
+    @Test
+    @OperateOnDeployment("incident")
+    public void createIncidentWithInvalidStatus() {
+        IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
+        incidentDto.setType(IncidentType.ASSET_NOT_SENDING);
+        incidentDto.setStatus(StatusEnum.PARKED);
+
+        AppError error = getWebTarget()
+                .path("incident")
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .post(Entity.json(incidentDto), AppError.class);
+
+        assertTrue(error.description, error.description.contains("does not support being placed in status"));
+    }
+
+    @Test
+    @OperateOnDeployment("incident")
+    public void createIncidentThatShouldNotHaveAnEndDateWithOne() {
+        IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
+        incidentDto.setType(IncidentType.ASSET_NOT_SENDING);
+        incidentDto.setStatus(StatusEnum.INCIDENT_CREATED);
+        incidentDto.setExpiryDate(Instant.now());
+
+        AppError error = getWebTarget()
+                .path("incident")
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .post(Entity.json(incidentDto), AppError.class);
+
+        assertTrue(error.description, error.description.contains("does not support having a expiry date"));
     }
 
     @Test
@@ -174,13 +207,13 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
     public void updateIncidentTest() {
         IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
         incidentDto.setType(IncidentType.ASSET_NOT_SENDING);
-        IncidentDto createdIncident = getWebTarget()
-                .path("incident")
-                .request(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, getToken())
-                .post(Entity.json(incidentDto), IncidentDto.class);
+        incidentDto.setStatus(null);
+        IncidentDto createdIncident = createIncident(incidentDto);
+
+        assertEquals(StatusEnum.INCIDENT_CREATED, createdIncident.getStatus());
 
         createdIncident.setType(IncidentType.PARKED);
+        createdIncident.setStatus(null);
         Instant expiryDate = Instant.now().truncatedTo(ChronoUnit.MILLIS);
         createdIncident.setExpiryDate(expiryDate);
         IncidentDto updatedIncident = getWebTarget()
@@ -192,7 +225,46 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
         assertNotNull(updatedIncident.getId());
         assertEquals(incidentDto.getAssetId(), updatedIncident.getAssetId());
         assertEquals(IncidentType.PARKED, updatedIncident.getType());
+        assertEquals(StatusEnum.PARKED, updatedIncident.getStatus());
         assertEquals(expiryDate, updatedIncident.getExpiryDate());
+    }
+
+    @Test
+    @OperateOnDeployment("incident")
+    public void updateIncidentInvalidStatus() {
+        IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
+        incidentDto.setType(IncidentType.ASSET_NOT_SENDING);
+        incidentDto.setStatus(StatusEnum.ATTEMPTED_CONTACT);
+        IncidentDto createdIncident = createIncident(incidentDto);
+
+        createdIncident.setStatus(StatusEnum.PARKED);
+        AppError error = getWebTarget()
+                .path("incident")
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .put(Entity.json(createdIncident), AppError.class);
+
+        assertNotNull(error);
+        assertTrue(error.description, error.description.contains("does not support being placed in status"));
+    }
+
+    @Test
+    @OperateOnDeployment("incident")
+    public void updateIncidentInvalidTypeForExpiryDate() {
+        IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
+        incidentDto.setType(IncidentType.ASSET_NOT_SENDING);
+        incidentDto.setStatus(StatusEnum.ATTEMPTED_CONTACT);
+        IncidentDto createdIncident = createIncident(incidentDto);
+
+        createdIncident.setExpiryDate(Instant.now());
+        AppError error = getWebTarget()
+                .path("incident")
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .put(Entity.json(createdIncident), AppError.class);
+
+        assertNotNull(error);
+        assertTrue(error.description, error.description.contains("does not support having a expiry date"));
     }
 
     @Test
@@ -200,11 +272,7 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
     public void updateIncidentLogCreatedTest() {
         IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
         incidentDto.setType(IncidentType.OWNER_TRANSFER);
-        IncidentDto createdIncident = getWebTarget()
-                .path("incident")
-                .request(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, getToken())
-                .post(Entity.json(incidentDto), IncidentDto.class);
+        IncidentDto createdIncident = createIncident(incidentDto);
 
         createdIncident.setType(IncidentType.PARKED);
         Instant expiryDate = Instant.now().truncatedTo(ChronoUnit.MILLIS);
