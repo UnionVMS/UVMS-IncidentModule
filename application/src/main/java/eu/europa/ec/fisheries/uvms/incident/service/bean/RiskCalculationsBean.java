@@ -62,7 +62,9 @@ public class RiskCalculationsBean {
             return null;
         }
         MicroMovement microMovement = movementClient.getMicroMovementById(incident.getMovementId());
-        if(checkIfPositionIsInPortArea(microMovement)){
+        if(microMovement == null){
+          return RiskLevel.HIGH;
+        } else if(checkIfPositionIsInPortArea(microMovement)){
             return RiskLevel.LOW;
         } else {
             return RiskLevel.HIGH;
@@ -77,6 +79,7 @@ public class RiskCalculationsBean {
                 .path("getAreaByLocation")
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(request), String.class);
+        LOG.debug(response);
         List<AreaExtendedIdentifierType> areaList = jsonb.fromJson(response, new ArrayList<AreaExtendedIdentifierType>() {}.getClass().getGenericSuperclass());
 
         Optional<AreaExtendedIdentifierType> portArea = areaList.stream().filter(a -> a.getAreaType().equals(AreaType.PORTAREA)).findAny();
