@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.RiskLevel;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 
 public class IncidentDto implements Serializable {
@@ -17,6 +18,7 @@ public class IncidentDto implements Serializable {
     private String assetName;
     private String assetIrcs;
     private StatusEnum status;
+    private RiskLevel risk;
     private Instant createDate;
     private Instant updateDate;
     private MovementDto lastKnownLocation;
@@ -116,5 +118,13 @@ public class IncidentDto implements Serializable {
 
     public void setExpiryDate(Instant expiryDate) {
         this.expiryDate = expiryDate;
+    }
+
+    public RiskLevel getRisk() {
+        return risk;
+    }
+
+    public void setRisk(RiskLevel risk) {
+        this.risk = risk;
     }
 }

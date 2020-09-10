@@ -4,10 +4,7 @@ import eu.europa.ec.fisheries.uvms.incident.model.dto.OpenAndRecentlyResolvedInc
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.EventCreationDto;
-import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.EventTypeEnum;
-import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
-import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.MovementSourceType;
-import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.*;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentDao;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentLogDao;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
@@ -56,6 +53,9 @@ public class IncidentServiceBean {
     @Inject
     private IncidentLogDao incidentLogDao;
 
+    @Inject
+    private RiskCalculationsBean riskCalculationsBean;
+
     public OpenAndRecentlyResolvedIncidentsDto getAllOpenAndRecentlyResolvedIncidents() {
         OpenAndRecentlyResolvedIncidentsDto dto = new OpenAndRecentlyResolvedIncidentsDto();
         List<Incident> unresolvedIncidents = incidentDao.findOpenByTypes(Arrays.asList(IncidentType.values()));
@@ -90,6 +90,8 @@ public class IncidentServiceBean {
             incidentDao.save(incident);
 
             if ("Asset not sending".equalsIgnoreCase(ticket.getRuleGuid())) {
+                RiskLevel riskLevel = riskCalculationsBean.calculateRiskLevelForIncident(incident);
+                incident.setRisk(riskLevel);
 
                 if(ticket.getPollId() != null && !ticket.getPollId().matches(uuidPattern)) {
                     incidentLogServiceBean.createIncidentLogForStatus(incident, "Creating autopoll failed since: " + ticket.getPollId(),
@@ -111,8 +113,8 @@ public class IncidentServiceBean {
     }
 
     public IncidentDto createIncident(IncidentDto incidentDto, String user) {
+        incidentDto = incidentHelper.checkIncidentIntegrity(incidentDto);
         Incident incident = incidentHelper.incidentDtoToIncident(incidentDto);
-        incident.setStatus(incidentDto.getType().equals(IncidentType.MANUAL_MODE) ? StatusEnum.MANUAL_POSITION_MODE : StatusEnum.INCIDENT_CREATED);
         incident.setCreateDate(Instant.now());
         Incident persistedIncident = incidentDao.save(incident);
         incidentLogServiceBean.createIncidentLogForStatus(persistedIncident, "Incident created by " + user, EventTypeEnum.INCIDENT_CREATED, null);
@@ -121,6 +123,7 @@ public class IncidentServiceBean {
     }
 
     public IncidentDto updateIncident(IncidentDto incidentDto, String user) {
+        incidentDto = incidentHelper.checkIncidentIntegrity(incidentDto);
         Incident incident = incidentDao.findById(incidentDto.getId());
         if(incident.getStatus().equals(StatusEnum.RESOLVED)){
             throw new IllegalArgumentException("Not allowed to update incident " + incident.getId() + " since it has status 'RESOLVED'");
@@ -137,6 +140,9 @@ public class IncidentServiceBean {
         if (!incident.getType().equals(incidentDto.getType())) {
             return EventTypeEnum.INCIDENT_TYPE;
         } else if (!incident.getStatus().toString().equals(incidentDto.getStatus())) {
+            if(incidentDto.getStatus().equals(StatusEnum.RESOLVED)){
+                return EventTypeEnum.INCIDENT_CLOSED;
+            }
             return EventTypeEnum.INCIDENT_STATUS;
         }
         return EventTypeEnum.INCIDENT_UPDATED;

@@ -17,6 +17,7 @@ import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentLogDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.EventCreationDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentLogServiceBean;
 import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentServiceBean;
@@ -40,10 +41,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Path("incident")
@@ -85,22 +83,36 @@ public class IncidentRestResource {
     @POST
     @RequiresFeature(UnionVMSFeature.manageAlarmsOpenTickets)
     public Response createIncident(IncidentDto incidentDto) {
-        IncidentDto createdIncident = incidentServiceBean.createIncident(incidentDto, request.getRemoteUser());
-        return Response.ok(createdIncident).header("MDC", MDC.get("requestId")).build();
+        try {
+            IncidentDto createdIncident = incidentServiceBean.createIncident(incidentDto, request.getRemoteUser());
+            return Response.ok(createdIncident).header("MDC", MDC.get("requestId")).build();
+        }catch (Exception e){
+            LOG.error("Error creating incident: " + e);
+            throw e;
+        }
     }
 
     @PUT
     @RequiresFeature(UnionVMSFeature.manageAlarmsOpenTickets)
     public Response updateIncident(IncidentDto incidentDto) {
-        IncidentDto createdIncident = incidentServiceBean.updateIncident(incidentDto, request.getRemoteUser());
-        return Response.ok(createdIncident).build();
+        try{
+            IncidentDto createdIncident = incidentServiceBean.updateIncident(incidentDto, request.getRemoteUser());
+            return Response.ok(createdIncident).build();
+        }catch (Exception e){
+            LOG.error("Error updating incident: " + e);
+            throw e;
+        }
     }
 
     @GET
-    @Path("resolvedStatuses")
+    @Path("validStatusForTypes")
     @RequiresFeature(UnionVMSFeature.viewAlarmsOpenTickets)
     public Response getStatuseThatCountAsResolved() {
-        return Response.ok(ServiceConstants.RESOLVED_STATUS_LIST).header("MDC", MDC.get("requestId")).build();
+        Map<IncidentType, List<StatusEnum>> response = new HashMap<>();
+        for (IncidentType value : IncidentType.values()) {
+            response.put(value, value.getValidStatuses());
+        }
+        return Response.ok(response).header("MDC", MDC.get("requestId")).build();
     }
 
     @GET

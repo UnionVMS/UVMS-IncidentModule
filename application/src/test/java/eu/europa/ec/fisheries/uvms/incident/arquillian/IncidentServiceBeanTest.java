@@ -17,6 +17,7 @@ import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentDao;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentLogDao;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.IncidentLog;
+import eu.europa.ec.fisheries.uvms.incident.service.helper.IncidentHelper;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Ignore;
@@ -47,6 +48,9 @@ public class IncidentServiceBeanTest extends TransactionalTests {
 
     @Inject
     private IncidentLogDao incidentLogDao;
+
+    @Inject
+    IncidentHelper incidentHelper;
 
     private Jsonb jsonb;
 
@@ -180,8 +184,8 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         assertEquals(EventTypeEnum.MANUAL_POSITION, manualMovementLog.getEventType());
     }
 
+
     @Test
-    @Ignore("Rewrite this when we have a proper update incident function")
     @OperateOnDeployment("incident")
     public void updateIncidentTest() throws Exception {
         UUID assetId = UUID.randomUUID();
@@ -194,17 +198,20 @@ public class IncidentServiceBeanTest extends TransactionalTests {
 
         LockSupport.parkNanos(2000000000L);
 
-        /*Incident created = incidentDao.findOpenByAsset(assetId).get(0);
+        Incident created = incidentDao.findOpenByAsset(assetId).get(0);
         assertNotNull(created);
         assertEquals(StatusEnum.INCIDENT_CREATED, created.getStatus());
 
-        EventCreationDto status = new EventCreationDto();
-        status.setStatus(StatusEnum.RESOLVED);
-        status.setEventType(EventTypeEnum.INCIDENT_CLOSED);
-        incidentService.addEventToIncident(created.getId(), status);
+        IncidentDto incidentDto = incidentHelper.incidentEntityToDto(created);
+        incidentDto.setStatus(StatusEnum.RESOLVED);
+        IncidentDto updatedDto = incidentService.updateIncident(incidentDto, "Test user");
 
         Incident updated = incidentDao.findById(created.getId());
-        assertEquals(updated.getStatus(), StatusEnum.RESOLVED);*/
+        assertEquals(updated.getStatus(), StatusEnum.RESOLVED);
+
+        List<IncidentLog> incidentLogs = incidentLogDao.findAllByIncidentId(updated.getId());
+        assertTrue(incidentLogs.stream().anyMatch(log -> log.getEventType().equals(EventTypeEnum.INCIDENT_CLOSED)));
+
     }
 
     @Test
@@ -314,12 +321,12 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         incidentService.updateIncident(ticket);
 
         Incident updatedIncident = incidentDao.findById(openByAssetAndType.getId());
-        assertEquals(StatusEnum.INCIDENT_CREATED, updatedIncident.getStatus());
+        assertEquals(StatusEnum.PARKED, updatedIncident.getStatus());
 
         List<IncidentLog> incidentLogs = incidentLogDao.findAllByIncidentId(openByAssetAndType.getId());
         assertFalse(incidentLogs.isEmpty());
         assertEquals(2, incidentLogs.size());
-        assertTrue(incidentLogs.stream().anyMatch(log -> log.getIncidentStatus().equals(StatusEnum.INCIDENT_CREATED)));
+        assertTrue(incidentLogs.stream().anyMatch(log -> log.getIncidentStatus().equals(StatusEnum.PARKED)));
         assertTrue(incidentLogs.stream().anyMatch(log -> log.getEventType().equals(EventTypeEnum.RECEIVED_AIS_POSITION)));
     }
 
@@ -344,12 +351,12 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         incidentService.updateIncident(ticket);
 
         Incident updatedIncident = incidentDao.findById(openByAssetAndType.getId());
-        assertEquals(StatusEnum.INCIDENT_CREATED, updatedIncident.getStatus());
+        assertEquals(StatusEnum.PARKED, updatedIncident.getStatus());
 
         List<IncidentLog> incidentLogs = incidentLogDao.findAllByIncidentId(openByAssetAndType.getId());
         assertFalse(incidentLogs.isEmpty());
         assertEquals(2, incidentLogs.size());
-        assertTrue(incidentLogs.stream().anyMatch(log -> log.getIncidentStatus().equals(StatusEnum.INCIDENT_CREATED)));
+        assertTrue(incidentLogs.stream().anyMatch(log -> log.getIncidentStatus().equals(StatusEnum.PARKED)));
         assertTrue(incidentLogs.stream().anyMatch(log -> log.getEventType().equals(EventTypeEnum.RECEIVED_VMS_POSITION)));
     }
 
@@ -379,7 +386,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         List<IncidentLog> incidentLogs = incidentLogDao.findAllByIncidentId(openByAssetAndType.getId());
         assertFalse(incidentLogs.isEmpty());
         assertEquals(2, incidentLogs.size());
-        assertTrue(incidentLogs.stream().anyMatch(log -> log.getIncidentStatus().equals(StatusEnum.INCIDENT_CREATED)));
+        assertTrue(incidentLogs.stream().anyMatch(log -> log.getIncidentStatus().equals(StatusEnum.PARKED)));
         assertTrue(incidentLogs.stream().anyMatch(log -> log.getEventType().equals(EventTypeEnum.RECEIVED_AIS_POSITION)));
     }
 
@@ -420,6 +427,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID mobTermId = UUID.randomUUID();
         IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
         incidentDto.setType(IncidentType.MANUAL_MODE);
+        incidentDto.setStatus(StatusEnum.MANUAL_POSITION_MODE);
 
         incidentDto = incidentService.createIncident(incidentDto, "Tester");
 
@@ -450,6 +458,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID mobTermId = UUID.randomUUID();
         IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
         incidentDto.setType(IncidentType.MANUAL_MODE);
+        incidentDto.setStatus(StatusEnum.MANUAL_POSITION_MODE);
 
         incidentDto = incidentService.createIncident(incidentDto, "Tester");
 
@@ -479,6 +488,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID mobTermId = UUID.randomUUID();
         IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
         incidentDto.setType(IncidentType.MANUAL_MODE);
+        incidentDto.setStatus(StatusEnum.MANUAL_POSITION_MODE);
 
         incidentDto = incidentService.createIncident(incidentDto, "Tester");
 
@@ -509,6 +519,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID mobTermId = UUID.randomUUID();
         IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
         incidentDto.setType(IncidentType.MANUAL_MODE);
+        incidentDto.setStatus(StatusEnum.MANUAL_POSITION_MODE);
 
         incidentDto = incidentService.createIncident(incidentDto, "Tester");
 
@@ -545,6 +556,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID mobTermId = UUID.randomUUID();
         IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
         incidentDto.setType(IncidentType.MANUAL_MODE);
+        incidentDto.setStatus(StatusEnum.MANUAL_POSITION_MODE);
 
         incidentDto = incidentService.createIncident(incidentDto, "Tester");
 
@@ -585,6 +597,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID mobTermId = UUID.randomUUID();
         IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
         incidentDto.setType(IncidentType.MANUAL_MODE);
+        incidentDto.setStatus(StatusEnum.MANUAL_POSITION_MODE);
 
         incidentDto = incidentService.createIncident(incidentDto, "Tester");
 

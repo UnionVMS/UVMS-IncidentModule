@@ -4,12 +4,12 @@ import eu.europa.ec.fisheries.uvms.asset.client.AssetClient;
 import eu.europa.ec.fisheries.uvms.asset.client.model.AssetDTO;
 import eu.europa.ec.fisheries.uvms.asset.client.model.AssetIdentifier;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.*;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.MovementSourceType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.IncidentLog;
 import eu.europa.ec.fisheries.uvms.movement.client.MovementRestClient;
-import eu.europa.ec.fisheries.uvms.movement.client.model.MicroMovement;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -72,6 +72,7 @@ public class IncidentHelper {
             incident.setMovementId(incidentDto.getLastKnownLocation().getId());
         }
         incident.setStatus(incidentDto.getStatus());
+        incident.setRisk(incidentDto.getRisk());
         return incident;
     }
 
@@ -106,6 +107,7 @@ public class IncidentHelper {
         dto.setAssetName(entity.getAssetName());
         dto.setAssetIrcs(entity.getIrcs());
         dto.setStatus(entity.getStatus());
+        dto.setRisk(entity.getRisk());
         dto.setCreateDate(entity.getCreateDate());
         dto.setExpiryDate(entity.getExpiryDate());
         if (entity.getUpdateDate() != null) {
@@ -159,5 +161,25 @@ public class IncidentHelper {
             retVal.put(dto.getId(), dto);
         }
         return retVal;
+    }
+
+    public IncidentDto checkIncidentIntegrity(IncidentDto incident){
+
+        if(incident.getStatus() == null){
+            incident.setStatus(incident.getType().getValidStatuses().get(0));
+
+        } else if(!incident.getType().getValidStatuses().contains(incident.getStatus())){
+            throw new IllegalArgumentException("Incident type " + incident.getType() + " does not support being placed in status " + incident.getStatus());
+        }
+
+        if(incident.getType().equals(IncidentType.ASSET_NOT_SENDING) || incident.getType().equals(IncidentType.MANUAL_MODE)){
+            if(incident.getExpiryDate() != null){
+                throw new IllegalArgumentException(incident.getType() + " does not support having a expiry date");
+            }
+        } else {
+            //maybe do something if type is one of the parked statuses
+        }
+
+        return incident;
     }
 }
