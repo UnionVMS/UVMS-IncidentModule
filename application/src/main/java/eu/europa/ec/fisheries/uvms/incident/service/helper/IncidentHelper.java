@@ -11,8 +11,8 @@ import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.IncidentLog;
 import eu.europa.ec.fisheries.uvms.movement.client.MovementRestClient;
 
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
@@ -24,10 +24,10 @@ import java.util.stream.Collectors;
 @Stateless
 public class IncidentHelper {
 
-    @EJB
+    @Inject
     private AssetClient assetClient;
 
-    @EJB
+    @Inject
     private MovementRestClient movementClient;
 
     public Incident constructIncident(IncidentTicketDto ticket) {
