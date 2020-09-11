@@ -184,9 +184,12 @@ public class IncidentRestResource {
     @GET
     @Path("incidentsForAssetId/{assetId}")
     @RequiresFeature(UnionVMSFeature.viewAlarmsOpenTickets)
-    public Response getIncidentsForAssetId(@PathParam("assetId") String assetId) {
+    public Response getIncidentsForAssetId(@PathParam("assetId") String assetId,@DefaultValue("false") @QueryParam("onlyOpen") Boolean onlyOpen) {
         try {
             List<Incident> incidents = incidentDao.findByAssetId(UUID.fromString(assetId));
+            if(onlyOpen){
+                incidents = incidents.stream().filter(incident -> !incident.getStatus().equals(StatusEnum.RESOLVED)).collect(Collectors.toList());
+            }
             Map<Long, IncidentDto> dtoList = incidentHelper.incidentToDtoMap(incidents);
             String response = jsonb.toJson(dtoList);
             return Response.ok(response).header("MDC", MDC.get("requestId")).build();

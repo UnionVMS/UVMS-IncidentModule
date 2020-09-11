@@ -18,14 +18,14 @@
     <properties>
         <installAtEnd>false</installAtEnd>
 
-        <docker.dev.version>3.44.8</docker.dev.version>
+        <docker.dev.version>3.45.2</docker.dev.version>
         <docker.liquibase.changeLogFile>LIQUIBASE/changelog/db-changelog-master.xml</docker.liquibase.changeLogFile>
         <docker.liquibase.db.user>incident</docker.liquibase.db.user>
         <docker.liquibase.db.passwd>incident</docker.liquibase.db.passwd>
 
         <!-- UVMS Libraries -->
         <uvms.common.version>4.1.7</uvms.common.version>
-        <movement.version>5.5.17-UVMS</movement.version>
+        <movement.version>5.5.18-UVMS</movement.version>
         <movement.rules.version>2.4.0</movement.rules.version>
         <asset.version>6.7.23</asset.version>
         <exchange.module>5.3.3-UVMS</exchange.module>
