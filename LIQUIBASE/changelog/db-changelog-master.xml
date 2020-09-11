@@ -15,5 +15,6 @@
     <include file="v0.3.6/db-changelog-add-expiry-date.xml" relativeToChangelogFile="true"/>
     <include file="v0.4.1/db-changelog-remap-removed-status-codes.xml" relativeToChangelogFile="true"/>
     <include file="v0.4.2/db-changelog-add-risk-level.xml" relativeToChangelogFile="true"/>
+    <include file="v0.4.4/db-changelog-set-risk-for-those-without.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

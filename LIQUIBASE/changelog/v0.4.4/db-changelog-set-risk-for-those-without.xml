@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.7.xsd"
+                   logicalFilePath="changelog/v0.4.4/db-changelog-set-risk-for-those-without.xml">
+
+    <changeSet id="Set risk for those asset not sending that does not have such" author="joemat">
+        <update  tableName="incident">
+            <column  name="risk" value="LOW"/>
+            <where>risk is null and type = 'ASSET_NOT_SENDING'</where>
+        </update>
+
+    </changeSet>
+
+
+</databaseChangeLog>
