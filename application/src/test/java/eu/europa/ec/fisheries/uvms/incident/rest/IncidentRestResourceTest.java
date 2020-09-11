@@ -362,12 +362,79 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
         assertNotNull(responseLogs);
     }
 
+    @Test
+    @OperateOnDeployment("incident")
+    public void getAllIncidentsForAsset() {
+        IncidentDto incidentDto1 = TicketHelper.createBasicIncidentDto();
+        UUID assetId = incidentDto1.getAssetId();
+        IncidentDto createdIncident1 = createIncident(incidentDto1);
+
+        createdIncident1.setType(IncidentType.PARKED);
+        createdIncident1.setStatus(StatusEnum.RESOLVED);
+        IncidentDto closedIncident = updateIncident(createdIncident1);
+
+        IncidentDto incidentDto2 = TicketHelper.createBasicIncidentDto();
+        incidentDto2.setAssetId(assetId);
+        IncidentDto createdIncident2 = createIncident(incidentDto2);
+
+        Response response = getWebTarget()
+                .path("incident/incidentsForAssetId")
+                .path(assetId.toString())
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .get(Response.class);
+
+        Map<Long, IncidentDto> responseLogs = response.readEntity(new GenericType<Map<Long, IncidentDto>>() {});
+        assertNotNull(responseLogs);
+        assertEquals(2, responseLogs.size());
+        assertTrue(responseLogs.containsKey("" + closedIncident.getId()));
+        assertTrue(responseLogs.containsKey("" + createdIncident2.getId()));
+    }
+
+    @Test
+    @OperateOnDeployment("incident")
+    public void getAllOpenIncidentsForAsset() {
+        IncidentDto incidentDto1 = TicketHelper.createBasicIncidentDto();
+        UUID assetId = incidentDto1.getAssetId();
+        IncidentDto createdIncident1 = createIncident(incidentDto1);
+
+        createdIncident1.setType(IncidentType.PARKED);
+        createdIncident1.setStatus(StatusEnum.RESOLVED);
+        IncidentDto closedIncident = updateIncident(createdIncident1);
+
+        IncidentDto incidentDto2 = TicketHelper.createBasicIncidentDto();
+        incidentDto2.setAssetId(assetId);
+        IncidentDto createdIncident2 = createIncident(incidentDto2);
+
+        Response response = getWebTarget()
+                .path("incident/incidentsForAssetId")
+                .path(assetId.toString())
+                .queryParam("onlyOpen", "true")
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .get(Response.class);
+
+        Map<Long, IncidentDto> responseLogs = response.readEntity(new GenericType<Map<Long, IncidentDto>>() {});
+        assertNotNull(responseLogs);
+        assertEquals(1, responseLogs.size());
+        assertFalse(responseLogs.containsKey("" + closedIncident.getId()));
+        assertTrue(responseLogs.containsKey("" + createdIncident2.getId()));
+    }
+
     private IncidentDto createIncident(IncidentDto incident){
         return getWebTarget()
                 .path("incident")
                 .request(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, getToken())
                 .post(Entity.json(incident), IncidentDto.class);
+    }
+
+    private IncidentDto updateIncident(IncidentDto incident){
+        return getWebTarget()
+                .path("incident")
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .put(Entity.json(incident), IncidentDto.class);
     }
 
     private Map<Long, IncidentLogDto> getIncidentLogForIncident(IncidentDto incident){
