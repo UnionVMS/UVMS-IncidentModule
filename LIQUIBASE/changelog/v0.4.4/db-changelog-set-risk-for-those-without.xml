@@ -7,8 +7,13 @@
 
     <changeSet id="Set risk for those asset not sending that does not have such" author="joemat">
         <update  tableName="incident">
-            <column  name="risk" value="LOW"/>
+            <column  name="risk" value="MEDIUM"/>
             <where>risk is null and type = 'ASSET_NOT_SENDING'</where>
+        </update>
+
+        <update  tableName="incident">
+            <column  name="risk" value="MEDIUM"/>
+            <where>risk = 'LOW' and type = 'ASSET_NOT_SENDING'</where>
         </update>
 
     </changeSet>
