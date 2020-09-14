@@ -31,7 +31,7 @@
         <exchange.module>5.3.3-UVMS</exchange.module>
         <spatial.version>2.2.3-UVMS</spatial.version>
         <usm4uvms.version>4.1.2</usm4uvms.version>
-        <uvms.pom>3.3</uvms.pom>
+        <uvms.pom>3.4</uvms.pom>
     </properties>
 
     <dependencies>
@@ -47,12 +47,6 @@
             <dependency>
                 <groupId>fish.focus.uvms.maven</groupId>
                 <artifactId>uvms-pom-gis-deps</artifactId>
-                <version>${uvms.pom}</version>
-                <type>pom</type>
-            </dependency>
-            <dependency>
-                <groupId>fish.focus.uvms.maven</groupId>
-                <artifactId>uvms-pom-logging-deps</artifactId>
                 <version>${uvms.pom}</version>
                 <type>pom</type>
             </dependency>
