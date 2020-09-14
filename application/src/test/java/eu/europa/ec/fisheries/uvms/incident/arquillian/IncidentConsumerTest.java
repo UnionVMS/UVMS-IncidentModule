@@ -112,7 +112,7 @@ public class IncidentConsumerTest extends BuildIncidentTestDeployment {
             IncidentDto incident = jsonb.fromJson(text, IncidentDto.class);
             assertNotNull(incident.getId());
             assertEquals(assetId, incident.getAssetId());
-            assertEquals(RiskLevel.LOW, incident.getRisk());
+            assertEquals(RiskLevel.MEDIUM, incident.getRisk());
         }
         System.clearProperty("SPATIAL_AREA_TYPE");
     }

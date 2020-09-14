@@ -65,7 +65,7 @@ public class RiskCalculationsBean {
         if(microMovement == null){
           return RiskLevel.HIGH;
         } else if(checkIfPositionIsInPortArea(microMovement)){
-            return RiskLevel.LOW;
+            return RiskLevel.MEDIUM;
         } else {
             return RiskLevel.HIGH;
         }
