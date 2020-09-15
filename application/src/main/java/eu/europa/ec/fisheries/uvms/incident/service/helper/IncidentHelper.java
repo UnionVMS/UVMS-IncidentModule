@@ -184,7 +184,7 @@ public class IncidentHelper {
 
         if(incident.getType().equals(IncidentType.MANUAL_MODE)){
             Instant in65Minutes = Instant.now().plus(ServiceConstants.MAX_DELAY_BETWEEN_MANUAL_POSITIONS_IN_MINUTES, ChronoUnit.MINUTES);
-            incident.setExpiryDate(incident.getExpiryDate() == null || incident.getExpiryDate().isBefore(in65Minutes)
+            incident.setExpiryDate(incident.getExpiryDate() != null && incident.getExpiryDate().isBefore(in65Minutes)
                     ? incident.getExpiryDate() : in65Minutes);
         }
 
