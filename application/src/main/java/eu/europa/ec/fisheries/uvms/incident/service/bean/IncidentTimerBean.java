@@ -45,7 +45,7 @@ public class IncidentTimerBean {
         try {
             List<Incident> manualPositionIncidents = incidentDao.findByStatus(StatusEnum.MANUAL_POSITION_MODE);
             for (Incident incident : manualPositionIncidents) {
-                if(incident.getUpdateDate().plus(65, ChronoUnit.MINUTES).isBefore(Instant.now())){
+                if(incident.getUpdateDate().plus(ServiceConstants.MAX_DELAY_BETWEEN_MANUAL_POSITIONS_IN_MINUTES, ChronoUnit.MINUTES).isBefore(Instant.now())){
                     incident.setStatus(StatusEnum.MANUAL_POSITION_LATE);
                     incidentLogServiceBean.createIncidentLogForStatus(incident, EventTypeEnum.MANUAL_POSITION_LATE.getMessage(), EventTypeEnum.MANUAL_POSITION_LATE, null);
                 }

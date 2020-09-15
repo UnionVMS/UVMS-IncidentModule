@@ -175,6 +175,8 @@ public class IncidentServiceBeanTest extends TransactionalTests {
 
         Incident incident = incidentDao.findOpenByAsset(assetId).get(0);
         assertNotNull(incident);
+        assertTrue(incident.getExpiryDate().isAfter(Instant.now().plus(64, ChronoUnit.MINUTES)));
+        assertTrue(incident.getExpiryDate().isBefore(Instant.now().plus(66, ChronoUnit.MINUTES)));
 
         assertTrue(incidentLogDao.checkIfMovementAlreadyExistsForIncident(incident.getId(), UUID.fromString(ticket.getMovementId())));
         List<IncidentLog> incidentLog = incidentLogDao.findAllByIncidentId(incident.getId());

@@ -8,6 +8,8 @@ import java.util.List;
 
 public class ServiceConstants {
 
+    public static final int MAX_DELAY_BETWEEN_MANUAL_POSITIONS_IN_MINUTES = 65;
+
     public static final List<StatusEnum> RESOLVED_STATUS_LIST = Arrays.asList(StatusEnum.RESOLVED);
     public static final List<IncidentType> REACT_ON_RECENT_AIS = Arrays.asList(IncidentType.MANUAL_MODE, IncidentType.OWNER_TRANSFER, IncidentType.PARKED, IncidentType.SEASONAL_FISHING);
 }
