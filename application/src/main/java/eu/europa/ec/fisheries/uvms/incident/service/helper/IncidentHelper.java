@@ -7,6 +7,7 @@ import eu.europa.ec.fisheries.uvms.incident.model.dto.*;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.MovementSourceType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
+import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.IncidentLog;
 import eu.europa.ec.fisheries.uvms.movement.client.MovementRestClient;
@@ -14,6 +15,7 @@ import eu.europa.ec.fisheries.uvms.movement.client.MovementRestClient;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -178,6 +180,12 @@ public class IncidentHelper {
             }
         } else {
             //maybe do something if type is one of the parked statuses
+        }
+
+        if(incident.getType().equals(IncidentType.MANUAL_MODE)){
+            Instant in65Minutes = Instant.now().plus(ServiceConstants.MAX_DELAY_BETWEEN_MANUAL_POSITIONS_IN_MINUTES, ChronoUnit.MINUTES);
+            incident.setExpiryDate(incident.getExpiryDate() == null || incident.getExpiryDate().isBefore(in65Minutes)
+                    ? incident.getExpiryDate() : in65Minutes);
         }
 
         return incident;

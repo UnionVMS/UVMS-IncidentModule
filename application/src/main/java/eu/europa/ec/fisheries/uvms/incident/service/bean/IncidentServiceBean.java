@@ -5,6 +5,7 @@ import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.EventCreationDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.*;
+import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentDao;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentLogDao;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
@@ -192,6 +193,7 @@ public class IncidentServiceBean {
 
                 persisted.setStatus(StatusEnum.MANUAL_POSITION_MODE);
                 persisted.setType(IncidentType.MANUAL_MODE);
+                persisted.setExpiryDate(Instant.now().plus(ServiceConstants.MAX_DELAY_BETWEEN_MANUAL_POSITIONS_IN_MINUTES, ChronoUnit.MINUTES));
                 incidentLogServiceBean.createIncidentLogForStatus(persisted, "Incident changed to type manual mode", EventTypeEnum.INCIDENT_TYPE, null);
 
                 persisted.setMovementId(UUID.fromString(ticket.getMovementId()));
@@ -209,8 +211,9 @@ public class IncidentServiceBean {
         if (ticket.getMovementSource().equals(MovementSourceType.MANUAL)
                 && !incidentLogDao.checkIfMovementAlreadyExistsForIncident(persisted.getId(), UUID.fromString(ticket.getMovementId()))) {
             persisted.setMovementId(UUID.fromString(ticket.getMovementId()));
-            persisted.setExpiryDate(Instant.now().plus(65, ChronoUnit.MINUTES));
+            persisted.setExpiryDate(Instant.now().plus(ServiceConstants.MAX_DELAY_BETWEEN_MANUAL_POSITIONS_IN_MINUTES, ChronoUnit.MINUTES));
             incidentLogServiceBean.createIncidentLogForManualPosition(persisted, UUID.fromString(ticket.getMovementId()));
+
         } else if(ticket.getMovementSource().equals(MovementSourceType.AIS)){   //how often should I do this?
             IncidentLog recentAis = incidentLogServiceBean.findLogWithTypeEntryFromTheLastHour(persisted.getId(), EventTypeEnum.RECEIVED_AIS_POSITION);
             if(recentAis != null) {
