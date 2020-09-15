@@ -19,6 +19,7 @@ import javax.ejb.Stateless;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -208,6 +209,7 @@ public class IncidentServiceBean {
         if (ticket.getMovementSource().equals(MovementSourceType.MANUAL)
                 && !incidentLogDao.checkIfMovementAlreadyExistsForIncident(persisted.getId(), UUID.fromString(ticket.getMovementId()))) {
             persisted.setMovementId(UUID.fromString(ticket.getMovementId()));
+            persisted.setExpiryDate(Instant.now().plus(65, ChronoUnit.MINUTES));
             incidentLogServiceBean.createIncidentLogForManualPosition(persisted, UUID.fromString(ticket.getMovementId()));
         } else if(ticket.getMovementSource().equals(MovementSourceType.AIS)){   //how often should I do this?
             IncidentLog recentAis = incidentLogServiceBean.findLogWithTypeEntryFromTheLastHour(persisted.getId(), EventTypeEnum.RECEIVED_AIS_POSITION);
