@@ -7,13 +7,11 @@ import eu.europa.ec.fisheries.uvms.asset.client.model.AssetIdentifier;
 import eu.europa.ec.fisheries.uvms.asset.client.model.CreatePollResultDto;
 import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
-import eu.europa.ec.fisheries.uvms.movementrules.model.dto.MovementDetails;
 import eu.europa.ec.fisheries.uvms.rest.security.InternalRestTokenHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.ws.rs.client.Client;
@@ -35,7 +33,7 @@ public class AssetCommunicationBean {
     @Resource(name = "java:global/asset_endpoint")
     private String assetEndpoint;
 
-    @EJB
+    @Inject
     private InternalRestTokenHandler tokenHandler;
 
     @Inject
