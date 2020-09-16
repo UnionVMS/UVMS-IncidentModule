@@ -210,6 +210,8 @@ public class IncidentServiceBean {
     private void updateManualMovement(IncidentTicketDto ticket, Incident persisted){
         if (ticket.getMovementSource().equals(MovementSourceType.MANUAL)
                 && !incidentLogDao.checkIfMovementAlreadyExistsForIncident(persisted.getId(), UUID.fromString(ticket.getMovementId()))) {
+
+            persisted.setStatus(StatusEnum.MANUAL_POSITION_MODE);
             persisted.setMovementId(UUID.fromString(ticket.getMovementId()));
             persisted.setExpiryDate(Instant.now().plus(ServiceConstants.MAX_DELAY_BETWEEN_MANUAL_POSITIONS_IN_MINUTES, ChronoUnit.MINUTES));
             incidentLogServiceBean.createIncidentLogForManualPosition(persisted, UUID.fromString(ticket.getMovementId()));

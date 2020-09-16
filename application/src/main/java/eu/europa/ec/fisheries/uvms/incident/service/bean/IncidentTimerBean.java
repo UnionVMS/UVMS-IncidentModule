@@ -17,12 +17,14 @@ import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentDao;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.IncidentLog;
+import eu.europa.ec.fisheries.uvms.incident.service.domain.interfaces.IncidentUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ejb.Schedule;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
+import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -40,6 +42,10 @@ public class IncidentTimerBean {
     @Inject
     IncidentLogServiceBean incidentLogServiceBean;
 
+    @Inject
+    @IncidentUpdate
+    private Event<Incident> updatedIncident;
+
     @Schedule(minute = "*/5", hour = "*", persistent = false)
     public void manualPositionsTimer() {
         try {
@@ -48,6 +54,7 @@ public class IncidentTimerBean {
                 if(incident.getUpdateDate().plus(ServiceConstants.MAX_DELAY_BETWEEN_MANUAL_POSITIONS_IN_MINUTES, ChronoUnit.MINUTES).isBefore(Instant.now())){
                     incident.setStatus(StatusEnum.MANUAL_POSITION_LATE);
                     incidentLogServiceBean.createIncidentLogForStatus(incident, EventTypeEnum.MANUAL_POSITION_LATE.getMessage(), EventTypeEnum.MANUAL_POSITION_LATE, null);
+                    updatedIncident.fire(incident);
                 }
             }
         } catch (Exception e) {
@@ -65,6 +72,7 @@ public class IncidentTimerBean {
                     if (recentAisLog == null) {
                         incident.setStatus(StatusEnum.PARKED);
                         incidentLogServiceBean.createIncidentLogForStatus(incident, "Incident status updated to " + incident.getStatus(), EventTypeEnum.INCIDENT_STATUS, null);
+                        updatedIncident.fire(incident);
                     }
                 }
             }
