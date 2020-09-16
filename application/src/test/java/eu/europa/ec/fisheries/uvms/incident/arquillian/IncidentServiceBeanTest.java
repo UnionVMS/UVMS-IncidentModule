@@ -160,6 +160,29 @@ public class IncidentServiceBeanTest extends TransactionalTests {
 
     @Test
     @OperateOnDeployment("incident")
+    public void sendManualPositionToLateManualStatus() {
+        UUID assetId = UUID.randomUUID();
+        UUID movementId = UUID.randomUUID();
+        UUID mobTermId = UUID.randomUUID();
+        IncidentTicketDto ticket = TicketHelper.createTicket(assetId, movementId, mobTermId);
+        ticket.setType(IncidentType.MANUAL_MODE);
+        ticket.setStatus(StatusEnum.MANUAL_POSITION_LATE.name());
+        incidentService.createIncident(ticket);
+
+        ticket.setType(null);
+        ticket.setMovementId(UUID.randomUUID().toString());
+        ticket.setMovementSource(MovementSourceType.MANUAL);
+        incidentService.updateIncident(ticket);
+
+        Incident incident = incidentDao.findOpenByAsset(assetId).get(0);
+        assertNotNull(incident);
+        assertEquals(assetId, incident.getAssetId());
+        assertEquals(IncidentType.MANUAL_MODE, incident.getType());
+        assertEquals(StatusEnum.MANUAL_POSITION_MODE, incident.getStatus());
+    }
+
+    @Test
+    @OperateOnDeployment("incident")
     public void setIncidentTypeToManualCheckLog() {
         UUID assetId = UUID.randomUUID();
         UUID movementId = UUID.randomUUID();
