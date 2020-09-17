@@ -174,7 +174,7 @@ public class IncidentHelper {
             throw new IllegalArgumentException("Incident type " + incident.getType() + " does not support being placed in status " + incident.getStatus());
         }
 
-        if(incident.getType().equals(IncidentType.ASSET_NOT_SENDING) || incident.getType().equals(IncidentType.MANUAL_MODE)){
+        if(incident.getType().equals(IncidentType.ASSET_NOT_SENDING) || incident.getType().equals(IncidentType.MANUAL_POSITION_MODE)){
             if(incident.getExpiryDate() != null){
                 throw new IllegalArgumentException(incident.getType() + " does not support having a expiry date");
             }
@@ -182,7 +182,7 @@ public class IncidentHelper {
             //maybe do something if type is one of the parked statuses
         }
 
-        if(incident.getType().equals(IncidentType.MANUAL_MODE)){
+        if(incident.getType().equals(IncidentType.MANUAL_POSITION_MODE)){
             Instant in65Minutes = Instant.now().plus(ServiceConstants.MAX_DELAY_BETWEEN_MANUAL_POSITIONS_IN_MINUTES, ChronoUnit.MINUTES);
             incident.setExpiryDate(incident.getExpiryDate() != null && incident.getExpiryDate().isBefore(in65Minutes)
                     ? incident.getExpiryDate() : in65Minutes);

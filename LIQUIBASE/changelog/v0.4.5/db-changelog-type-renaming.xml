@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.7.xsd"
+                   logicalFilePath="changelog/v0.4.5/db-changelog-type-renaming.xml">
+
+    <changeSet id="Renmaed OWNER_TRANSFER to OWNERSHIP_TRANSFER and MANUAL_MODE to MANUAL_POSITION_MODE" author="joemat">
+        <update  tableName="incident">
+            <column  name="type" value="OWNERSHIP_TRANSFER"/>
+            <where>type = 'OWNER_TRANSFER'</where>
+        </update>
+
+        <update  tableName="incident">
+            <column  name="type" value="MANUAL_POSITION_MODE"/>
+            <where>type = 'MANUAL_MODE'</where>
+        </update>
+
+    </changeSet>
+
+
+</databaseChangeLog>

@@ -8,7 +8,6 @@ import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.EventTypeEnum;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 import eu.europa.ec.fisheries.uvms.incident.rest.filters.AppError;
-import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;
@@ -271,7 +270,7 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
     @OperateOnDeployment("incident")
     public void updateIncidentLogCreatedTest() {
         IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
-        incidentDto.setType(IncidentType.OWNER_TRANSFER);
+        incidentDto.setType(IncidentType.OWNERSHIP_TRANSFER);
         IncidentDto createdIncident = createIncident(incidentDto);
 
         createdIncident.setType(IncidentType.PARKED);
