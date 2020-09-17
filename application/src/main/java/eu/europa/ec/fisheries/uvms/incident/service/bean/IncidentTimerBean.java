@@ -12,20 +12,24 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
 package eu.europa.ec.fisheries.uvms.incident.service.bean;
 
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.EventTypeEnum;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentDao;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.IncidentLog;
+import eu.europa.ec.fisheries.uvms.incident.service.domain.interfaces.IncidentUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ejb.Schedule;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
+import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.List;
 
 @Startup
@@ -40,18 +44,39 @@ public class IncidentTimerBean {
     @Inject
     IncidentLogServiceBean incidentLogServiceBean;
 
-    @Schedule(minute = "*/5", hour = "*", persistent = false)
+    @Inject
+    @IncidentUpdate
+    private Event<Incident> updatedIncident;
+
+    @Schedule(minute = "*/1", hour = "*", persistent = false)
     public void manualPositionsTimer() {
         try {
             List<Incident> manualPositionIncidents = incidentDao.findByStatus(StatusEnum.MANUAL_POSITION_MODE);
             for (Incident incident : manualPositionIncidents) {
-                if(incident.getUpdateDate().plus(ServiceConstants.MAX_DELAY_BETWEEN_MANUAL_POSITIONS_IN_MINUTES, ChronoUnit.MINUTES).isBefore(Instant.now())){
+                if(incident.getExpiryDate().isBefore(Instant.now())){
                     incident.setStatus(StatusEnum.MANUAL_POSITION_LATE);
                     incidentLogServiceBean.createIncidentLogForStatus(incident, EventTypeEnum.MANUAL_POSITION_LATE.getMessage(), EventTypeEnum.MANUAL_POSITION_LATE, null);
+                    updatedIncident.fire(incident);
                 }
             }
         } catch (Exception e) {
             LOG.error("[ Error when running manualPositionsTimer. ] {}", e);
+        }
+    }
+
+    @Schedule(minute = "*/5", hour = "*", persistent = false)
+    public void parkedOverdueTimer() {
+        try {
+            List<Incident> parkedIncidents = incidentDao.findOpenByTypes(Arrays.asList(IncidentType.SEASONAL_FISHING, IncidentType.PARKED, IncidentType.OWNERSHIP_TRANSFER));
+            for (Incident incident : parkedIncidents) {
+                if(incident.getExpiryDate() != null && incident.getExpiryDate().isBefore(Instant.now())){
+                    incident.setStatus(StatusEnum.OVERDUE);
+                    incidentLogServiceBean.createIncidentLogForStatus(incident, "Incident is past its due date", EventTypeEnum.INCIDENT_STATUS, null);
+                    updatedIncident.fire(incident);
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("[ Error when running parkedOverdueTimer. ] {}", e);
         }
     }
 
@@ -65,6 +90,7 @@ public class IncidentTimerBean {
                     if (recentAisLog == null) {
                         incident.setStatus(StatusEnum.PARKED);
                         incidentLogServiceBean.createIncidentLogForStatus(incident, "Incident status updated to " + incident.getStatus(), EventTypeEnum.INCIDENT_STATUS, null);
+                        updatedIncident.fire(incident);
                     }
                 }
             }

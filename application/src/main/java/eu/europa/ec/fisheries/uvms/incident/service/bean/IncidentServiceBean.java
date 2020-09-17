@@ -1,9 +1,9 @@
 package eu.europa.ec.fisheries.uvms.incident.service.bean;
 
-import eu.europa.ec.fisheries.uvms.incident.model.dto.OpenAndRecentlyResolvedIncidentsDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.EventCreationDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
-import eu.europa.ec.fisheries.uvms.incident.model.dto.EventCreationDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.OpenAndRecentlyResolvedIncidentsDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.*;
 import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentDao;
@@ -115,7 +115,7 @@ public class IncidentServiceBean {
     }
 
     public IncidentDto createIncident(IncidentDto incidentDto, String user) {
-        incidentDto = incidentHelper.checkIncidentIntegrity(incidentDto);
+        incidentDto = incidentHelper.checkIncidentIntegrity(incidentDto, null);
         Incident incident = incidentHelper.incidentDtoToIncident(incidentDto);
         incident.setCreateDate(Instant.now());
         Incident persistedIncident = incidentDao.save(incident);
@@ -125,17 +125,17 @@ public class IncidentServiceBean {
     }
 
     public IncidentDto updateIncident(IncidentDto incidentDto, String user) {
-        incidentDto = incidentHelper.checkIncidentIntegrity(incidentDto);
-        Incident incident = incidentDao.findById(incidentDto.getId());
-        if(incident.getStatus().equals(StatusEnum.RESOLVED)){
-            throw new IllegalArgumentException("Not allowed to update incident " + incident.getId() + " since it has status 'RESOLVED'");
+        Incident oldIncident = incidentDao.findById(incidentDto.getId());
+        if(oldIncident.getStatus().equals(StatusEnum.RESOLVED)){
+            throw new IllegalArgumentException("Not allowed to update incident " + oldIncident.getId() + " since it has status 'RESOLVED'");
         }
-        EventTypeEnum eventType = mapEventType(incident, incidentDto);
-        incidentHelper.populateIncident(incident, incidentDto);
-        Incident updated = incidentDao.update(incident);
+        incidentDto = incidentHelper.checkIncidentIntegrity(incidentDto, oldIncident);
+        EventTypeEnum eventType = mapEventType(oldIncident, incidentDto);
+        incidentHelper.populateIncident(oldIncident, incidentDto);
+        Incident updated = incidentDao.update(oldIncident);
         updatedIncident.fire(updated);
         incidentLogServiceBean.createIncidentLogForStatus(updated, "Incident updated by " + user, eventType, null);
-        return incidentHelper.incidentEntityToDto(incident);
+        return incidentHelper.incidentEntityToDto(oldIncident);
     }
 
     private EventTypeEnum mapEventType(Incident incident, IncidentDto incidentDto) {
@@ -166,7 +166,7 @@ public class IncidentServiceBean {
                 case ASSET_NOT_SENDING:
                     updateAssetNotSending(ticket, persisted);
                     break;
-                case MANUAL_MODE:
+                case MANUAL_POSITION_MODE:
                     updateManualMovement(ticket, persisted);
                     break;
                 case PARKED:
@@ -175,7 +175,7 @@ public class IncidentServiceBean {
                 case SEASONAL_FISHING:
                     updateSeasonalFishing(ticket, persisted);
                     break;
-                case OWNER_TRANSFER:
+                case OWNERSHIP_TRANSFER:
                     updateOwnerTransfer(ticket, persisted);
                     break;
             }
@@ -192,7 +192,7 @@ public class IncidentServiceBean {
             if (ticket.getMovementSource() != null && ticket.getMovementSource().equals(MovementSourceType.MANUAL)) {
 
                 persisted.setStatus(StatusEnum.MANUAL_POSITION_MODE);
-                persisted.setType(IncidentType.MANUAL_MODE);
+                persisted.setType(IncidentType.MANUAL_POSITION_MODE);
                 persisted.setExpiryDate(Instant.now().plus(ServiceConstants.MAX_DELAY_BETWEEN_MANUAL_POSITIONS_IN_MINUTES, ChronoUnit.MINUTES));
                 incidentLogServiceBean.createIncidentLogForStatus(persisted, "Incident changed to type manual mode", EventTypeEnum.INCIDENT_TYPE, null);
 
@@ -210,6 +210,8 @@ public class IncidentServiceBean {
     private void updateManualMovement(IncidentTicketDto ticket, Incident persisted){
         if (ticket.getMovementSource().equals(MovementSourceType.MANUAL)
                 && !incidentLogDao.checkIfMovementAlreadyExistsForIncident(persisted.getId(), UUID.fromString(ticket.getMovementId()))) {
+
+            persisted.setStatus(StatusEnum.MANUAL_POSITION_MODE);
             persisted.setMovementId(UUID.fromString(ticket.getMovementId()));
             persisted.setExpiryDate(Instant.now().plus(ServiceConstants.MAX_DELAY_BETWEEN_MANUAL_POSITIONS_IN_MINUTES, ChronoUnit.MINUTES));
             incidentLogServiceBean.createIncidentLogForManualPosition(persisted, UUID.fromString(ticket.getMovementId()));
