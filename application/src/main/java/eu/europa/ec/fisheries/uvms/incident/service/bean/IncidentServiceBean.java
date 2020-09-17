@@ -166,7 +166,7 @@ public class IncidentServiceBean {
                 case ASSET_NOT_SENDING:
                     updateAssetNotSending(ticket, persisted);
                     break;
-                case MANUAL_MODE:
+                case MANUAL_POSITION_MODE:
                     updateManualMovement(ticket, persisted);
                     break;
                 case PARKED:
@@ -175,7 +175,7 @@ public class IncidentServiceBean {
                 case SEASONAL_FISHING:
                     updateSeasonalFishing(ticket, persisted);
                     break;
-                case OWNER_TRANSFER:
+                case OWNERSHIP_TRANSFER:
                     updateOwnerTransfer(ticket, persisted);
                     break;
             }
@@ -192,7 +192,7 @@ public class IncidentServiceBean {
             if (ticket.getMovementSource() != null && ticket.getMovementSource().equals(MovementSourceType.MANUAL)) {
 
                 persisted.setStatus(StatusEnum.MANUAL_POSITION_MODE);
-                persisted.setType(IncidentType.MANUAL_MODE);
+                persisted.setType(IncidentType.MANUAL_POSITION_MODE);
                 persisted.setExpiryDate(Instant.now().plus(ServiceConstants.MAX_DELAY_BETWEEN_MANUAL_POSITIONS_IN_MINUTES, ChronoUnit.MINUTES));
                 incidentLogServiceBean.createIncidentLogForStatus(persisted, "Incident changed to type manual mode", EventTypeEnum.INCIDENT_TYPE, null);
 
