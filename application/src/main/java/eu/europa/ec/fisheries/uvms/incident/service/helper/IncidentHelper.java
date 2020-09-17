@@ -11,6 +11,7 @@ import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.IncidentLog;
 import eu.europa.ec.fisheries.uvms.movement.client.MovementRestClient;
+import eu.europa.ec.fisheries.uvms.movement.client.model.MicroMovement;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -165,7 +166,7 @@ public class IncidentHelper {
         return retVal;
     }
 
-    public IncidentDto checkIncidentIntegrity(IncidentDto incident){
+    public IncidentDto checkIncidentIntegrity(IncidentDto incident, Incident oldIncident){
 
         if(incident.getStatus() == null){
             incident.setStatus(incident.getType().getValidStatuses().get(0));
@@ -174,18 +175,35 @@ public class IncidentHelper {
             throw new IllegalArgumentException("Incident type " + incident.getType() + " does not support being placed in status " + incident.getStatus());
         }
 
-        if(incident.getType().equals(IncidentType.ASSET_NOT_SENDING) || incident.getType().equals(IncidentType.MANUAL_POSITION_MODE)){
+        if(incident.getType().equals(IncidentType.ASSET_NOT_SENDING)){
             if(incident.getExpiryDate() != null){
                 throw new IllegalArgumentException(incident.getType() + " does not support having a expiry date");
             }
-        } else {
-            //maybe do something if type is one of the parked statuses
         }
 
         if(incident.getType().equals(IncidentType.MANUAL_POSITION_MODE)){
-            Instant in65Minutes = Instant.now().plus(ServiceConstants.MAX_DELAY_BETWEEN_MANUAL_POSITIONS_IN_MINUTES, ChronoUnit.MINUTES);
-            incident.setExpiryDate(incident.getExpiryDate() != null && incident.getExpiryDate().isBefore(in65Minutes)
-                    ? incident.getExpiryDate() : in65Minutes);
+            if(incident.getStatus().equals(StatusEnum.RESOLVED)){
+                //do nothing
+            } else {
+                Instant expiry;
+                if (oldIncident != null && oldIncident.getMovementId() != null) {
+                    MicroMovement microMovementById = movementClient.getMicroMovementById(oldIncident.getMovementId());
+                    StatusEnum status;
+                    if (microMovementById != null) {
+                        expiry = microMovementById.getTimestamp().plus(ServiceConstants.MAX_DELAY_BETWEEN_MANUAL_POSITIONS_IN_MINUTES, ChronoUnit.MINUTES);
+                        status = expiry.isBefore(Instant.now()) ? StatusEnum.MANUAL_POSITION_LATE : StatusEnum.MANUAL_POSITION_MODE;
+
+                    } else {
+                        status = StatusEnum.MANUAL_POSITION_MODE;
+                        expiry = Instant.now().plus(ServiceConstants.MAX_DELAY_BETWEEN_MANUAL_POSITIONS_IN_MINUTES, ChronoUnit.MINUTES);
+                    }
+                    incident.setStatus(status);
+
+                } else {
+                    expiry = Instant.now().plus(ServiceConstants.MAX_DELAY_BETWEEN_MANUAL_POSITIONS_IN_MINUTES, ChronoUnit.MINUTES);
+                }
+                incident.setExpiryDate(expiry);
+            }
         }
 
         return incident;
