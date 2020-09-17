@@ -7,7 +7,6 @@ import eu.europa.ec.fisheries.uvms.incident.helper.TicketHelper;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.OpenAndRecentlyResolvedIncidentsDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
-import eu.europa.ec.fisheries.uvms.incident.model.dto.EventCreationDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.EventTypeEnum;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.MovementSourceType;
@@ -20,7 +19,6 @@ import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.IncidentLog;
 import eu.europa.ec.fisheries.uvms.incident.service.helper.IncidentHelper;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -155,7 +153,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         Incident incident = incidentDao.findOpenByAsset(assetId).get(0);
         assertNotNull(incident);
         assertEquals(assetId, incident.getAssetId());
-        assertEquals(IncidentType.MANUAL_MODE, incident.getType());
+        assertEquals(IncidentType.MANUAL_POSITION_MODE, incident.getType());
     }
 
     @Test
@@ -165,7 +163,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID movementId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
         IncidentTicketDto ticket = TicketHelper.createTicket(assetId, movementId, mobTermId);
-        ticket.setType(IncidentType.MANUAL_MODE);
+        ticket.setType(IncidentType.MANUAL_POSITION_MODE);
         ticket.setStatus(StatusEnum.MANUAL_POSITION_LATE.name());
         incidentService.createIncident(ticket);
 
@@ -177,7 +175,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         Incident incident = incidentDao.findOpenByAsset(assetId).get(0);
         assertNotNull(incident);
         assertEquals(assetId, incident.getAssetId());
-        assertEquals(IncidentType.MANUAL_MODE, incident.getType());
+        assertEquals(IncidentType.MANUAL_POSITION_MODE, incident.getType());
         assertEquals(StatusEnum.MANUAL_POSITION_MODE, incident.getStatus());
     }
 
@@ -331,11 +329,11 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID movementId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
         IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
-        incidentDto.setType(IncidentType.OWNER_TRANSFER);
+        incidentDto.setType(IncidentType.OWNERSHIP_TRANSFER);
 
         incidentDto = incidentService.createIncident(incidentDto, "Tester");
 
-        Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(incidentDto.getAssetId(), IncidentType.OWNER_TRANSFER);
+        Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(incidentDto.getAssetId(), IncidentType.OWNERSHIP_TRANSFER);
 
         assertNotNull(openByAssetAndType);
 
@@ -361,11 +359,11 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID movementId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
         IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
-        incidentDto.setType(IncidentType.OWNER_TRANSFER);
+        incidentDto.setType(IncidentType.OWNERSHIP_TRANSFER);
 
         incidentDto = incidentService.createIncident(incidentDto, "Tester");
 
-        Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(incidentDto.getAssetId(), IncidentType.OWNER_TRANSFER);
+        Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(incidentDto.getAssetId(), IncidentType.OWNERSHIP_TRANSFER);
 
         assertNotNull(openByAssetAndType);
 
@@ -451,12 +449,12 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID movementId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
         IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
-        incidentDto.setType(IncidentType.MANUAL_MODE);
+        incidentDto.setType(IncidentType.MANUAL_POSITION_MODE);
         incidentDto.setStatus(StatusEnum.MANUAL_POSITION_MODE);
 
         incidentDto = incidentService.createIncident(incidentDto, "Tester");
 
-        Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(incidentDto.getAssetId(), IncidentType.MANUAL_MODE);
+        Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(incidentDto.getAssetId(), IncidentType.MANUAL_POSITION_MODE);
 
         assertNotNull(openByAssetAndType);
 
@@ -482,12 +480,12 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID movementId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
         IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
-        incidentDto.setType(IncidentType.MANUAL_MODE);
+        incidentDto.setType(IncidentType.MANUAL_POSITION_MODE);
         incidentDto.setStatus(StatusEnum.MANUAL_POSITION_MODE);
 
         incidentDto = incidentService.createIncident(incidentDto, "Tester");
 
-        Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(incidentDto.getAssetId(), IncidentType.MANUAL_MODE);
+        Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(incidentDto.getAssetId(), IncidentType.MANUAL_POSITION_MODE);
 
         assertNotNull(openByAssetAndType);
 
@@ -512,12 +510,12 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID movementId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
         IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
-        incidentDto.setType(IncidentType.MANUAL_MODE);
+        incidentDto.setType(IncidentType.MANUAL_POSITION_MODE);
         incidentDto.setStatus(StatusEnum.MANUAL_POSITION_MODE);
 
         incidentDto = incidentService.createIncident(incidentDto, "Tester");
 
-        Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(incidentDto.getAssetId(), IncidentType.MANUAL_MODE);
+        Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(incidentDto.getAssetId(), IncidentType.MANUAL_POSITION_MODE);
 
         assertNotNull(openByAssetAndType);
 
@@ -543,12 +541,12 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID movementId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
         IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
-        incidentDto.setType(IncidentType.MANUAL_MODE);
+        incidentDto.setType(IncidentType.MANUAL_POSITION_MODE);
         incidentDto.setStatus(StatusEnum.MANUAL_POSITION_MODE);
 
         incidentDto = incidentService.createIncident(incidentDto, "Tester");
 
-        Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(incidentDto.getAssetId(), IncidentType.MANUAL_MODE);
+        Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(incidentDto.getAssetId(), IncidentType.MANUAL_POSITION_MODE);
 
         assertNotNull(openByAssetAndType);
 
@@ -580,12 +578,12 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID movementId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
         IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
-        incidentDto.setType(IncidentType.MANUAL_MODE);
+        incidentDto.setType(IncidentType.MANUAL_POSITION_MODE);
         incidentDto.setStatus(StatusEnum.MANUAL_POSITION_MODE);
 
         incidentDto = incidentService.createIncident(incidentDto, "Tester");
 
-        Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(incidentDto.getAssetId(), IncidentType.MANUAL_MODE);
+        Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(incidentDto.getAssetId(), IncidentType.MANUAL_POSITION_MODE);
 
         assertNotNull(openByAssetAndType);
 
@@ -621,12 +619,12 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID movementId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
         IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
-        incidentDto.setType(IncidentType.MANUAL_MODE);
+        incidentDto.setType(IncidentType.MANUAL_POSITION_MODE);
         incidentDto.setStatus(StatusEnum.MANUAL_POSITION_MODE);
 
         incidentDto = incidentService.createIncident(incidentDto, "Tester");
 
-        Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(incidentDto.getAssetId(), IncidentType.MANUAL_MODE);
+        Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(incidentDto.getAssetId(), IncidentType.MANUAL_POSITION_MODE);
 
         assertNotNull(openByAssetAndType);
 

@@ -181,7 +181,7 @@ public class IncidentHelper {
             }
         }
 
-        if(incident.getType().equals(IncidentType.MANUAL_MODE)){
+        if(incident.getType().equals(IncidentType.MANUAL_POSITION_MODE)){
             if(incident.getStatus().equals(StatusEnum.RESOLVED)){
                 //do nothing
             } else {
