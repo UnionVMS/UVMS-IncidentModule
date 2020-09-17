@@ -1,9 +1,9 @@
 package eu.europa.ec.fisheries.uvms.incident.service.bean;
 
-import eu.europa.ec.fisheries.uvms.incident.model.dto.OpenAndRecentlyResolvedIncidentsDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.EventCreationDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
-import eu.europa.ec.fisheries.uvms.incident.model.dto.EventCreationDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.OpenAndRecentlyResolvedIncidentsDto;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.*;
 import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentDao;
@@ -115,7 +115,7 @@ public class IncidentServiceBean {
     }
 
     public IncidentDto createIncident(IncidentDto incidentDto, String user) {
-        incidentDto = incidentHelper.checkIncidentIntegrity(incidentDto);
+        incidentDto = incidentHelper.checkIncidentIntegrity(incidentDto, null);
         Incident incident = incidentHelper.incidentDtoToIncident(incidentDto);
         incident.setCreateDate(Instant.now());
         Incident persistedIncident = incidentDao.save(incident);
@@ -125,17 +125,17 @@ public class IncidentServiceBean {
     }
 
     public IncidentDto updateIncident(IncidentDto incidentDto, String user) {
-        incidentDto = incidentHelper.checkIncidentIntegrity(incidentDto);
-        Incident incident = incidentDao.findById(incidentDto.getId());
-        if(incident.getStatus().equals(StatusEnum.RESOLVED)){
-            throw new IllegalArgumentException("Not allowed to update incident " + incident.getId() + " since it has status 'RESOLVED'");
+        Incident oldIncident = incidentDao.findById(incidentDto.getId());
+        if(oldIncident.getStatus().equals(StatusEnum.RESOLVED)){
+            throw new IllegalArgumentException("Not allowed to update incident " + oldIncident.getId() + " since it has status 'RESOLVED'");
         }
-        EventTypeEnum eventType = mapEventType(incident, incidentDto);
-        incidentHelper.populateIncident(incident, incidentDto);
-        Incident updated = incidentDao.update(incident);
+        incidentDto = incidentHelper.checkIncidentIntegrity(incidentDto, oldIncident);
+        EventTypeEnum eventType = mapEventType(oldIncident, incidentDto);
+        incidentHelper.populateIncident(oldIncident, incidentDto);
+        Incident updated = incidentDao.update(oldIncident);
         updatedIncident.fire(updated);
         incidentLogServiceBean.createIncidentLogForStatus(updated, "Incident updated by " + user, eventType, null);
-        return incidentHelper.incidentEntityToDto(incident);
+        return incidentHelper.incidentEntityToDto(oldIncident);
     }
 
     private EventTypeEnum mapEventType(Incident incident, IncidentDto incidentDto) {

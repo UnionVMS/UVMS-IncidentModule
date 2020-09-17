@@ -46,12 +46,12 @@ public class IncidentTimerBean {
     @IncidentUpdate
     private Event<Incident> updatedIncident;
 
-    @Schedule(minute = "*/5", hour = "*", persistent = false)
+    @Schedule(minute = "*/1", hour = "*", persistent = false)
     public void manualPositionsTimer() {
         try {
             List<Incident> manualPositionIncidents = incidentDao.findByStatus(StatusEnum.MANUAL_POSITION_MODE);
             for (Incident incident : manualPositionIncidents) {
-                if(incident.getUpdateDate().plus(ServiceConstants.MAX_DELAY_BETWEEN_MANUAL_POSITIONS_IN_MINUTES, ChronoUnit.MINUTES).isBefore(Instant.now())){
+                if(incident.getExpiryDate().isBefore(Instant.now())){
                     incident.setStatus(StatusEnum.MANUAL_POSITION_LATE);
                     incidentLogServiceBean.createIncidentLogForStatus(incident, EventTypeEnum.MANUAL_POSITION_LATE.getMessage(), EventTypeEnum.MANUAL_POSITION_LATE, null);
                     updatedIncident.fire(incident);
