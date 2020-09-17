@@ -8,6 +8,7 @@ public enum  StatusEnum {
     PARKED,
     RESOLVED,
     RECEIVING_VMS_POSITIONS,
+    OVERDUE,
     RECEIVING_AIS_POSITIONS;
 
 }

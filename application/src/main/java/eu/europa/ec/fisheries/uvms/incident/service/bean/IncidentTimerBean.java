@@ -12,6 +12,7 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
 package eu.europa.ec.fisheries.uvms.incident.service.bean;
 
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.EventTypeEnum;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentDao;
@@ -28,6 +29,7 @@ import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.List;
 
 @Startup
@@ -59,6 +61,22 @@ public class IncidentTimerBean {
             }
         } catch (Exception e) {
             LOG.error("[ Error when running manualPositionsTimer. ] {}", e);
+        }
+    }
+
+    @Schedule(minute = "*/5", hour = "*", persistent = false)
+    public void parkedOverdueTimer() {
+        try {
+            List<Incident> parkedIncidents = incidentDao.findOpenByTypes(Arrays.asList(IncidentType.SEASONAL_FISHING, IncidentType.PARKED, IncidentType.OWNERSHIP_TRANSFER));
+            for (Incident incident : parkedIncidents) {
+                if(incident.getExpiryDate() != null && incident.getExpiryDate().isBefore(Instant.now())){
+                    incident.setStatus(StatusEnum.OVERDUE);
+                    incidentLogServiceBean.createIncidentLogForStatus(incident, "Incident is past its due date", EventTypeEnum.INCIDENT_STATUS, null);
+                    updatedIncident.fire(incident);
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("[ Error when running parkedOverdueTimer. ] {}", e);
         }
     }
 
