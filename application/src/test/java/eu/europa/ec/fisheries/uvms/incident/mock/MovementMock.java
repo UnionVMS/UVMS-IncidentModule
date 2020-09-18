@@ -2,6 +2,7 @@ package eu.europa.ec.fisheries.uvms.incident.mock;
 
 import eu.europa.ec.fisheries.schema.movement.v1.MovementPoint;
 import eu.europa.ec.fisheries.schema.movement.v1.MovementSourceType;
+import eu.europa.ec.fisheries.uvms.commons.date.DateUtils;
 import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
 import eu.europa.ec.fisheries.uvms.movement.client.model.MicroMovement;
 import eu.europa.ec.fisheries.uvms.movement.model.dto.MovementDto;
@@ -45,7 +46,8 @@ public class MovementMock {
             movement.setLocation(point);
 
             movement.setSource(id.getMostSignificantBits() == 0l ? MovementSourceType.NAF : MovementSourceType.MANUAL);
-            movement.setTimestamp(Instant.now());
+            Instant timestamp = DateUtils.stringToDate(System.getProperty("MOVEMENT_MOCK_TIMESTAMP", "" + Instant.now().toEpochMilli()));
+            movement.setTimestamp(timestamp);
             movement.setSpeed(122d);
             movement.setHeading(123d);
         }

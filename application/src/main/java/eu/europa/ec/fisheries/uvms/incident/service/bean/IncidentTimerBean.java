@@ -69,7 +69,10 @@ public class IncidentTimerBean {
         try {
             List<Incident> parkedIncidents = incidentDao.findOpenByTypes(Arrays.asList(IncidentType.SEASONAL_FISHING, IncidentType.PARKED, IncidentType.OWNERSHIP_TRANSFER));
             for (Incident incident : parkedIncidents) {
-                if(incident.getExpiryDate() != null && incident.getExpiryDate().isBefore(Instant.now())){
+                if( !incident.getStatus().equals(StatusEnum.OVERDUE)
+                        && incident.getExpiryDate() != null
+                        && incident.getExpiryDate().isBefore(Instant.now())){
+
                     incident.setStatus(StatusEnum.OVERDUE);
                     incidentLogServiceBean.createIncidentLogForStatus(incident, "Incident is past its due date", EventTypeEnum.INCIDENT_STATUS, null);
                     updatedIncident.fire(incident);
@@ -88,7 +91,7 @@ public class IncidentTimerBean {
                 if (incident.getStatus().equals(StatusEnum.RECEIVING_AIS_POSITIONS)) {
                     IncidentLog recentAisLog = incidentLogServiceBean.findLogWithTypeEntryFromTheLastHour(incident.getId(), EventTypeEnum.RECEIVED_AIS_POSITION);
                     if (recentAisLog == null) {
-                        incident.setStatus(StatusEnum.PARKED);
+                        incident.setStatus(incident.getType().getValidStatuses().get(0));
                         incidentLogServiceBean.createIncidentLogForStatus(incident, "Incident status updated to " + incident.getStatus(), EventTypeEnum.INCIDENT_STATUS, null);
                         updatedIncident.fire(incident);
                     }
