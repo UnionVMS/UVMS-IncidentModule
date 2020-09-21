@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.7.xsd"
+                   logicalFilePath="changelog/v0.4.6/db-changelog-owner-transfer-status-renaming.xml">
+
+    <changeSet id="Renamed OWNERSHIP_TRANSFER status 'PARKED' and 'OVERDUE' to 'NOT_RECEIVING_VMS_POSITIONS'" author="joemat">
+        <update  tableName="incident">
+            <column  name="status" value="NOT_RECEIVING_VMS_POSITIONS"/>
+            <where>type = 'OWNERSHIP_TRANSFER' and (status = 'PARKED' or status = 'OVERDUE')</where>
+        </update>
+
+    </changeSet>
+
+
+</databaseChangeLog>

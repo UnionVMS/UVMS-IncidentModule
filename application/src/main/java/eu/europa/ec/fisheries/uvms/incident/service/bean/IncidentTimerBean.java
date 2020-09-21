@@ -67,7 +67,7 @@ public class IncidentTimerBean {
     @Schedule(minute = "*/5", hour = "*", persistent = false)
     public void parkedOverdueTimer() {
         try {
-            List<Incident> parkedIncidents = incidentDao.findOpenByTypes(Arrays.asList(IncidentType.SEASONAL_FISHING, IncidentType.PARKED, IncidentType.OWNERSHIP_TRANSFER));
+            List<Incident> parkedIncidents = incidentDao.findOpenByTypes(Arrays.asList(IncidentType.SEASONAL_FISHING, IncidentType.PARKED));
             for (Incident incident : parkedIncidents) {
                 if( !incident.getStatus().equals(StatusEnum.OVERDUE)
                         && incident.getExpiryDate() != null
@@ -99,6 +99,25 @@ public class IncidentTimerBean {
             }
         } catch (Exception e) {
             LOG.error("[ Error when running recentAisTimer. ] {}", e);
+        }
+    }
+
+    @Schedule(minute = "*/5", hour = "*", persistent = false)
+    public void ownerTransferRecentVmsTimer() {
+        try {
+            List<Incident> incidentsThatReactOnRecentVMS = incidentDao.findOpenByTypes(Arrays.asList(IncidentType.OWNERSHIP_TRANSFER));
+            for (Incident incident : incidentsThatReactOnRecentVMS) {
+                if (incident.getStatus().equals(StatusEnum.RECEIVING_VMS_POSITIONS)) {
+                    IncidentLog recentVmsLog = incidentLogServiceBean.findLogWithTypeEntryFromTheLastDay(incident.getId(), EventTypeEnum.RECEIVED_VMS_POSITION);
+                    if (recentVmsLog == null) {
+                        incident.setStatus(StatusEnum.NOT_RECEIVING_VMS_POSITIONS);
+                        incidentLogServiceBean.createIncidentLogForStatus(incident, "Incident status updated to " + incident.getStatus(), EventTypeEnum.INCIDENT_STATUS, null);
+                        updatedIncident.fire(incident);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("[ Error when running ownerTransferRecentVmsTimer. ] {}", e);
         }
     }
 
