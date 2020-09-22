@@ -330,6 +330,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID mobTermId = UUID.randomUUID();
         IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
         incidentDto.setType(IncidentType.OWNERSHIP_TRANSFER);
+        incidentDto.setStatus(StatusEnum.NOT_RECEIVING_VMS_POSITIONS);
 
         incidentDto = incidentService.createIncident(incidentDto, "Tester");
 
@@ -344,12 +345,12 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         incidentService.updateIncident(ticket);
 
         Incident updatedIncident = incidentDao.findById(openByAssetAndType.getId());
-        assertEquals(StatusEnum.PARKED, updatedIncident.getStatus());
+        assertEquals(StatusEnum.NOT_RECEIVING_VMS_POSITIONS, updatedIncident.getStatus());
 
         List<IncidentLog> incidentLogs = incidentLogDao.findAllByIncidentId(openByAssetAndType.getId());
         assertFalse(incidentLogs.isEmpty());
         assertEquals(2, incidentLogs.size());
-        assertTrue(incidentLogs.stream().anyMatch(log -> log.getIncidentStatus().equals(StatusEnum.PARKED)));
+        assertTrue(incidentLogs.stream().allMatch(log -> log.getIncidentStatus().equals(StatusEnum.NOT_RECEIVING_VMS_POSITIONS)));
         assertTrue(incidentLogs.stream().anyMatch(log -> log.getEventType().equals(EventTypeEnum.RECEIVED_AIS_POSITION)));
     }
 
@@ -360,6 +361,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         UUID mobTermId = UUID.randomUUID();
         IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
         incidentDto.setType(IncidentType.OWNERSHIP_TRANSFER);
+        incidentDto.setStatus(StatusEnum.NOT_RECEIVING_VMS_POSITIONS);
 
         incidentDto = incidentService.createIncident(incidentDto, "Tester");
 
@@ -374,12 +376,12 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         incidentService.updateIncident(ticket);
 
         Incident updatedIncident = incidentDao.findById(openByAssetAndType.getId());
-        assertEquals(StatusEnum.PARKED, updatedIncident.getStatus());
+        assertEquals(StatusEnum.RECEIVING_VMS_POSITIONS, updatedIncident.getStatus());
 
         List<IncidentLog> incidentLogs = incidentLogDao.findAllByIncidentId(openByAssetAndType.getId());
         assertFalse(incidentLogs.isEmpty());
         assertEquals(2, incidentLogs.size());
-        assertTrue(incidentLogs.stream().anyMatch(log -> log.getIncidentStatus().equals(StatusEnum.PARKED)));
+        assertTrue(incidentLogs.stream().anyMatch(log -> log.getIncidentStatus().equals(StatusEnum.RECEIVING_VMS_POSITIONS)));
         assertTrue(incidentLogs.stream().anyMatch(log -> log.getEventType().equals(EventTypeEnum.RECEIVED_VMS_POSITION)));
     }
 

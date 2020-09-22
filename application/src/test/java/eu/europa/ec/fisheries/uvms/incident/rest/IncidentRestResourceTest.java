@@ -271,9 +271,11 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
     public void updateIncidentLogCreatedTest() {
         IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
         incidentDto.setType(IncidentType.OWNERSHIP_TRANSFER);
+        incidentDto.setStatus(StatusEnum.NOT_RECEIVING_VMS_POSITIONS);
         IncidentDto createdIncident = createIncident(incidentDto);
 
         createdIncident.setType(IncidentType.PARKED);
+        createdIncident.setStatus(StatusEnum.PARKED);
         Instant expiryDate = Instant.now().truncatedTo(ChronoUnit.MILLIS);
         createdIncident.setExpiryDate(expiryDate);
         IncidentDto updatedIncident = getWebTarget()

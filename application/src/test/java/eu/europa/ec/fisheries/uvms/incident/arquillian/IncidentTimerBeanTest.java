@@ -95,30 +95,6 @@ public class IncidentTimerBeanTest extends TransactionalTests {
 
     @Test
     @OperateOnDeployment("incident")
-    public void ownerIncidentIsOverdue() {
-        IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
-
-        incidentDto.setType(IncidentType.OWNERSHIP_TRANSFER);
-        incidentDto.setStatus(StatusEnum.PARKED);
-        incidentDto.setExpiryDate(Instant.now().minus(1, ChronoUnit.MINUTES));
-
-        incidentDto = incidentService.createIncident(incidentDto, "Tester");
-
-        timerBean.parkedOverdueTimer();
-
-        Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(incidentDto.getAssetId(), IncidentType.OWNERSHIP_TRANSFER);
-        assertNotNull(openByAssetAndType);
-        assertEquals(StatusEnum.OVERDUE, openByAssetAndType.getStatus());
-
-        List<IncidentLog> incidentLogs = incidentLogDao.findAllByIncidentId(openByAssetAndType.getId());
-        assertFalse(incidentLogs.isEmpty());
-        assertEquals(2, incidentLogs.size());
-        assertTrue(incidentLogs.stream().anyMatch(log -> log.getIncidentStatus().equals(StatusEnum.OVERDUE)));
-        assertTrue(incidentLogs.stream().anyMatch(log -> log.getEventType().equals(EventTypeEnum.INCIDENT_STATUS)));
-    }
-
-    @Test
-    @OperateOnDeployment("incident")
     public void parkedIncidentWoExpiry() {
         IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
 
@@ -263,5 +239,55 @@ public class IncidentTimerBeanTest extends TransactionalTests {
         assertEquals(2, incidentLogs.size());
         assertTrue(incidentLogs.stream().anyMatch(log -> log.getIncidentStatus().equals(StatusEnum.RECEIVING_AIS_POSITIONS)));
         assertTrue(incidentLogs.stream().anyMatch(log -> log.getEventType().equals(EventTypeEnum.RECEIVED_AIS_POSITION)));
+    }
+
+    @Test
+    @OperateOnDeployment("incident")
+    public void ownerIncidentIsNotReceivingVmsAnyMore() {
+        IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
+
+        incidentDto.setType(IncidentType.OWNERSHIP_TRANSFER);
+        incidentDto.setStatus(StatusEnum.RECEIVING_VMS_POSITIONS);
+        incidentDto.setExpiryDate(Instant.now().minus(1, ChronoUnit.MINUTES));
+
+        incidentDto = incidentService.createIncident(incidentDto, "Tester");
+
+        timerBean.ownerTransferRecentVmsTimer();
+
+        Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(incidentDto.getAssetId(), IncidentType.OWNERSHIP_TRANSFER);
+        assertNotNull(openByAssetAndType);
+        assertEquals(StatusEnum.NOT_RECEIVING_VMS_POSITIONS, openByAssetAndType.getStatus());
+
+        List<IncidentLog> incidentLogs = incidentLogDao.findAllByIncidentId(openByAssetAndType.getId());
+        assertFalse(incidentLogs.isEmpty());
+        assertEquals(2, incidentLogs.size());
+        assertTrue(incidentLogs.stream().anyMatch(log -> log.getIncidentStatus().equals(StatusEnum.NOT_RECEIVING_VMS_POSITIONS)));
+        assertTrue(incidentLogs.stream().anyMatch(log -> log.getEventType().equals(EventTypeEnum.INCIDENT_STATUS)));
+    }
+
+    @Test
+    @OperateOnDeployment("incident")
+    public void ownerIncidentHasRecentVms() {
+        IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
+
+        incidentDto.setType(IncidentType.OWNERSHIP_TRANSFER);
+        incidentDto.setStatus(StatusEnum.RECEIVING_VMS_POSITIONS);
+        incidentDto.setExpiryDate(Instant.now().minus(1, ChronoUnit.MINUTES));
+
+        incidentDto = incidentService.createIncident(incidentDto, "Tester");
+        Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(incidentDto.getAssetId(), IncidentType.OWNERSHIP_TRANSFER);
+        logServiceBean.createIncidentLogForStatus(openByAssetAndType, "test", EventTypeEnum.RECEIVED_VMS_POSITION, null);
+
+        timerBean.ownerTransferRecentVmsTimer();
+
+        openByAssetAndType = incidentDao.findOpenByAssetAndType(incidentDto.getAssetId(), IncidentType.OWNERSHIP_TRANSFER);
+        assertNotNull(openByAssetAndType);
+        assertEquals(StatusEnum.RECEIVING_VMS_POSITIONS, openByAssetAndType.getStatus());
+
+        List<IncidentLog> incidentLogs = incidentLogDao.findAllByIncidentId(openByAssetAndType.getId());
+        assertFalse(incidentLogs.isEmpty());
+        assertEquals(2, incidentLogs.size());
+        assertTrue(incidentLogs.stream().allMatch(log -> log.getIncidentStatus().equals(StatusEnum.RECEIVING_VMS_POSITIONS)));
+        assertTrue(incidentLogs.stream().anyMatch(log -> log.getEventType().equals(EventTypeEnum.RECEIVED_VMS_POSITION)));
     }
 }
