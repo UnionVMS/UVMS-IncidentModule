@@ -62,4 +62,10 @@ public class IncidentLogServiceBean {
         List<IncidentLog> incidentLogs = incidentLogDao.findLogWithEventTypeAfter(incidentId, eventType, hourAgo);
         return incidentLogs.isEmpty() ? null : incidentLogs.get(0);
     }
+
+    public IncidentLog findLogWithTypeEntryFromTheLastDay(long incidentId, EventTypeEnum eventType){
+        Instant hourAgo = Instant.now().minus(1, ChronoUnit.DAYS);
+        List<IncidentLog> incidentLogs = incidentLogDao.findLogWithEventTypeAfter(incidentId, eventType, hourAgo);
+        return incidentLogs.isEmpty() ? null : incidentLogs.get(0);
+    }
 }
