@@ -1,10 +1,7 @@
 package eu.europa.ec.fisheries.uvms.incident.service.bean;
 
 import eu.europa.ec.fisheries.uvms.asset.client.AssetClient;
-import eu.europa.ec.fisheries.uvms.asset.client.model.AssetBO;
-import eu.europa.ec.fisheries.uvms.asset.client.model.AssetDTO;
-import eu.europa.ec.fisheries.uvms.asset.client.model.AssetIdentifier;
-import eu.europa.ec.fisheries.uvms.asset.client.model.CreatePollResultDto;
+import eu.europa.ec.fisheries.uvms.asset.client.model.*;
 import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
 import eu.europa.ec.fisheries.uvms.rest.security.InternalRestTokenHandler;
@@ -44,14 +41,17 @@ public class AssetCommunicationBean {
             String username = "Triggerd by asset not sending";
             String comment = "This poll was triggered by asset not sending on: " + Instant.now().toString() + " on Asset: " + dto.getRecipient();
 
+            SimpleCreatePoll createPoll = new SimpleCreatePoll();
+            createPoll.setComment(comment);
+            createPoll.setPollType(PollType.AUTOMATIC_POLL);
+
             Response createdPollResponse = getWebTarget()
                     .path("internal/createPollForAsset")
                     .path(dto.getAssetId())
                     .queryParam("username", username)
-                    .queryParam("comment", comment)
                     .request(MediaType.APPLICATION_JSON)
                     .header(HttpHeaders.AUTHORIZATION, tokenHandler.createAndFetchToken("user"))
-                    .post(Entity.json(""), Response.class);
+                    .post(Entity.json(createPoll), Response.class);
 
             if (createdPollResponse.getStatus() != 200) {
                 return stripExceptionFromResponseString(createdPollResponse.readEntity(String.class));
