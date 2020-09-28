@@ -2,6 +2,7 @@ package eu.europa.ec.fisheries.uvms.incident.mock;
 
 import eu.europa.ec.fisheries.uvms.asset.client.model.AssetBO;
 import eu.europa.ec.fisheries.uvms.asset.client.model.AssetDTO;
+import eu.europa.ec.fisheries.uvms.asset.client.model.SimpleCreatePoll;
 import eu.europa.ec.fisheries.uvms.rest.security.RequiresFeature;
 import eu.europa.ec.fisheries.uvms.rest.security.UnionVMSFeature;
 
@@ -31,7 +32,7 @@ public class AssetMock {
 
     @POST
     @Path("/createPollForAsset/{id}")
-    public Response createPoll(@PathParam("id") String assetId, @QueryParam("username") String username, @QueryParam("comment") String comment) {
+    public Response createPoll(@PathParam("id") String assetId, @QueryParam("username") String username, SimpleCreatePoll createPoll) {
         System.setProperty("AssetPollEndpointReached", "True");
         return Response.ok().entity(Boolean.TRUE).build();
     }
