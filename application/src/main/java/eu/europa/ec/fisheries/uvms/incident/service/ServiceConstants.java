@@ -12,5 +12,5 @@ public class ServiceConstants {
     public static final int OWNER_TRANSFER_VMS_THRESHOLD_IN_DAYS = 1;
 
     public static final List<StatusEnum> RESOLVED_STATUS_LIST = Arrays.asList(StatusEnum.RESOLVED);
-    public static final List<IncidentType> REACT_ON_RECENT_AIS = Arrays.asList(IncidentType.MANUAL_POSITION_MODE, IncidentType.PARKED, IncidentType.SEASONAL_FISHING);
+    public static final List<IncidentType> REACT_ON_RECENT_AIS = Arrays.asList(IncidentType.PARKED, IncidentType.SEASONAL_FISHING);
 }
