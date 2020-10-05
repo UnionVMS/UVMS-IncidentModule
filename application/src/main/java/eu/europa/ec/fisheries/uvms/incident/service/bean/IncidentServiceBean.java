@@ -280,7 +280,6 @@ public class IncidentServiceBean {
             persisted.setMovementId(UUID.fromString(ticket.getMovementId()));
             incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_VMS_POSITION.getMessage(), EventTypeEnum.RECEIVED_VMS_POSITION, UUID.fromString(ticket.getMovementId()));
         }
-        updatedIncident.fire(persisted);
     }
 
 
