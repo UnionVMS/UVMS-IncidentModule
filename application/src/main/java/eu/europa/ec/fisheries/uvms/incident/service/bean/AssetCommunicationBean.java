@@ -38,7 +38,7 @@ public class AssetCommunicationBean {
 
     public String createPollInternal(IncidentTicketDto dto) {
         try {
-            String username = "Triggerd by asset not sending";
+            String username = "Triggered by asset not sending";
             String comment = "This poll was triggered by asset not sending on: " + Instant.now().toString() + " on Asset: " + dto.getRecipient();
 
             SimpleCreatePoll createPoll = new SimpleCreatePoll();
