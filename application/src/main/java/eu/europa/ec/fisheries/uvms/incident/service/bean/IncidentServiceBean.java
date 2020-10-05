@@ -301,8 +301,8 @@ public class IncidentServiceBean {
             }
         } else {
             persisted.setStatus(StatusEnum.RECEIVING_VMS_POSITIONS);
+            persisted.setMovementId(UUID.fromString(ticket.getMovementId()));
             incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_VMS_POSITION.getMessage(), EventTypeEnum.RECEIVED_VMS_POSITION, UUID.fromString(ticket.getMovementId()));
-
         }
     }
 
