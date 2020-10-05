@@ -225,9 +225,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         assertNotNull(created);
         assertEquals(StatusEnum.INCIDENT_CREATED, created.getStatus());
 
-        IncidentDto incidentDto = incidentHelper.incidentEntityToDto(created);
-        incidentDto.setStatus(StatusEnum.RESOLVED);
-        IncidentDto updatedDto = incidentService.updateIncident(incidentDto, "Test user");
+        IncidentDto updatedDto = incidentService.updateIncidentStatus(created.getId(), StatusEnum.RESOLVED, "Test user");
 
         Incident updated = incidentDao.findById(created.getId());
         assertEquals(updated.getStatus(), StatusEnum.RESOLVED);
