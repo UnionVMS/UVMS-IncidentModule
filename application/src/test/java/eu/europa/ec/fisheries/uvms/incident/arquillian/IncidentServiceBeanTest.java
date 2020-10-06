@@ -11,6 +11,7 @@ import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.EventTypeEnum;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.MovementSourceType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
+import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentServiceBean;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentDao;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentLogDao;
@@ -154,6 +155,70 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         assertNotNull(incident);
         assertEquals(assetId, incident.getAssetId());
         assertEquals(IncidentType.MANUAL_POSITION_MODE, incident.getType());
+    }
+
+    @Test
+    @OperateOnDeployment("incident")
+    public void olderManualMovementArrives() {
+        UUID assetId = UUID.randomUUID();
+        UUID movementId = UUID.randomUUID();
+        UUID mobTermId = UUID.randomUUID();
+        IncidentTicketDto ticket = TicketHelper.createTicket(assetId, movementId, mobTermId);
+        ticket.setType(IncidentType.ASSET_NOT_SENDING);
+        incidentService.createIncident(ticket);
+
+        Instant positionTime = Instant.now().truncatedTo(ChronoUnit.SECONDS).minus(1, ChronoUnit.MINUTES);
+        Instant correctExpiry = positionTime.plus(ServiceConstants.MAX_DELAY_BETWEEN_MANUAL_POSITIONS_IN_MINUTES, ChronoUnit.MINUTES);
+        ticket.setPositionTime(positionTime);
+        ticket.setType(null);
+        String correctMoveId = UUID.randomUUID().toString();
+        ticket.setMovementId(correctMoveId);
+        ticket.setMovementSource(MovementSourceType.MANUAL);
+        incidentService.updateIncident(ticket);
+
+        ticket.setPositionTime(positionTime.minus(10, ChronoUnit.MINUTES));
+        ticket.setType(null);
+        ticket.setMovementId(UUID.randomUUID().toString());
+        ticket.setMovementSource(MovementSourceType.MANUAL);
+        incidentService.updateIncident(ticket);
+
+        Incident incident = incidentDao.findOpenByAsset(assetId).get(0);
+        assertNotNull(incident);
+        assertEquals(correctMoveId, incident.getMovementId().toString());
+        assertEquals(correctExpiry, incident.getExpiryDate());
+
+    }
+
+    @Test
+    @OperateOnDeployment("incident")
+    public void newerManualMovementArrives() {
+        UUID assetId = UUID.randomUUID();
+        UUID movementId = UUID.randomUUID();
+        UUID mobTermId = UUID.randomUUID();
+        IncidentTicketDto ticket = TicketHelper.createTicket(assetId, movementId, mobTermId);
+        ticket.setType(IncidentType.ASSET_NOT_SENDING);
+        incidentService.createIncident(ticket);
+
+        Instant positionTime = Instant.now().truncatedTo(ChronoUnit.SECONDS).minus(1, ChronoUnit.MINUTES);
+        Instant correctExpiry = positionTime.plus(ServiceConstants.MAX_DELAY_BETWEEN_MANUAL_POSITIONS_IN_MINUTES, ChronoUnit.MINUTES);
+        ticket.setPositionTime(positionTime.minus(10, ChronoUnit.MINUTES));
+        ticket.setType(null);
+        ticket.setMovementId(UUID.randomUUID().toString());
+        ticket.setMovementSource(MovementSourceType.MANUAL);
+        incidentService.updateIncident(ticket);
+
+        ticket.setPositionTime(positionTime);
+        ticket.setType(null);
+        String correctMoveId = UUID.randomUUID().toString();
+        ticket.setMovementId(correctMoveId);
+        ticket.setMovementSource(MovementSourceType.MANUAL);
+        incidentService.updateIncident(ticket);
+
+        Incident incident = incidentDao.findOpenByAsset(assetId).get(0);
+        assertNotNull(incident);
+        assertEquals(correctMoveId, incident.getMovementId().toString());
+        assertEquals(correctExpiry, incident.getExpiryDate());
+
     }
 
     @Test
