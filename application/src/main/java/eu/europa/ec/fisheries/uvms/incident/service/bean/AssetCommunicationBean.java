@@ -2,6 +2,7 @@ package eu.europa.ec.fisheries.uvms.incident.service.bean;
 
 import eu.europa.ec.fisheries.uvms.asset.client.AssetClient;
 import eu.europa.ec.fisheries.uvms.asset.client.model.*;
+import eu.europa.ec.fisheries.uvms.commons.date.DateUtils;
 import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentTicketDto;
 import eu.europa.ec.fisheries.uvms.rest.security.InternalRestTokenHandler;
@@ -19,6 +20,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -39,7 +41,7 @@ public class AssetCommunicationBean {
     public String createPollInternal(IncidentTicketDto dto) {
         try {
             String username = "Triggered by asset not sending";
-            String comment = "This poll was triggered by asset not sending on: " + Instant.now().toString() + " on Asset: " + dto.getRecipient();
+            String comment = "This poll was triggered by asset not sending on: " + DateUtils.dateToHumanReadableString(Instant.now().truncatedTo(ChronoUnit.SECONDS)) + " on Asset: " + dto.getRecipient();
 
             SimpleCreatePoll createPoll = new SimpleCreatePoll();
             createPoll.setComment(comment);
