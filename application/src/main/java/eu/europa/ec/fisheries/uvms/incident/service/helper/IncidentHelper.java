@@ -166,19 +166,20 @@ public class IncidentHelper {
         return retVal;
     }
 
-    public IncidentDto checkIncidentIntegrity(IncidentDto incident, Incident oldIncident){
-
-        if(incident.getStatus() == null){
-            incident.setStatus(incident.getType().getValidStatuses().get(0));
-
-        } else if(!incident.getType().getValidStatuses().contains(incident.getStatus())){
-            throw new IllegalArgumentException("Incident type " + incident.getType() + " does not support being placed in status " + incident.getStatus());
+    public void checkIfUpdateIsAllowed(Incident oldIncident, StatusEnum status){
+        if(oldIncident.getStatus().equals(StatusEnum.RESOLVED)){
+            throw new IllegalArgumentException("Not allowed to update incident " + oldIncident.getId() + " since it has status 'RESOLVED'");
         }
 
+        if(!oldIncident.getType().getValidStatuses().contains(status)){
+            throw new IllegalArgumentException("Incident type " + oldIncident.getType() + " does not support being placed in status " + status);
+        }
+    }
+
+    public void setCorrectValuesForIncidentType(Incident incident){
+
         if(incident.getType().equals(IncidentType.ASSET_NOT_SENDING)){
-            if(incident.getExpiryDate() != null){
-                throw new IllegalArgumentException(incident.getType() + " does not support having a expiry date");
-            }
+            incident.setExpiryDate(null);
         }
 
         if(incident.getType().equals(IncidentType.MANUAL_POSITION_MODE)){
@@ -186,8 +187,8 @@ public class IncidentHelper {
                 //do nothing
             } else {
                 Instant expiry;
-                if (oldIncident != null && oldIncident.getMovementId() != null) {
-                    MicroMovement microMovementById = movementClient.getMicroMovementById(oldIncident.getMovementId());
+                if (incident != null && incident.getMovementId() != null) {
+                    MicroMovement microMovementById = movementClient.getMicroMovementById(incident.getMovementId());
                     StatusEnum status;
                     if (microMovementById != null) {
                         expiry = microMovementById.getTimestamp().plus(ServiceConstants.MAX_DELAY_BETWEEN_MANUAL_POSITIONS_IN_MINUTES, ChronoUnit.MINUTES);
@@ -205,7 +206,5 @@ public class IncidentHelper {
                 incident.setExpiryDate(expiry);
             }
         }
-
-        return incident;
     }
 }
