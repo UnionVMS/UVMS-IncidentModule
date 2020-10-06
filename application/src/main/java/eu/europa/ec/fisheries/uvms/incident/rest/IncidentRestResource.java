@@ -12,13 +12,9 @@ details. You should have received a copy of the GNU General Public License along
 package eu.europa.ec.fisheries.uvms.incident.rest;
 
 import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
-import eu.europa.ec.fisheries.uvms.incident.model.dto.OpenAndRecentlyResolvedIncidentsDto;
-import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
-import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentLogDto;
-import eu.europa.ec.fisheries.uvms.incident.model.dto.EventCreationDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.*;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
-import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentLogServiceBean;
 import eu.europa.ec.fisheries.uvms.incident.service.bean.IncidentServiceBean;
 import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentDao;
@@ -84,6 +80,7 @@ public class IncidentRestResource {
     @RequiresFeature(UnionVMSFeature.manageAlarmsOpenTickets)
     public Response createIncident(IncidentDto incidentDto) {
         try {
+            incidentDto.setStatus(incidentDto.getStatus() != null ? incidentDto.getStatus() : incidentDto.getType().getValidStatuses().get(0));
             IncidentDto createdIncident = incidentServiceBean.createIncident(incidentDto, request.getRemoteUser());
             return Response.ok(createdIncident).header("MDC", MDC.get("requestId")).build();
         }catch (Exception e){
@@ -93,13 +90,46 @@ public class IncidentRestResource {
     }
 
     @PUT
+    @Path("updateType/")
     @RequiresFeature(UnionVMSFeature.manageAlarmsOpenTickets)
-    public Response updateIncident(IncidentDto incidentDto) {
+    public Response setIncidentType(UpdateIncidentDto update) {
         try{
-            IncidentDto createdIncident = incidentServiceBean.updateIncident(incidentDto, request.getRemoteUser());
+            IncidentDto createdIncident = incidentServiceBean.updateIncidentType(update.getIncidentId(), update.getType(), request.getRemoteUser());
+            if(update.getExpiryDate() != null){
+                createdIncident = incidentServiceBean.updateIncidentExpiry(update.getIncidentId(), update.getExpiryDate(), request.getRemoteUser());
+            }
             return Response.ok(createdIncident).build();
         }catch (Exception e){
-            LOG.error("Error updating incident: " + e);
+            LOG.error("Error updating incident type: " + e);
+            throw e;
+        }
+    }
+
+    @PUT
+    @Path("updateStatus/")
+    @RequiresFeature(UnionVMSFeature.manageAlarmsOpenTickets)
+    public Response setIncidentStatus(UpdateIncidentDto update) {
+        try{
+            IncidentDto createdIncident = incidentServiceBean.updateIncidentStatus(update.getIncidentId(), update.getStatus(), request.getRemoteUser());
+            if(update.getExpiryDate() != null){
+                createdIncident = incidentServiceBean.updateIncidentExpiry(update.getIncidentId(), update.getExpiryDate(), request.getRemoteUser());
+            }
+            return Response.ok(createdIncident).build();
+        }catch (Exception e){
+            LOG.error("Error updating incident status: " + e);
+            throw e;
+        }
+    }
+
+    @PUT
+    @Path("updateExpiry/")
+    @RequiresFeature(UnionVMSFeature.manageAlarmsOpenTickets)
+    public Response setIncidentExpiry( UpdateIncidentDto update) {
+        try{
+            IncidentDto createdIncident = incidentServiceBean.updateIncidentExpiry(update.getIncidentId(), update.getExpiryDate(), request.getRemoteUser());
+            return Response.ok(createdIncident).build();
+        }catch (Exception e){
+            LOG.error("Error setting expiry: " + e);
             throw e;
         }
     }

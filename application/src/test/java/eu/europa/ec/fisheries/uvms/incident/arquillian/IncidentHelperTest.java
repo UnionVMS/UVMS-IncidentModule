@@ -30,12 +30,13 @@ public class IncidentHelperTest extends TransactionalTests {
     @Test
     @OperateOnDeployment("incident")
     public void settingManualModeIntoParkedStatus() {
-        IncidentDto newIncident = TicketHelper.createBasicIncidentDto();
+        IncidentDto dto = TicketHelper.createBasicIncidentDto();
+        Incident incident = incidentHelper.incidentDtoToIncident(dto);
 
-        newIncident.setType(IncidentType.MANUAL_POSITION_MODE);
-        newIncident.setStatus(StatusEnum.PARKED);
+        incident.setType(IncidentType.MANUAL_POSITION_MODE);
+        incident.setStatus(StatusEnum.PARKED);
         try {
-            incidentHelper.checkIncidentIntegrity(newIncident, null);
+            incidentHelper.checkIfUpdateIsAllowed(incident, null);
             fail();
         }catch (Exception e){
             assertTrue(e.getMessage().contains("does not support being placed in status"));
@@ -45,70 +46,70 @@ public class IncidentHelperTest extends TransactionalTests {
     @Test
     @OperateOnDeployment("incident")
     public void givingAssetNotSendingAnExpiryDate() {
-        IncidentDto newIncident = TicketHelper.createBasicIncidentDto();
+        IncidentDto dto = TicketHelper.createBasicIncidentDto();
+        Incident incident = incidentHelper.incidentDtoToIncident(dto);
 
-        newIncident.setType(IncidentType.ASSET_NOT_SENDING);
-        newIncident.setStatus(StatusEnum.INCIDENT_CREATED);
-        newIncident.setExpiryDate(Instant.now());
+        incident.setType(IncidentType.ASSET_NOT_SENDING);
+        incident.setStatus(StatusEnum.INCIDENT_CREATED);
+        incident.setExpiryDate(Instant.now());
 
-        try {
-            incidentHelper.checkIncidentIntegrity(newIncident, null);
-            fail();
-        }catch (Exception e){
-            assertTrue(e.getMessage().contains("does not support having a expiry date"));
-        }
+        incidentHelper.setCorrectValuesForIncidentType(incident);
+
+        assertNull(incident.getExpiryDate());
     }
 
     @Test
     @OperateOnDeployment("incident")
     public void setManualModeAsResolved() {
-        IncidentDto newIncident = TicketHelper.createBasicIncidentDto();
+        IncidentDto dto = TicketHelper.createBasicIncidentDto();
+        Incident incident = incidentHelper.incidentDtoToIncident(dto);
 
-        newIncident.setType(IncidentType.MANUAL_POSITION_MODE);
-        newIncident.setStatus(StatusEnum.RESOLVED);
-        newIncident.setExpiryDate(Instant.now());
+        incident.setType(IncidentType.MANUAL_POSITION_MODE);
+        incident.setStatus(StatusEnum.RESOLVED);
+        incident.setExpiryDate(Instant.now());
 
-       IncidentDto checkedIncident = incidentHelper.checkIncidentIntegrity(newIncident, null);
-       assertEquals(StatusEnum.RESOLVED, checkedIncident.getStatus());
+       incidentHelper.setCorrectValuesForIncidentType(incident);
+       assertEquals(StatusEnum.RESOLVED, incident.getStatus());
     }
 
     @Test
     @OperateOnDeployment("incident")
     public void checkManualIncidentWoOldIncident() {
-        IncidentDto newIncident = TicketHelper.createBasicIncidentDto();
+        IncidentDto dto = TicketHelper.createBasicIncidentDto();
+        Incident incident = incidentHelper.incidentDtoToIncident(dto);
 
-        newIncident.setType(IncidentType.MANUAL_POSITION_MODE);
-        newIncident.setStatus(StatusEnum.MANUAL_POSITION_MODE);
+        incident.setType(IncidentType.MANUAL_POSITION_MODE);
+        incident.setStatus(StatusEnum.MANUAL_POSITION_MODE);
         Instant now = Instant.now();
-        newIncident.setExpiryDate(now);
+        incident.setExpiryDate(now);
 
-        IncidentDto checkedIncident = incidentHelper.checkIncidentIntegrity(newIncident, null);
+        incidentHelper.setCorrectValuesForIncidentType(incident);
 
-        assertNotEquals(now, checkedIncident.getExpiryDate());
-        assertTrue(now.plus(65, ChronoUnit.MINUTES).isBefore(checkedIncident.getExpiryDate()));
-        assertTrue(now.plus(66, ChronoUnit.MINUTES).isAfter(checkedIncident.getExpiryDate()));
+        assertNotEquals(now, incident.getExpiryDate());
+        assertTrue(now.plus(65, ChronoUnit.MINUTES).isBefore(incident.getExpiryDate()));
+        assertTrue(now.plus(66, ChronoUnit.MINUTES).isAfter(incident.getExpiryDate()));
     }
 
     @Test
     @OperateOnDeployment("incident")
     public void checkManualIncidentWithRecentMovement() {
-        IncidentDto newIncident = TicketHelper.createBasicIncidentDto();
+        IncidentDto dto = TicketHelper.createBasicIncidentDto();
+        Incident incident = incidentHelper.incidentDtoToIncident(dto);
 
-        newIncident.setType(IncidentType.MANUAL_POSITION_MODE);
-        newIncident.setStatus(StatusEnum.RECEIVING_VMS_POSITIONS);
+        incident.setType(IncidentType.MANUAL_POSITION_MODE);
+        incident.setStatus(StatusEnum.RECEIVING_VMS_POSITIONS);
         Instant now = Instant.now();
-        newIncident.setExpiryDate(now);
+        incident.setExpiryDate(now);
+        incident.setMovementId(UUID.randomUUID());
 
-        Incident oldIncident = new Incident();
-        oldIncident.setMovementId(UUID.randomUUID());
         Instant movementTimestamp = Instant.now().minus(ServiceConstants.MAX_DELAY_BETWEEN_MANUAL_POSITIONS_IN_MINUTES - 30, ChronoUnit.MINUTES).truncatedTo(ChronoUnit.MILLIS);
         System.setProperty("MOVEMENT_MOCK_TIMESTAMP", "" + movementTimestamp.toEpochMilli());
 
-        IncidentDto checkedIncident = incidentHelper.checkIncidentIntegrity(newIncident, oldIncident);
+        incidentHelper.setCorrectValuesForIncidentType(incident);
 
-        assertEquals(StatusEnum.MANUAL_POSITION_MODE, checkedIncident.getStatus());
-        assertNotEquals(now, checkedIncident.getExpiryDate());
-        assertEquals(movementTimestamp.plus(65, ChronoUnit.MINUTES), checkedIncident.getExpiryDate());
+        assertEquals(StatusEnum.MANUAL_POSITION_MODE, incident.getStatus());
+        assertNotEquals(now, incident.getExpiryDate());
+        assertEquals(movementTimestamp.plus(65, ChronoUnit.MINUTES), incident.getExpiryDate());
 
         System.clearProperty("MOVEMENT_MOCK_TIMESTAMP");
     }
@@ -116,23 +117,23 @@ public class IncidentHelperTest extends TransactionalTests {
     @Test
     @OperateOnDeployment("incident")
     public void checkManualIncidentWithoutRecentMovement() {
-        IncidentDto newIncident = TicketHelper.createBasicIncidentDto();
+        IncidentDto dto = TicketHelper.createBasicIncidentDto();
+        Incident incident = incidentHelper.incidentDtoToIncident(dto);
 
-        newIncident.setType(IncidentType.MANUAL_POSITION_MODE);
-        newIncident.setStatus(StatusEnum.RECEIVING_VMS_POSITIONS);
+        incident.setType(IncidentType.MANUAL_POSITION_MODE);
+        incident.setStatus(StatusEnum.RECEIVING_VMS_POSITIONS);
         Instant now = Instant.now();
-        newIncident.setExpiryDate(now);
+        incident.setExpiryDate(now);
+        incident.setMovementId(UUID.randomUUID());
 
-        Incident oldIncident = new Incident();
-        oldIncident.setMovementId(UUID.randomUUID());
         Instant movementTimestamp = Instant.now().minus(ServiceConstants.MAX_DELAY_BETWEEN_MANUAL_POSITIONS_IN_MINUTES + 30, ChronoUnit.MINUTES).truncatedTo(ChronoUnit.MILLIS);
         System.setProperty("MOVEMENT_MOCK_TIMESTAMP", "" + movementTimestamp.toEpochMilli());
 
-        IncidentDto checkedIncident = incidentHelper.checkIncidentIntegrity(newIncident, oldIncident);
+        incidentHelper.setCorrectValuesForIncidentType(incident);
 
-        assertEquals(StatusEnum.MANUAL_POSITION_LATE, checkedIncident.getStatus());
-        assertNotEquals(now, checkedIncident.getExpiryDate());
-        assertEquals(movementTimestamp.plus(65, ChronoUnit.MINUTES), checkedIncident.getExpiryDate());
+        assertEquals(StatusEnum.MANUAL_POSITION_LATE, incident.getStatus());
+        assertNotEquals(now, incident.getExpiryDate());
+        assertEquals(movementTimestamp.plus(65, ChronoUnit.MINUTES), incident.getExpiryDate());
 
         System.clearProperty("MOVEMENT_MOCK_TIMESTAMP");
     }

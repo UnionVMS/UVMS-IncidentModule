@@ -225,9 +225,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         assertNotNull(created);
         assertEquals(StatusEnum.INCIDENT_CREATED, created.getStatus());
 
-        IncidentDto incidentDto = incidentHelper.incidentEntityToDto(created);
-        incidentDto.setStatus(StatusEnum.RESOLVED);
-        IncidentDto updatedDto = incidentService.updateIncident(incidentDto, "Test user");
+        IncidentDto updatedDto = incidentService.updateIncidentStatus(created.getId(), StatusEnum.RESOLVED, "Test user");
 
         Incident updated = incidentDao.findById(created.getId());
         assertEquals(updated.getStatus(), StatusEnum.RESOLVED);
@@ -644,5 +642,31 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         assertEquals(2, incidentLogs.size());
         assertTrue(incidentLogs.stream().anyMatch(log -> log.getIncidentStatus().equals(StatusEnum.RECEIVING_VMS_POSITIONS)));
         assertTrue(incidentLogs.stream().anyMatch(log -> log.getEventType().equals(EventTypeEnum.RECEIVED_VMS_POSITION)));
+    }
+
+    @Test
+    @OperateOnDeployment("incident")
+    public void ownershipTransferIncidentReceivesVmsPosition() {
+        UUID movementId = UUID.randomUUID();
+        UUID mobTermId = UUID.randomUUID();
+        IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
+        incidentDto.setType(IncidentType.OWNERSHIP_TRANSFER);
+        incidentDto.setStatus(StatusEnum.NOT_RECEIVING_VMS_POSITIONS);
+
+        incidentDto = incidentService.createIncident(incidentDto, "Tester");
+
+        Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(incidentDto.getAssetId(), IncidentType.OWNERSHIP_TRANSFER);
+
+        assertNotNull(openByAssetAndType);
+
+        IncidentTicketDto ticket = TicketHelper.createTicket(incidentDto.getAssetId(), movementId, mobTermId);
+        ticket.setMovementSource(MovementSourceType.INMARSAT_C);
+        ticket.setUpdated(Instant.now());
+
+        incidentService.updateIncident(ticket);
+
+        Incident updatedIncident = incidentDao.findById(openByAssetAndType.getId());
+        assertEquals(StatusEnum.RECEIVING_VMS_POSITIONS, updatedIncident.getStatus());
+        assertEquals(movementId, updatedIncident.getMovementId());
     }
 }
