@@ -15,6 +15,7 @@ public class IncidentTicketDto implements Serializable {
     private String channelId;
     private String movementId;
     private MovementSourceType movementSource;
+    private Instant positionTime;
     private String pollId;
 
     private String ruleGuid;
@@ -153,5 +154,13 @@ public class IncidentTicketDto implements Serializable {
 
     public void setMovementSource(MovementSourceType movementSource) {
         this.movementSource = movementSource;
+    }
+
+    public Instant getPositionTime() {
+        return positionTime;
+    }
+
+    public void setPositionTime(Instant positionTime) {
+        this.positionTime = positionTime;
     }
 }

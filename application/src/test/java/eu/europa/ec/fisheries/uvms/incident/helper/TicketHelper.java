@@ -25,6 +25,7 @@ public class TicketHelper {
         Instant date = Instant.now();
         ticket.setCreatedDate(date);
         ticket.setUpdated(date);
+        ticket.setPositionTime(date);
         return ticket;
     }
 
