@@ -40,8 +40,11 @@ public class AssetCommunicationBean {
 
     public String createPollInternal(IncidentTicketDto dto) {
         try {
+
+            AssetDTO assetById = assetClient.getAssetById(AssetIdentifier.GUID, dto.getAssetId());
             String username = "Triggered by asset not sending";
-            String comment = "This poll was triggered by asset not sending on: " + DateUtils.dateToHumanReadableString(Instant.now().truncatedTo(ChronoUnit.SECONDS)) + " on Asset: " + dto.getRecipient();
+            String comment = "This poll was triggered by asset not sending on: " + DateUtils.dateToHumanReadableString(Instant.now().truncatedTo(ChronoUnit.SECONDS))
+                    + " on Asset: " + assetById.getName() + " (" + assetById.getIrcs() + ")";
 
             SimpleCreatePoll createPoll = new SimpleCreatePoll();
             createPoll.setComment(comment);
