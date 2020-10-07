@@ -43,7 +43,7 @@ public class AssetCommunicationBean {
 
             AssetDTO assetById = assetClient.getAssetById(AssetIdentifier.GUID, dto.getAssetId());
             String username = "Triggered by asset not sending";
-            String comment = "This poll was triggered by asset not sending on: " + DateUtils.dateToHumanReadableString(Instant.now().truncatedTo(ChronoUnit.SECONDS))
+            String comment = "This poll was triggered by asset not sending on: " + DateUtils.dateToHumanReadableString(Instant.now())
                     + " on Asset: " + assetById.getName() + " (" + assetById.getIrcs() + ")";
 
             SimpleCreatePoll createPoll = new SimpleCreatePoll();
