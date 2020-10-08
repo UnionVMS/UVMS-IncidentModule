@@ -49,11 +49,6 @@
             <version>${asset.version}</version>
         </dependency>
         <dependency>
-            <groupId>eu.europa.ec.fisheries.uvms.movement-rules</groupId>
-            <artifactId>movement-rules-model</artifactId>
-            <version>${movement.rules.version}</version>
-        </dependency>
-        <dependency>
             <groupId>eu.europa.ec.fisheries.uvms.spatialSwe</groupId>
             <artifactId>spatial-model</artifactId>
             <version>${spatial.version}</version>
