@@ -152,6 +152,7 @@ public class IncidentServiceBean {
             incidentLogServiceBean.createIncidentLogForStatus(updated, "Incident status changed by " + user + " to " + update, EventTypeEnum.INCIDENT_STATUS, null);
         }
 
+        updatedIncident.fire(updated);
         return incidentHelper.incidentEntityToDto(oldIncident);
     }
 
@@ -170,6 +171,7 @@ public class IncidentServiceBean {
         Incident updated = incidentDao.update(oldIncident);
         incidentLogServiceBean.createIncidentLogForStatus(updated, "Expiry date set by " + user + " to " + DateUtils.dateToHumanReadableString(update), EventTypeEnum.INCIDENT_UPDATED, null);
 
+        updatedIncident.fire(updated);
         return incidentHelper.incidentEntityToDto(oldIncident);
     }
 
