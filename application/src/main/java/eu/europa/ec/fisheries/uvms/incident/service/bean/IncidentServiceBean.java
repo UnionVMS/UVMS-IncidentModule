@@ -156,6 +156,7 @@ public class IncidentServiceBean {
         return incidentHelper.incidentEntityToDto(oldIncident);
     }
 
+    
     public IncidentDto updateIncidentExpiry(Long incidentId, Instant update, String user){
         Incident oldIncident = incidentDao.findById(incidentId);
         incidentHelper.checkIfUpdateIsAllowed(oldIncident, oldIncident.getStatus());
