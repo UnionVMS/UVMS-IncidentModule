@@ -14,7 +14,7 @@ pipeline {
     jdk 'JDK11'
   }
   triggers {
-    issueCommentTrigger('.*(test\W+me).*')
+    issueCommentTrigger('.*test me.*')
   }
   stages {
     stage('Remove docker containers') {
