@@ -152,9 +152,11 @@ public class IncidentServiceBean {
             incidentLogServiceBean.createIncidentLogForStatus(updated, "Incident status changed by " + user + " to " + update, EventTypeEnum.INCIDENT_STATUS, null);
         }
 
+        updatedIncident.fire(updated);
         return incidentHelper.incidentEntityToDto(oldIncident);
     }
 
+    
     public IncidentDto updateIncidentExpiry(Long incidentId, Instant update, String user){
         Incident oldIncident = incidentDao.findById(incidentId);
         incidentHelper.checkIfUpdateIsAllowed(oldIncident, oldIncident.getStatus());
@@ -170,6 +172,7 @@ public class IncidentServiceBean {
         Incident updated = incidentDao.update(oldIncident);
         incidentLogServiceBean.createIncidentLogForStatus(updated, "Expiry date set by " + user + " to " + DateUtils.dateToHumanReadableString(update), EventTypeEnum.INCIDENT_UPDATED, null);
 
+        updatedIncident.fire(updated);
         return incidentHelper.incidentEntityToDto(oldIncident);
     }
 
@@ -268,10 +271,14 @@ public class IncidentServiceBean {
                 incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_AIS_POSITION.getMessage(), EventTypeEnum.RECEIVED_AIS_POSITION, UUID.fromString(ticket.getMovementId()));
             }
         } else {
-            persisted.setStatus(StatusEnum.RESOLVED);
-            assetCommunication.setAssetParkedStatus(persisted.getAssetId(), false);
-            incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_VMS_POSITION.getMessage(), EventTypeEnum.RECEIVED_VMS_POSITION, UUID.fromString(ticket.getMovementId()));
-            incidentLogServiceBean.createIncidentLogForStatus(persisted, "Closing parked incident due to receiving VMS positions ", EventTypeEnum.INCIDENT_CLOSED, UUID.fromString(ticket.getMovementId()));
+            if (ticket.getMovementSource().equals(MovementSourceType.MANUAL)) {
+                incidentLogServiceBean.createIncidentLogForManualPosition(persisted, UUID.fromString(ticket.getMovementId()));
+            } else {
+                persisted.setStatus(StatusEnum.RESOLVED);
+                assetCommunication.setAssetParkedStatus(persisted.getAssetId(), false);
+                incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_VMS_POSITION.getMessage(), EventTypeEnum.RECEIVED_VMS_POSITION, UUID.fromString(ticket.getMovementId()));
+                incidentLogServiceBean.createIncidentLogForStatus(persisted, "Closing parked incident due to receiving VMS positions ", EventTypeEnum.INCIDENT_CLOSED, UUID.fromString(ticket.getMovementId()));
+            }
 
         }
     }
@@ -287,10 +294,14 @@ public class IncidentServiceBean {
                 incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_AIS_POSITION.getMessage(), EventTypeEnum.RECEIVED_AIS_POSITION, UUID.fromString(ticket.getMovementId()));
             }
         } else {
-            persisted.setStatus(StatusEnum.RESOLVED);
-            assetCommunication.setAssetParkedStatus(persisted.getAssetId(), false);
-            incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_VMS_POSITION.getMessage(), EventTypeEnum.RECEIVED_VMS_POSITION, UUID.fromString(ticket.getMovementId()));
-            incidentLogServiceBean.createIncidentLogForStatus(persisted, "Closing seasonal fishing incident due to receiving VMS positions ", EventTypeEnum.INCIDENT_CLOSED, UUID.fromString(ticket.getMovementId()));
+            if (ticket.getMovementSource().equals(MovementSourceType.MANUAL)) {
+                incidentLogServiceBean.createIncidentLogForManualPosition(persisted, UUID.fromString(ticket.getMovementId()));
+            } else {
+                persisted.setStatus(StatusEnum.RESOLVED);
+                assetCommunication.setAssetParkedStatus(persisted.getAssetId(), false);
+                incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_VMS_POSITION.getMessage(), EventTypeEnum.RECEIVED_VMS_POSITION, UUID.fromString(ticket.getMovementId()));
+                incidentLogServiceBean.createIncidentLogForStatus(persisted, "Closing seasonal fishing incident due to receiving VMS positions ", EventTypeEnum.INCIDENT_CLOSED, UUID.fromString(ticket.getMovementId()));
+            }
         }
     }
 

@@ -5,7 +5,7 @@
     <parent>
         <groupId>eu.europa.ec.fisheries.uvms.incident</groupId>
         <artifactId>incident</artifactId>
-        <version>0.4.9</version>
+        <version>0.4.10</version>
     </parent>
 
     <artifactId>incident-application</artifactId>
@@ -47,11 +47,6 @@
             <groupId>eu.europa.ec.fisheries.uvms.asset</groupId>
             <artifactId>asset-client</artifactId>
             <version>${asset.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>eu.europa.ec.fisheries.uvms.movement-rules</groupId>
-            <artifactId>movement-rules-model</artifactId>
-            <version>${movement.rules.version}</version>
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.fisheries.uvms.spatialSwe</groupId>
