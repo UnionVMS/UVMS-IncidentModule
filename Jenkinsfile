@@ -13,6 +13,9 @@ pipeline {
     maven 'Maven3'
     jdk 'JDK11'
   }
+  triggers {
+    issueCommentTrigger('.*test me.*')
+  }
   stages {
     stage('Remove docker containers') {
       when {
