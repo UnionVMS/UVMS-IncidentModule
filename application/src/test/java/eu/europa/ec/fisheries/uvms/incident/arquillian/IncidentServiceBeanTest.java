@@ -450,6 +450,48 @@ public class IncidentServiceBeanTest extends TransactionalTests {
 
     @Test
     @OperateOnDeployment("incident")
+    public void dontUpdateOwnerTransferMovementOnOldMovement() {
+        UUID movementId = UUID.randomUUID();
+        UUID mobTermId = UUID.randomUUID();
+        UUID firstMove = UUID.randomUUID();
+        UUID secondMove = UUID.randomUUID();
+        IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
+        incidentDto.setType(IncidentType.OWNERSHIP_TRANSFER);
+        incidentDto.setStatus(StatusEnum.NOT_RECEIVING_VMS_POSITIONS);
+
+        incidentDto = incidentService.createIncident(incidentDto, "Tester");
+
+        Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(incidentDto.getAssetId(), IncidentType.OWNERSHIP_TRANSFER);
+
+        assertNotNull(openByAssetAndType);
+
+        IncidentTicketDto ticket = TicketHelper.createTicket(incidentDto.getAssetId(), movementId, mobTermId);
+        ticket.setMovementId(firstMove.toString());
+        ticket.setMovementSource(MovementSourceType.IRIDIUM);
+        ticket.setUpdated(Instant.now());
+
+        incidentService.updateIncident(ticket);
+
+        ticket = TicketHelper.createTicket(incidentDto.getAssetId(), movementId, mobTermId);
+        ticket.setMovementId(secondMove.toString());
+        ticket.setMovementSource(MovementSourceType.IRIDIUM);
+        ticket.setUpdated(Instant.now().minus(1, ChronoUnit.MINUTES));
+
+        incidentService.updateIncident(ticket);
+
+        Incident updatedIncident = incidentDao.findById(openByAssetAndType.getId());
+        assertEquals(StatusEnum.RECEIVING_VMS_POSITIONS, updatedIncident.getStatus());
+        assertEquals(firstMove, updatedIncident.getMovementId());
+
+        List<IncidentLog> incidentLogs = incidentLogDao.findAllByIncidentId(openByAssetAndType.getId());
+        assertFalse(incidentLogs.isEmpty());
+        assertEquals(3, incidentLogs.size());
+        assertTrue(incidentLogs.stream().anyMatch(log -> log.getRelatedObjectId() != null && log.getRelatedObjectId().equals(firstMove)));
+        assertTrue(incidentLogs.stream().anyMatch(log -> log.getRelatedObjectId() != null && log.getRelatedObjectId().equals(secondMove)));
+    }
+
+    @Test
+    @OperateOnDeployment("incident")
     public void createAndUpdateAssetSendingAisDespiteSeasonalFishingTest() {
         UUID movementId = UUID.randomUUID();
         UUID mobTermId = UUID.randomUUID();
