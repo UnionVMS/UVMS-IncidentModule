@@ -11,6 +11,8 @@ import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.IncidentLog;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.interfaces.IncidentCreate;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.interfaces.IncidentUpdate;
 import eu.europa.ec.fisheries.uvms.incident.service.helper.IncidentHelper;
+import eu.europa.ec.fisheries.uvms.movement.client.MovementRestClient;
+import eu.europa.ec.fisheries.uvms.movement.client.model.MicroMovement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +40,9 @@ public class IncidentServiceBean {
 
     @Inject
     AssetCommunicationBean assetCommunication;
+
+    @Inject
+    MovementRestClient movementRestClient;
 
     @Inject
     @IncidentCreate
@@ -315,12 +320,21 @@ public class IncidentServiceBean {
                 incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_AIS_POSITION.getMessage(), EventTypeEnum.RECEIVED_AIS_POSITION, UUID.fromString(ticket.getMovementId()));
             }
         } else {
+            MicroMovement microMovementById = persisted.getMovementId() != null ? movementRestClient.getMicroMovementById(persisted.getMovementId()) : null;
             if (ticket.getMovementSource().equals(MovementSourceType.MANUAL)) {
                 incidentLogServiceBean.createIncidentLogForManualPosition(persisted, UUID.fromString(ticket.getMovementId()));
+
+                if(microMovementById == null || ticket.getPositionTime().isAfter(microMovementById.getTimestamp())) {
+                    persisted.setMovementId(UUID.fromString(ticket.getMovementId()));
+                }
             } else {
                 persisted.setStatus(StatusEnum.RECEIVING_VMS_POSITIONS);
-                persisted.setMovementId(UUID.fromString(ticket.getMovementId()));
                 incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_VMS_POSITION.getMessage(), EventTypeEnum.RECEIVED_VMS_POSITION, UUID.fromString(ticket.getMovementId()));
+
+                if(microMovementById == null || ticket.getPositionTime().isAfter(microMovementById.getTimestamp())) {
+                    persisted.setMovementId(UUID.fromString(ticket.getMovementId()));
+                }
+
             }
         }
     }
