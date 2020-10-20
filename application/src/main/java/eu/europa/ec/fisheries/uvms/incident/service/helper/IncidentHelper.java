@@ -134,7 +134,6 @@ public class IncidentHelper {
         dto.setAsset(move.getAsset());
         dto.setHeading(move.getHeading());
         dto.setId(move.getId());
-        dto.setInternalReferenceNumber(move.getInternalReferenceNumber());
         dto.setLesReportTime(move.getLesReportTime());
         dto.setMovementType(move.getMovementType() != null ? move.getMovementType().value() : null);
         dto.setSource(MovementSourceType.fromValue(move.getSource().value()));
@@ -142,7 +141,6 @@ public class IncidentHelper {
         dto.setSpeed(move.getSpeed());
         dto.setStatus(move.getStatus());
         dto.setTimestamp(move.getTimestamp());
-        dto.setTripNumber(move.getTripNumber());
         dto.setUpdated(move.getUpdated());
         dto.setUpdatedBy(move.getUpdatedBy());
 
