@@ -175,7 +175,7 @@ public class IncidentServiceBean {
         oldIncident.setExpiryDate(update);
 
         Incident updated = incidentDao.update(oldIncident);
-        incidentLogServiceBean.createIncidentLogForStatus(updated, "Expiry date set by " + user + " to " + DateUtils.dateToHumanReadableString(update), EventTypeEnum.INCIDENT_UPDATED, null);
+        incidentLogServiceBean.createIncidentLogForStatus(updated, "Expiry date set by " + user + " to " + DateUtils.dateToHumanReadableString(update), EventTypeEnum.EXPIRY_UPDATED, null);
 
         updatedIncident.fire(updated);
         return incidentHelper.incidentEntityToDto(oldIncident);

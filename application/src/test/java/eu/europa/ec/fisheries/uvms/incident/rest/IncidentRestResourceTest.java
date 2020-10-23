@@ -278,7 +278,7 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
 
         assertEquals(3, logs.size());
         assertTrue(logs.values().stream().anyMatch(log -> log.getEventType().equals(EventTypeEnum.INCIDENT_TYPE)));
-        assertTrue(logs.values().stream().anyMatch(log -> log.getEventType().equals(EventTypeEnum.INCIDENT_UPDATED)));
+        assertTrue(logs.values().stream().anyMatch(log -> log.getEventType().equals(EventTypeEnum.EXPIRY_UPDATED)));
     }
 
 
