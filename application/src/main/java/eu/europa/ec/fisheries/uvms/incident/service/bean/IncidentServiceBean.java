@@ -260,7 +260,6 @@ public class IncidentServiceBean {
                 incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_AIS_POSITION.getMessage(), EventTypeEnum.RECEIVED_AIS_POSITION, UUID.fromString(ticket.getMovementId()));
             }
         } else {
-            checkAndUpdateIncidentPosition(ticket, persisted);
             persisted.setStatus(StatusEnum.RECEIVING_VMS_POSITIONS);
             incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_VMS_POSITION.getMessage(), EventTypeEnum.RECEIVED_VMS_POSITION, UUID.fromString(ticket.getMovementId()));
         }
@@ -277,7 +276,6 @@ public class IncidentServiceBean {
                 incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_AIS_POSITION.getMessage(), EventTypeEnum.RECEIVED_AIS_POSITION, UUID.fromString(ticket.getMovementId()));
             }
         } else {
-            checkAndUpdateIncidentPosition(ticket, persisted);
             if (ticket.getMovementSource().equals(MovementSourceType.MANUAL)) {
                 incidentLogServiceBean.createIncidentLogForManualPosition(persisted, UUID.fromString(ticket.getMovementId()));
             } else {
@@ -301,7 +299,6 @@ public class IncidentServiceBean {
                 incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_AIS_POSITION.getMessage(), EventTypeEnum.RECEIVED_AIS_POSITION, UUID.fromString(ticket.getMovementId()));
             }
         } else {
-            checkAndUpdateIncidentPosition(ticket, persisted);
             if (ticket.getMovementSource().equals(MovementSourceType.MANUAL)) {
                 incidentLogServiceBean.createIncidentLogForManualPosition(persisted, UUID.fromString(ticket.getMovementId()));
             } else {
@@ -323,24 +320,25 @@ public class IncidentServiceBean {
                 incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_AIS_POSITION.getMessage(), EventTypeEnum.RECEIVED_AIS_POSITION, UUID.fromString(ticket.getMovementId()));
             }
         } else {
-            checkAndUpdateIncidentPosition(ticket, persisted);
+            MicroMovement microMovementById = persisted.getMovementId() != null ? movementRestClient.getMicroMovementById(persisted.getMovementId()) : null;
             if (ticket.getMovementSource().equals(MovementSourceType.MANUAL)) {
                 incidentLogServiceBean.createIncidentLogForManualPosition(persisted, UUID.fromString(ticket.getMovementId()));
+
+                if(microMovementById == null || ticket.getPositionTime().isAfter(microMovementById.getTimestamp())) {
+                    persisted.setMovementId(UUID.fromString(ticket.getMovementId()));
+                }
             } else {
                 persisted.setStatus(StatusEnum.RECEIVING_VMS_POSITIONS);
                 incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_VMS_POSITION.getMessage(), EventTypeEnum.RECEIVED_VMS_POSITION, UUID.fromString(ticket.getMovementId()));
+
+                if(microMovementById == null || ticket.getPositionTime().isAfter(microMovementById.getTimestamp())) {
+                    persisted.setMovementId(UUID.fromString(ticket.getMovementId()));
+                }
 
             }
         }
     }
 
-    private void checkAndUpdateIncidentPosition(IncidentTicketDto ticket, Incident persisted) {
-        MicroMovement microMovementById = persisted.getMovementId() != null ? movementRestClient.getMicroMovementById(persisted.getMovementId()) : null;
-        if(microMovementById == null || ticket.getPositionTime().isAfter(microMovementById.getTimestamp())) {
-            persisted.setMovementId(UUID.fromString(ticket.getMovementId()));
-        }
-
-    }
 
     public void addEventToIncident(long incidentId, EventCreationDto eventCreationDto) {
         Incident persisted = incidentDao.findById(incidentId);
