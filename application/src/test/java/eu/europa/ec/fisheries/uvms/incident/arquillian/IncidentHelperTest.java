@@ -3,6 +3,7 @@ package eu.europa.ec.fisheries.uvms.incident.arquillian;
 import eu.europa.ec.fisheries.uvms.incident.TransactionalTests;
 import eu.europa.ec.fisheries.uvms.incident.helper.TicketHelper;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.KeyValuePair;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
@@ -17,6 +18,8 @@ import javax.inject.Inject;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
@@ -136,5 +139,45 @@ public class IncidentHelperTest extends TransactionalTests {
         assertEquals(movementTimestamp.plus(65, ChronoUnit.MINUTES), incident.getExpiryDate());
 
         System.clearProperty("MOVEMENT_MOCK_TIMESTAMP");
+    }
+
+    @Test
+    @OperateOnDeployment("incident")
+    public void createJsonStringTest() {
+        String test = incidentHelper.createJsonString("test", Instant.now().toEpochMilli());
+        assertNotNull(test);
+        assertFalse(test.isEmpty());
+
+        test = incidentHelper.createJsonString("test", "Instant.now().toEpochMilli()");
+        assertNotNull(test);
+        assertFalse(test.isEmpty());
+
+        test = incidentHelper.createJsonString("test", Instant.now());
+        assertNotNull(test);
+        assertFalse(test.isEmpty());
+
+        test = incidentHelper.createJsonString("test", IncidentType.MANUAL_POSITION_MODE);
+        assertNotNull(test);
+        assertFalse(test.isEmpty());
+    }
+
+    @Test
+    @OperateOnDeployment("incident")
+    public void createJsonStringListTest() {
+        List<KeyValuePair> keyValuePairs = Arrays.asList(new KeyValuePair("test1", Instant.now().toEpochMilli()),
+                new KeyValuePair("test2", "Instant.now().toEpochMilli()"),
+                new KeyValuePair("test3", Instant.now()),
+                new KeyValuePair("test4", IncidentType.MANUAL_POSITION_MODE));
+        String json = incidentHelper.createJsonString(keyValuePairs);
+        assertNotNull(json);
+        assertFalse(json.isEmpty());
+
+        assertTrue(json.contains("test1\":"));
+        assertFalse(json.contains("test1\":\""));
+        assertTrue(json.contains("test2\":\"Instant.now().toEpochMilli()\""));
+        assertTrue(json.contains("test3\":"));
+        assertFalse(json.contains("test3\":\""));
+        assertTrue(json.contains("test4\":\"MANUAL_POSITION_MODE\""));
+
     }
 }

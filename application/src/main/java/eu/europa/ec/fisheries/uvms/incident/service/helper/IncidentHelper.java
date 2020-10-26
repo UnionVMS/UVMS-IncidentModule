@@ -15,12 +15,13 @@ import eu.europa.ec.fisheries.uvms.movement.client.model.MicroMovement;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.bind.JsonbBuilder;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -32,6 +33,7 @@ public class IncidentHelper {
 
     @Inject
     private MovementRestClient movementClient;
+
 
     public Incident constructIncident(IncidentTicketDto ticket) {
         Incident incident = new Incident();
@@ -204,5 +206,24 @@ public class IncidentHelper {
                 incident.setExpiryDate(expiry);
             }
         }
+    }
+
+    public String createJsonString(String key, Object value){
+        return createJsonString(Arrays.asList(new KeyValuePair(key, value)));
+    }
+
+    public String createJsonString(List<KeyValuePair> pairs) {
+        JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+        for (KeyValuePair pair : pairs) {
+            if(pair.getValue() instanceof Number) {
+                objectBuilder.add(pair.getKey(), ((Number) pair.getValue()).longValue());
+            } else if(pair.getValue() instanceof Instant) {
+                objectBuilder.add(pair.getKey(), ((Instant) pair.getValue()).toEpochMilli());
+            } else {
+                objectBuilder.add(pair.getKey(), pair.getValue().toString());
+            }
+        }
+
+        return objectBuilder.build().toString();
     }
 }

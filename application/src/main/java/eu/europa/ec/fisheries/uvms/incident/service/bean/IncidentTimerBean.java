@@ -11,6 +11,7 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
  */
 package eu.europa.ec.fisheries.uvms.incident.service.bean;
 
+import eu.europa.ec.fisheries.uvms.incident.model.dto.KeyValuePair;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.EventTypeEnum;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
@@ -19,6 +20,7 @@ import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentDao;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.IncidentLog;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.interfaces.IncidentUpdate;
+import eu.europa.ec.fisheries.uvms.incident.service.helper.IncidentHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +47,9 @@ public class IncidentTimerBean {
     IncidentLogServiceBean incidentLogServiceBean;
 
     @Inject
+    IncidentHelper incidentHelper;
+
+    @Inject
     @IncidentUpdate
     private Event<Incident> updatedIncident;
 
@@ -55,7 +60,7 @@ public class IncidentTimerBean {
             for (Incident incident : manualPositionIncidents) {
                 if(incident.getExpiryDate().isBefore(Instant.now())){
                     incident.setStatus(StatusEnum.MANUAL_POSITION_LATE);
-                    incidentLogServiceBean.createIncidentLogForStatus(incident, EventTypeEnum.MANUAL_POSITION_LATE.getMessage(), EventTypeEnum.MANUAL_POSITION_LATE, null);
+                    incidentLogServiceBean.createIncidentLogForStatus(incident, EventTypeEnum.MANUAL_POSITION_LATE, null, null);
                     updatedIncident.fire(incident);
                 }
             }
@@ -73,8 +78,11 @@ public class IncidentTimerBean {
                         && incident.getExpiryDate() != null
                         && incident.getExpiryDate().isBefore(Instant.now())){
 
+                    StatusEnum oldStatus = incident.getStatus();
                     incident.setStatus(StatusEnum.OVERDUE);
-                    incidentLogServiceBean.createIncidentLogForStatus(incident, "Incident is past its due date", EventTypeEnum.INCIDENT_STATUS, null);
+
+                    String json = incidentHelper.createJsonString(Arrays.asList(new KeyValuePair("updatedBy", "Overdue timer"), new KeyValuePair("from", oldStatus), new KeyValuePair("to", incident.getStatus())));
+                    incidentLogServiceBean.createIncidentLogForStatus(incident, EventTypeEnum.INCIDENT_STATUS, null, json);
                     updatedIncident.fire(incident);
                 }
             }
@@ -91,8 +99,10 @@ public class IncidentTimerBean {
                 if (incident.getStatus().equals(StatusEnum.RECEIVING_AIS_POSITIONS)) {
                     IncidentLog recentAisLog = incidentLogServiceBean.findLogWithTypeEntryFromTheLastHour(incident.getId(), EventTypeEnum.RECEIVED_AIS_POSITION);
                     if (recentAisLog == null) {
+                        StatusEnum oldStatus = incident.getStatus();
                         incident.setStatus(incident.getType().getValidStatuses().get(0));
-                        incidentLogServiceBean.createIncidentLogForStatus(incident, "Incident status updated to " + incident.getStatus(), EventTypeEnum.INCIDENT_STATUS, null);
+                        String json = incidentHelper.createJsonString(Arrays.asList(new KeyValuePair("updatedBy", "Recent AIS timer"), new KeyValuePair("from", oldStatus), new KeyValuePair("to", incident.getStatus())));
+                        incidentLogServiceBean.createIncidentLogForStatus(incident, EventTypeEnum.INCIDENT_STATUS, null, json);
                         updatedIncident.fire(incident);
                     }
                 }
@@ -110,8 +120,10 @@ public class IncidentTimerBean {
                 if (incident.getStatus().equals(StatusEnum.RECEIVING_VMS_POSITIONS)) {
                     IncidentLog recentVmsLog = incidentLogServiceBean.findLogWithTypeEntryFromTheLastDay(incident.getId(), EventTypeEnum.RECEIVED_VMS_POSITION);
                     if (recentVmsLog == null) {
+                        StatusEnum oldStatus = incident.getStatus();
                         incident.setStatus(StatusEnum.NOT_RECEIVING_VMS_POSITIONS);
-                        incidentLogServiceBean.createIncidentLogForStatus(incident, "Incident status updated to " + incident.getStatus(), EventTypeEnum.INCIDENT_STATUS, null);
+                        String json = incidentHelper.createJsonString(Arrays.asList(new KeyValuePair("updatedBy", "Recent VMS timer"), new KeyValuePair("from", oldStatus), new KeyValuePair("to", incident.getStatus())));
+                        incidentLogServiceBean.createIncidentLogForStatus(incident, EventTypeEnum.INCIDENT_STATUS, null, json);
                         updatedIncident.fire(incident);
                     }
                 }

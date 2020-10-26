@@ -31,14 +31,15 @@ public class IncidentLogServiceBean {
         return incidentLogDao.findAllByIncidentId(incidentId);
     }
 
-    public void createIncidentLogForStatus(Incident updated, String message, EventTypeEnum eventType, UUID relatedObjectId) {
+    public void createIncidentLogForStatus(Incident updated, EventTypeEnum eventType, UUID relatedObjectId, String data) {
         IncidentLog log = new IncidentLog();
         log.setCreateDate(Instant.now());
         log.setIncidentId(updated.getId());
         log.setEventType(eventType);
         log.setRelatedObjectId(relatedObjectId);
-        log.setMessage(message);
+        log.setMessage(eventType.getMessage());
         log.setIncidentStatus(updated.getStatus());
+        log.setData(data);
         log.setRelatedObjectType( relatedObjectId == null ? RelatedObjectType.NONE :  eventType.getRelatedObjectType());
         incidentLogDao.save(log);
 

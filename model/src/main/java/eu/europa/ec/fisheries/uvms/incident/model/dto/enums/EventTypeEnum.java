@@ -7,6 +7,7 @@ public enum EventTypeEnum {
     RECEIVED_VMS_POSITION("Received VMS position", RelatedObjectType.MOVEMENT),
     POLL_CREATED("Poll has been created", RelatedObjectType.POLL),
     AUTO_POLL_CREATED("Automatic poll has been created", RelatedObjectType.POLL),
+    AUTO_POLL_CREATION_FAILED("Automatic poll creation has failed", RelatedObjectType.NONE),
     NOTE_CREATED("Note has been created", RelatedObjectType.NOTE),
     INCIDENT_CREATED("Incident have been created", RelatedObjectType.NONE),
     EXPIRY_UPDATED("Incident expiry has been updated", RelatedObjectType.NONE),

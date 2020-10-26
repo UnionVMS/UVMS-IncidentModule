@@ -99,15 +99,18 @@ public class IncidentServiceBean {
                 incident.setRisk(riskLevel);
 
                 if(ticket.getPollId() != null && !ticket.getPollId().matches(uuidPattern)) {
-                    incidentLogServiceBean.createIncidentLogForStatus(incident, "Creating autopoll failed since: " + ticket.getPollId(),
-                            EventTypeEnum.AUTO_POLL_CREATED, null);
+                    String json = incidentHelper.createJsonString("errorMessage", ticket.getPollId());
+                    incidentLogServiceBean.createIncidentLogForStatus(incident,
+                            EventTypeEnum.AUTO_POLL_CREATION_FAILED, null, json);
                 } else {
-                    incidentLogServiceBean.createIncidentLogForStatus(incident, "Asset not sending, sending autopoll",
-                            EventTypeEnum.AUTO_POLL_CREATED, (ticket.getPollId() == null ? null : UUID.fromString(ticket.getPollId())));
+                    incidentLogServiceBean.createIncidentLogForStatus(incident,
+                            EventTypeEnum.AUTO_POLL_CREATED, (ticket.getPollId() == null ? null : UUID.fromString(ticket.getPollId())),
+                            null);
                 }
             } else {
-                incidentLogServiceBean.createIncidentLogForStatus(incident, "Creating incident from rule " + ticket.getRuleGuid(),
-                        EventTypeEnum.INCIDENT_CREATED, null);
+                String json = incidentHelper.createJsonString("creatorRule", ticket.getRuleGuid());
+                incidentLogServiceBean.createIncidentLogForStatus(incident,
+                        EventTypeEnum.INCIDENT_CREATED, null, json);
             }
 
             createdIncident.fire(incident);
@@ -123,7 +126,8 @@ public class IncidentServiceBean {
         incidentHelper.setCorrectValuesForIncidentType(incident);
         incident.setCreateDate(Instant.now());
         Incident persistedIncident = incidentDao.save(incident);
-        incidentLogServiceBean.createIncidentLogForStatus(persistedIncident, "Incident created by " + user, EventTypeEnum.INCIDENT_CREATED, null);
+        String json = incidentHelper.createJsonString("createdBy", user);
+        incidentLogServiceBean.createIncidentLogForStatus(persistedIncident, EventTypeEnum.INCIDENT_CREATED, null, json);
         createdIncident.fire(persistedIncident);
         return incidentHelper.incidentEntityToDto(persistedIncident);
     }
@@ -132,13 +136,16 @@ public class IncidentServiceBean {
         Incident oldIncident = incidentDao.findById(incidentId);
         incidentHelper.checkIfUpdateIsAllowed(oldIncident, oldIncident.getStatus());
 
+        IncidentType oldType = oldIncident.getType();
         oldIncident.setType(update);
         oldIncident.setStatus(update.getValidStatuses().get(0));
 
         incidentHelper.setCorrectValuesForIncidentType(oldIncident);
         Incident updated = incidentDao.update(oldIncident);
 
-        incidentLogServiceBean.createIncidentLogForStatus(updated, "Incident type changed by " + user + " to " + update, EventTypeEnum.INCIDENT_TYPE, null);
+
+        String json = incidentHelper.createJsonString(Arrays.asList(new KeyValuePair("updatedBy", user), new KeyValuePair("from", oldType), new KeyValuePair("to", update)));
+        incidentLogServiceBean.createIncidentLogForStatus(updated, EventTypeEnum.INCIDENT_TYPE, null, json);
 
         updatedIncident.fire(updated);
         return incidentHelper.incidentEntityToDto(updated);
@@ -148,13 +155,15 @@ public class IncidentServiceBean {
         Incident oldIncident = incidentDao.findById(incidentId);
         incidentHelper.checkIfUpdateIsAllowed(oldIncident, update);
 
+        StatusEnum oldStatus = oldIncident.getStatus();
         oldIncident.setStatus(update);
 
         Incident updated = incidentDao.update(oldIncident);
+        String json = incidentHelper.createJsonString(Arrays.asList(new KeyValuePair("updatedBy", user), new KeyValuePair("from", oldStatus), new KeyValuePair("to", update)));
         if(update.equals(StatusEnum.RESOLVED)){
-            incidentLogServiceBean.createIncidentLogForStatus(updated, "Incident resolved by " + user, EventTypeEnum.INCIDENT_CLOSED, null);
+            incidentLogServiceBean.createIncidentLogForStatus(updated, EventTypeEnum.INCIDENT_CLOSED, null, json);
         } else {
-            incidentLogServiceBean.createIncidentLogForStatus(updated, "Incident status changed by " + user + " to " + update, EventTypeEnum.INCIDENT_STATUS, null);
+            incidentLogServiceBean.createIncidentLogForStatus(updated, EventTypeEnum.INCIDENT_STATUS, null, json);
         }
 
         updatedIncident.fire(updated);
@@ -175,7 +184,8 @@ public class IncidentServiceBean {
         oldIncident.setExpiryDate(update);
 
         Incident updated = incidentDao.update(oldIncident);
-        incidentLogServiceBean.createIncidentLogForStatus(updated, "Expiry date set by " + user + " to " + DateUtils.dateToHumanReadableString(update), EventTypeEnum.EXPIRY_UPDATED, null);
+        String json = incidentHelper.createJsonString(Arrays.asList(new KeyValuePair("updatedBy", user), new KeyValuePair("expiry", update)));
+        incidentLogServiceBean.createIncidentLogForStatus(updated, EventTypeEnum.EXPIRY_UPDATED, null, json);
 
         updatedIncident.fire(updated);
         return incidentHelper.incidentEntityToDto(oldIncident);
@@ -225,15 +235,16 @@ public class IncidentServiceBean {
                 persisted.setStatus(StatusEnum.MANUAL_POSITION_MODE);
                 persisted.setType(IncidentType.MANUAL_POSITION_MODE);
                 persisted.setExpiryDate(ticket.getPositionTime().plus(ServiceConstants.MAX_DELAY_BETWEEN_MANUAL_POSITIONS_IN_MINUTES, ChronoUnit.MINUTES));
-                incidentLogServiceBean.createIncidentLogForStatus(persisted, "Incident changed to type manual mode", EventTypeEnum.INCIDENT_TYPE, null);
+                String json = incidentHelper.createJsonString(Arrays.asList(new KeyValuePair("updatedBy", "UVMS"), new KeyValuePair("from", IncidentType.ASSET_NOT_SENDING), new KeyValuePair("to", IncidentType.MANUAL_POSITION_MODE), new KeyValuePair("expiry", persisted.getExpiryDate())));
+                incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.INCIDENT_TYPE, null, json);
 
                 persisted.setMovementId(UUID.fromString(ticket.getMovementId()));
                 incidentLogServiceBean.createIncidentLogForManualPosition(persisted, UUID.fromString(ticket.getMovementId()));
             } else if (ticket.getMovementSource() != null && !ticket.getMovementSource().equals(MovementSourceType.AIS)){
                 persisted.setStatus(StatusEnum.RESOLVED);
                 Incident updated = incidentDao.update(persisted);
-                incidentLogServiceBean.createIncidentLogForStatus(updated, EventTypeEnum.INCIDENT_CLOSED.getMessage(),
-                        EventTypeEnum.INCIDENT_CLOSED, UUID.fromString(ticket.getMovementId()));
+                incidentLogServiceBean.createIncidentLogForStatus(updated,
+                        EventTypeEnum.INCIDENT_CLOSED, UUID.fromString(ticket.getMovementId()), null);
             }
         }
     }
@@ -257,11 +268,11 @@ public class IncidentServiceBean {
                 recentAis.setCreateDate(Instant.now());
                 recentAis.setRelatedObjectId(UUID.fromString(ticket.getMovementId()));
             }else{
-                incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_AIS_POSITION.getMessage(), EventTypeEnum.RECEIVED_AIS_POSITION, UUID.fromString(ticket.getMovementId()));
+                incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_AIS_POSITION, UUID.fromString(ticket.getMovementId()), null);
             }
         } else {
             persisted.setStatus(StatusEnum.RECEIVING_VMS_POSITIONS);
-            incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_VMS_POSITION.getMessage(), EventTypeEnum.RECEIVED_VMS_POSITION, UUID.fromString(ticket.getMovementId()));
+            incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_VMS_POSITION, UUID.fromString(ticket.getMovementId()), null);
         }
     }
 
@@ -273,7 +284,7 @@ public class IncidentServiceBean {
                 recentAis.setRelatedObjectId(UUID.fromString(ticket.getMovementId()));
             }else{
                 persisted.setStatus(StatusEnum.RECEIVING_AIS_POSITIONS);
-                incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_AIS_POSITION.getMessage(), EventTypeEnum.RECEIVED_AIS_POSITION, UUID.fromString(ticket.getMovementId()));
+                incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_AIS_POSITION, UUID.fromString(ticket.getMovementId()), null);
             }
         } else {
             if (ticket.getMovementSource().equals(MovementSourceType.MANUAL)) {
@@ -281,8 +292,8 @@ public class IncidentServiceBean {
             } else {
                 persisted.setStatus(StatusEnum.RESOLVED);
                 assetCommunication.setAssetParkedStatus(persisted.getAssetId(), false);
-                incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_VMS_POSITION.getMessage(), EventTypeEnum.RECEIVED_VMS_POSITION, UUID.fromString(ticket.getMovementId()));
-                incidentLogServiceBean.createIncidentLogForStatus(persisted, "Closing parked incident due to receiving VMS positions ", EventTypeEnum.INCIDENT_CLOSED, UUID.fromString(ticket.getMovementId()));
+                incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_VMS_POSITION, UUID.fromString(ticket.getMovementId()), null);
+                incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.INCIDENT_CLOSED, UUID.fromString(ticket.getMovementId()), null);
             }
 
         }
@@ -296,7 +307,7 @@ public class IncidentServiceBean {
                 recentAis.setRelatedObjectId(UUID.fromString(ticket.getMovementId()));
             }else{
                 persisted.setStatus(StatusEnum.RECEIVING_AIS_POSITIONS);
-                incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_AIS_POSITION.getMessage(), EventTypeEnum.RECEIVED_AIS_POSITION, UUID.fromString(ticket.getMovementId()));
+                incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_AIS_POSITION, UUID.fromString(ticket.getMovementId()), null);
             }
         } else {
             if (ticket.getMovementSource().equals(MovementSourceType.MANUAL)) {
@@ -304,8 +315,8 @@ public class IncidentServiceBean {
             } else {
                 persisted.setStatus(StatusEnum.RESOLVED);
                 assetCommunication.setAssetParkedStatus(persisted.getAssetId(), false);
-                incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_VMS_POSITION.getMessage(), EventTypeEnum.RECEIVED_VMS_POSITION, UUID.fromString(ticket.getMovementId()));
-                incidentLogServiceBean.createIncidentLogForStatus(persisted, "Closing seasonal fishing incident due to receiving VMS positions ", EventTypeEnum.INCIDENT_CLOSED, UUID.fromString(ticket.getMovementId()));
+                incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_VMS_POSITION, UUID.fromString(ticket.getMovementId()), null);
+                incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.INCIDENT_CLOSED, UUID.fromString(ticket.getMovementId()), null);
             }
         }
     }
@@ -317,7 +328,7 @@ public class IncidentServiceBean {
                 recentAis.setCreateDate(Instant.now());
                 recentAis.setRelatedObjectId(UUID.fromString(ticket.getMovementId()));
             }else{
-                incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_AIS_POSITION.getMessage(), EventTypeEnum.RECEIVED_AIS_POSITION, UUID.fromString(ticket.getMovementId()));
+                incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_AIS_POSITION, UUID.fromString(ticket.getMovementId()), null);
             }
         } else {
             MicroMovement microMovementById = persisted.getMovementId() != null ? movementRestClient.getMicroMovementById(persisted.getMovementId()) : null;
@@ -329,7 +340,7 @@ public class IncidentServiceBean {
                 }
             } else {
                 persisted.setStatus(StatusEnum.RECEIVING_VMS_POSITIONS);
-                incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_VMS_POSITION.getMessage(), EventTypeEnum.RECEIVED_VMS_POSITION, UUID.fromString(ticket.getMovementId()));
+                incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.RECEIVED_VMS_POSITION, UUID.fromString(ticket.getMovementId()), null);
 
                 if(microMovementById == null || ticket.getPositionTime().isAfter(microMovementById.getTimestamp())) {
                     persisted.setMovementId(UUID.fromString(ticket.getMovementId()));
@@ -346,8 +357,8 @@ public class IncidentServiceBean {
             throw new IllegalArgumentException("Not allowed to add event to incident " + incidentId + " since it has status 'RESOLVED'");
         }
 
-        incidentLogServiceBean.createIncidentLogForStatus(persisted, eventCreationDto.getEventType().getMessage(),
-                eventCreationDto.getEventType(), eventCreationDto.getRelatedObjectId());
+        incidentLogServiceBean.createIncidentLogForStatus(persisted,
+                eventCreationDto.getEventType(), eventCreationDto.getRelatedObjectId(), null);
     }
 
     public Incident findByTicketId(UUID ticketId) {
