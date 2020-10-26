@@ -19,6 +19,7 @@ public class IncidentLogDto implements Serializable {
     private UUID relatedObjectId;
     private RelatedObjectType relatedObjectType;
     private StatusEnum incidentStatus;
+    private String data;
 
     public Long getId() {
         return id;
@@ -82,5 +83,13 @@ public class IncidentLogDto implements Serializable {
 
     public void setIncidentStatus(StatusEnum incidentStatus) {
         this.incidentStatus = incidentStatus;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
     }
 }

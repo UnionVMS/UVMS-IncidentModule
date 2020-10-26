@@ -161,6 +161,7 @@ public class IncidentHelper {
             dto.setRelatedObjectId(entity.getRelatedObjectId());
             dto.setRelatedObjectType(entity.getRelatedObjectType());
             dto.setIncidentStatus(entity.getIncidentStatus());
+            dto.setData(entity.getData());
             retVal.put(dto.getId(), dto);
         }
         return retVal;
@@ -215,7 +216,9 @@ public class IncidentHelper {
     public String createJsonString(List<KeyValuePair> pairs) {
         JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
         for (KeyValuePair pair : pairs) {
-            if(pair.getValue() instanceof Number) {
+            if(pair.getValue() == null) {
+                objectBuilder.addNull(pair.getKey());
+            }else if(pair.getValue() instanceof Number) {
                 objectBuilder.add(pair.getKey(), ((Number) pair.getValue()).longValue());
             } else if(pair.getValue() instanceof Instant) {
                 objectBuilder.add(pair.getKey(), ((Instant) pair.getValue()).toEpochMilli());

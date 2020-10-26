@@ -349,7 +349,7 @@ public class IncidentServiceBeanTest extends TransactionalTests {
         List<IncidentLog> incidentLogs = incidentLogDao.findAllByIncidentId(openByAssetAndType.getId());
         assertFalse(incidentLogs.isEmpty());
         assertEquals(2, incidentLogs.size());
-        assertTrue(incidentLogs.stream().anyMatch(log -> log.getMessage().contains(ticket.getRuleGuid())));
+        assertTrue(incidentLogs.stream().anyMatch(log -> log.getData().contains(ticket.getRuleGuid())));
     }
 
     @Test
