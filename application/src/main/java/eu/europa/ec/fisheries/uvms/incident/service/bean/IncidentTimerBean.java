@@ -21,6 +21,7 @@ import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.IncidentLog;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.interfaces.IncidentUpdate;
 import eu.europa.ec.fisheries.uvms.incident.service.helper.IncidentHelper;
+import eu.europa.ec.fisheries.uvms.incident.service.helper.IncidentLogData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +82,11 @@ public class IncidentTimerBean {
                     StatusEnum oldStatus = incident.getStatus();
                     incident.setStatus(StatusEnum.OVERDUE);
 
-                    String json = incidentHelper.createJsonString(Arrays.asList(new KeyValuePair("updatedBy", "Overdue timer"), new KeyValuePair("from", oldStatus), new KeyValuePair("to", incident.getStatus())));
+                    IncidentLogData data = new IncidentLogData();
+                    data.setUser("Overdue timer");
+                    data.setFrom(oldStatus.name());
+                    data.setTo(incident.getStatus().name());
+                    String json = incidentHelper.createJsonString(data);
                     incidentLogServiceBean.createIncidentLogForStatus(incident, EventTypeEnum.INCIDENT_STATUS, null, json);
                     updatedIncident.fire(incident);
                 }
@@ -101,7 +106,12 @@ public class IncidentTimerBean {
                     if (recentAisLog == null) {
                         StatusEnum oldStatus = incident.getStatus();
                         incident.setStatus(incident.getType().getValidStatuses().get(0));
-                        String json = incidentHelper.createJsonString(Arrays.asList(new KeyValuePair("updatedBy", "Recent AIS timer"), new KeyValuePair("from", oldStatus), new KeyValuePair("to", incident.getStatus())));
+
+                        IncidentLogData data = new IncidentLogData();
+                        data.setUser("Recent AIS timer");
+                        data.setFrom(oldStatus.name());
+                        data.setTo(incident.getStatus().name());
+                        String json = incidentHelper.createJsonString(data);
                         incidentLogServiceBean.createIncidentLogForStatus(incident, EventTypeEnum.INCIDENT_STATUS, null, json);
                         updatedIncident.fire(incident);
                     }
@@ -122,7 +132,12 @@ public class IncidentTimerBean {
                     if (recentVmsLog == null) {
                         StatusEnum oldStatus = incident.getStatus();
                         incident.setStatus(StatusEnum.NOT_RECEIVING_VMS_POSITIONS);
-                        String json = incidentHelper.createJsonString(Arrays.asList(new KeyValuePair("updatedBy", "Recent VMS timer"), new KeyValuePair("from", oldStatus), new KeyValuePair("to", incident.getStatus())));
+
+                        IncidentLogData data = new IncidentLogData();
+                        data.setUser("Recent VMS timer");
+                        data.setFrom(oldStatus.name());
+                        data.setTo(incident.getStatus().name());
+                        String json = incidentHelper.createJsonString(data);
                         incidentLogServiceBean.createIncidentLogForStatus(incident, EventTypeEnum.INCIDENT_STATUS, null, json);
                         updatedIncident.fire(incident);
                     }

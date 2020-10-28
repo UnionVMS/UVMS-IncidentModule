@@ -9,6 +9,7 @@ import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.service.helper.IncidentHelper;
+import eu.europa.ec.fisheries.uvms.incident.service.helper.IncidentLogData;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;
@@ -143,41 +144,21 @@ public class IncidentHelperTest extends TransactionalTests {
 
     @Test
     @OperateOnDeployment("incident")
-    public void createJsonStringTest() {
-        String test = incidentHelper.createJsonString("test", Instant.now().toEpochMilli());
-        assertNotNull(test);
-        assertFalse(test.isEmpty());
-
-        test = incidentHelper.createJsonString("test", "Instant.now().toEpochMilli()");
-        assertNotNull(test);
-        assertFalse(test.isEmpty());
-
-        test = incidentHelper.createJsonString("test", Instant.now());
-        assertNotNull(test);
-        assertFalse(test.isEmpty());
-
-        test = incidentHelper.createJsonString("test", IncidentType.MANUAL_POSITION_MODE);
-        assertNotNull(test);
-        assertFalse(test.isEmpty());
-    }
-
-    @Test
-    @OperateOnDeployment("incident")
     public void createJsonStringListTest() {
-        List<KeyValuePair> keyValuePairs = Arrays.asList(new KeyValuePair("test1", Instant.now().toEpochMilli()),
-                new KeyValuePair("test2", "Instant.now().toEpochMilli()"),
-                new KeyValuePair("test3", Instant.now()),
-                new KeyValuePair("test4", IncidentType.MANUAL_POSITION_MODE));
-        String json = incidentHelper.createJsonString(keyValuePairs);
+        IncidentLogData data = new IncidentLogData();
+        data.setExpiry(Instant.now());
+        data.setUser("Instant.now().toEpochMilli()");
+        data.setFrom(IncidentType.MANUAL_POSITION_MODE.name());
+        data.setErrorMessage("Error message");
+        String json = incidentHelper.createJsonString(data);
         assertNotNull(json);
         assertFalse(json.isEmpty());
 
-        assertTrue(json.contains("test1\":"));
-        assertFalse(json.contains("test1\":\""));
-        assertTrue(json.contains("test2\":\"Instant.now().toEpochMilli()\""));
-        assertTrue(json.contains("test3\":"));
-        assertFalse(json.contains("test3\":\""));
-        assertTrue(json.contains("test4\":\"MANUAL_POSITION_MODE\""));
+        assertTrue(json.contains("expiry\":"));
+        assertFalse(json.contains("expiry\":\""));
+        assertTrue(json.contains("user\":\"Instant.now().toEpochMilli()\""));
+        assertTrue(json.contains("from\":\"MANUAL_POSITION_MODE\""));
+        assertTrue(json.contains("errorMessage\":\"Error message\""));
 
     }
 }

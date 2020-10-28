@@ -1,6 +1,5 @@
 package eu.europa.ec.fisheries.uvms.incident.service.bean;
 
-import eu.europa.ec.fisheries.uvms.commons.date.DateUtils;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.*;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.*;
 import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
@@ -11,6 +10,7 @@ import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.IncidentLog;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.interfaces.IncidentCreate;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.interfaces.IncidentUpdate;
 import eu.europa.ec.fisheries.uvms.incident.service.helper.IncidentHelper;
+import eu.europa.ec.fisheries.uvms.incident.service.helper.IncidentLogData;
 import eu.europa.ec.fisheries.uvms.movement.client.MovementRestClient;
 import eu.europa.ec.fisheries.uvms.movement.client.model.MicroMovement;
 import org.slf4j.Logger;
@@ -99,7 +99,9 @@ public class IncidentServiceBean {
                 incident.setRisk(riskLevel);
 
                 if(ticket.getPollId() != null && !ticket.getPollId().matches(uuidPattern)) {
-                    String json = incidentHelper.createJsonString("errorMessage", ticket.getPollId());
+                    IncidentLogData data = new IncidentLogData();
+                    data.setErrorMessage(ticket.getPollId());
+                    String json = incidentHelper.createJsonString(data);
                     incidentLogServiceBean.createIncidentLogForStatus(incident,
                             EventTypeEnum.AUTO_POLL_CREATION_FAILED, null, json);
                 } else {
@@ -108,7 +110,9 @@ public class IncidentServiceBean {
                             null);
                 }
             } else {
-                String json = incidentHelper.createJsonString("creatorRule", ticket.getRuleGuid());
+                IncidentLogData data = new IncidentLogData();
+                data.setUser(ticket.getRuleGuid());
+                String json = incidentHelper.createJsonString(data);
                 incidentLogServiceBean.createIncidentLogForStatus(incident,
                         EventTypeEnum.INCIDENT_CREATED, null, json);
             }
@@ -126,7 +130,10 @@ public class IncidentServiceBean {
         incidentHelper.setCorrectValuesForIncidentType(incident);
         incident.setCreateDate(Instant.now());
         Incident persistedIncident = incidentDao.save(incident);
-        String json = incidentHelper.createJsonString("createdBy", user);
+
+        IncidentLogData data = new IncidentLogData();
+        data.setUser(user);
+        String json = incidentHelper.createJsonString(data);
         incidentLogServiceBean.createIncidentLogForStatus(persistedIncident, EventTypeEnum.INCIDENT_CREATED, null, json);
         createdIncident.fire(persistedIncident);
         return incidentHelper.incidentEntityToDto(persistedIncident);
@@ -143,8 +150,11 @@ public class IncidentServiceBean {
         incidentHelper.setCorrectValuesForIncidentType(oldIncident);
         Incident updated = incidentDao.update(oldIncident);
 
-
-        String json = incidentHelper.createJsonString(Arrays.asList(new KeyValuePair("updatedBy", user), new KeyValuePair("from", oldType), new KeyValuePair("to", update)));
+        IncidentLogData data = new IncidentLogData();
+        data.setUser(user);
+        data.setFrom(oldType.name());
+        data.setTo(update.name());
+        String json = incidentHelper.createJsonString(data);
         incidentLogServiceBean.createIncidentLogForStatus(updated, EventTypeEnum.INCIDENT_TYPE, null, json);
 
         updatedIncident.fire(updated);
@@ -159,7 +169,12 @@ public class IncidentServiceBean {
         oldIncident.setStatus(update);
 
         Incident updated = incidentDao.update(oldIncident);
-        String json = incidentHelper.createJsonString(Arrays.asList(new KeyValuePair("updatedBy", user), new KeyValuePair("from", oldStatus), new KeyValuePair("to", update)));
+
+        IncidentLogData data = new IncidentLogData();
+        data.setUser(user);
+        data.setFrom(oldStatus.name());
+        data.setTo(update.name());
+        String json = incidentHelper.createJsonString(data);
         if(update.equals(StatusEnum.RESOLVED)){
             incidentLogServiceBean.createIncidentLogForStatus(updated, EventTypeEnum.INCIDENT_CLOSED, null, json);
         } else {
@@ -184,7 +199,11 @@ public class IncidentServiceBean {
         oldIncident.setExpiryDate(update);
 
         Incident updated = incidentDao.update(oldIncident);
-        String json = incidentHelper.createJsonString(Arrays.asList(new KeyValuePair("updatedBy", user), new KeyValuePair("expiry", update)));
+
+        IncidentLogData data = new IncidentLogData();
+        data.setUser(user);
+        data.setExpiry(update);
+        String json = incidentHelper.createJsonString(data);
         incidentLogServiceBean.createIncidentLogForStatus(updated, EventTypeEnum.EXPIRY_UPDATED, null, json);
 
         updatedIncident.fire(updated);
@@ -235,7 +254,13 @@ public class IncidentServiceBean {
                 persisted.setStatus(StatusEnum.MANUAL_POSITION_MODE);
                 persisted.setType(IncidentType.MANUAL_POSITION_MODE);
                 persisted.setExpiryDate(ticket.getPositionTime().plus(ServiceConstants.MAX_DELAY_BETWEEN_MANUAL_POSITIONS_IN_MINUTES, ChronoUnit.MINUTES));
-                String json = incidentHelper.createJsonString(Arrays.asList(new KeyValuePair("updatedBy", "UVMS"), new KeyValuePair("from", IncidentType.ASSET_NOT_SENDING), new KeyValuePair("to", IncidentType.MANUAL_POSITION_MODE), new KeyValuePair("expiry", persisted.getExpiryDate())));
+
+                IncidentLogData data = new IncidentLogData();
+                data.setUser("UVMS");
+                data.setFrom(IncidentType.ASSET_NOT_SENDING.name());
+                data.setTo(IncidentType.MANUAL_POSITION_MODE.name());
+                data.setExpiry(persisted.getExpiryDate());
+                String json = incidentHelper.createJsonString(data);
                 incidentLogServiceBean.createIncidentLogForStatus(persisted, EventTypeEnum.INCIDENT_TYPE, null, json);
 
                 persisted.setMovementId(UUID.fromString(ticket.getMovementId()));

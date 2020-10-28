@@ -3,6 +3,7 @@ package eu.europa.ec.fisheries.uvms.incident.service.helper;
 import eu.europa.ec.fisheries.uvms.asset.client.AssetClient;
 import eu.europa.ec.fisheries.uvms.asset.client.model.AssetDTO;
 import eu.europa.ec.fisheries.uvms.asset.client.model.AssetIdentifier;
+import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.*;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.MovementSourceType;
@@ -18,6 +19,7 @@ import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
+import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -33,6 +35,8 @@ public class IncidentHelper {
 
     @Inject
     private MovementRestClient movementClient;
+
+    private Jsonb jsonb = new JsonBConfigurator().getContext(null);
 
 
     public Incident constructIncident(IncidentTicketDto ticket) {
@@ -209,24 +213,8 @@ public class IncidentHelper {
         }
     }
 
-    public String createJsonString(String key, Object value){
-        return createJsonString(Arrays.asList(new KeyValuePair(key, value)));
+    public String createJsonString(IncidentLogData data){
+        return jsonb.toJson(data);
     }
 
-    public String createJsonString(List<KeyValuePair> pairs) {
-        JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
-        for (KeyValuePair pair : pairs) {
-            if(pair.getValue() == null) {
-                objectBuilder.addNull(pair.getKey());
-            }else if(pair.getValue() instanceof Number) {
-                objectBuilder.add(pair.getKey(), ((Number) pair.getValue()).longValue());
-            } else if(pair.getValue() instanceof Instant) {
-                objectBuilder.add(pair.getKey(), ((Instant) pair.getValue()).toEpochMilli());
-            } else {
-                objectBuilder.add(pair.getKey(), pair.getValue().toString());
-            }
-        }
-
-        return objectBuilder.build().toString();
-    }
 }
