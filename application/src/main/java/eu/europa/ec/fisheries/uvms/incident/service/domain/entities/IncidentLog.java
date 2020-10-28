@@ -58,6 +58,9 @@ public class IncidentLog {
     @Enumerated(value = EnumType.STRING)
     private StatusEnum incidentStatus;
 
+    @Column(name = "data")
+    private String data;
+
     public Long getId() {
         return id;
     }
@@ -120,5 +123,13 @@ public class IncidentLog {
 
     public void setIncidentStatus(StatusEnum incidentStatus) {
         this.incidentStatus = incidentStatus;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
     }
 }
