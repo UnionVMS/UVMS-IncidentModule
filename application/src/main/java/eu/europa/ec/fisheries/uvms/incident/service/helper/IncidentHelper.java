@@ -89,7 +89,7 @@ public class IncidentHelper {
         eu.europa.ec.fisheries.uvms.movement.model.dto.MovementDto movement = null;
         if(incident.getMovementId() != null) {
             movement = movementClient.getMovementById(incident.getMovementId());
-            movement = movement.getId() != null ? movement : null ;    //for the sole reason that getMovementById returns an empty object if that move id does not exist
+            movement = movement != null && movement.getId() != null ? movement : null ;    //for the sole reason that getMovementById returns an empty object if that move id does not exist
         }
         return mapEntityToDto(incident, movement);
     }
