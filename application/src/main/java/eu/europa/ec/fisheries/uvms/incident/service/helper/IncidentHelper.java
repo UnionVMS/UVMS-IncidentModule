@@ -3,6 +3,7 @@ package eu.europa.ec.fisheries.uvms.incident.service.helper;
 import eu.europa.ec.fisheries.uvms.asset.client.AssetClient;
 import eu.europa.ec.fisheries.uvms.asset.client.model.AssetDTO;
 import eu.europa.ec.fisheries.uvms.asset.client.model.AssetIdentifier;
+import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.*;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.MovementSourceType;
@@ -15,12 +16,14 @@ import eu.europa.ec.fisheries.uvms.movement.client.model.MicroMovement;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -32,6 +35,9 @@ public class IncidentHelper {
 
     @Inject
     private MovementRestClient movementClient;
+
+    private Jsonb jsonb = new JsonBConfigurator().getContext(null);
+
 
     public Incident constructIncident(IncidentTicketDto ticket) {
         Incident incident = new Incident();
@@ -159,6 +165,7 @@ public class IncidentHelper {
             dto.setRelatedObjectId(entity.getRelatedObjectId());
             dto.setRelatedObjectType(entity.getRelatedObjectType());
             dto.setIncidentStatus(entity.getIncidentStatus());
+            dto.setData(entity.getData());
             retVal.put(dto.getId(), dto);
         }
         return retVal;
@@ -205,4 +212,9 @@ public class IncidentHelper {
             }
         }
     }
+
+    public String createJsonString(IncidentLogData data){
+        return jsonb.toJson(data);
+    }
+
 }

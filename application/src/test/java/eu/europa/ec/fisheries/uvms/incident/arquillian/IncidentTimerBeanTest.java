@@ -226,7 +226,7 @@ public class IncidentTimerBeanTest extends TransactionalTests {
         incidentDto = incidentService.createIncident(incidentDto, "Tester");
         Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(incidentDto.getAssetId(), IncidentType.SEASONAL_FISHING);
 
-        logServiceBean.createIncidentLogForStatus(openByAssetAndType, "test", EventTypeEnum.RECEIVED_AIS_POSITION, null);
+        logServiceBean.createIncidentLogForStatus(openByAssetAndType, EventTypeEnum.RECEIVED_AIS_POSITION, null, "test");
 
         timerBean.recentAisTimer();
 
@@ -276,7 +276,7 @@ public class IncidentTimerBeanTest extends TransactionalTests {
 
         incidentDto = incidentService.createIncident(incidentDto, "Tester");
         Incident openByAssetAndType = incidentDao.findOpenByAssetAndType(incidentDto.getAssetId(), IncidentType.OWNERSHIP_TRANSFER);
-        logServiceBean.createIncidentLogForStatus(openByAssetAndType, "test", EventTypeEnum.RECEIVED_VMS_POSITION, null);
+        logServiceBean.createIncidentLogForStatus(openByAssetAndType, EventTypeEnum.RECEIVED_VMS_POSITION, null, "test");
 
         timerBean.ownerTransferRecentVmsTimer();
 

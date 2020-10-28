@@ -11,7 +11,7 @@
 
     <groupId>eu.europa.ec.fisheries.uvms.incident</groupId>
     <artifactId>incident</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <packaging>pom</packaging>
     <description>Incident handling module</description>
 
@@ -25,10 +25,10 @@
 
         <!-- UVMS Libraries -->
         <uvms.common.version>4.1.8</uvms.common.version>
-        <movement.version>5.5.24-UVMS</movement.version>
-        <asset.version>6.7.29</asset.version>
-        <exchange.module>5.3.11-UVMS</exchange.module>
-        <spatial.version>2.2.6-UVMS</spatial.version>
+        <movement.version>5.5.28-UVMS</movement.version>
+        <asset.version>6.7.32</asset.version>
+        <exchange.module>5.3.13-UVMS</exchange.module>
+        <spatial.version>2.2.8-UVMS</spatial.version>
         <usm4uvms.version>4.1.5</usm4uvms.version>
         <uvms.pom>3.4</uvms.pom>
     </properties>

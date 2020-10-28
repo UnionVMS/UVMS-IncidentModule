@@ -3,11 +3,13 @@ package eu.europa.ec.fisheries.uvms.incident.arquillian;
 import eu.europa.ec.fisheries.uvms.incident.TransactionalTests;
 import eu.europa.ec.fisheries.uvms.incident.helper.TicketHelper;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.IncidentDto;
+import eu.europa.ec.fisheries.uvms.incident.model.dto.KeyValuePair;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.IncidentType;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.StatusEnum;
 import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.service.helper.IncidentHelper;
+import eu.europa.ec.fisheries.uvms.incident.service.helper.IncidentLogData;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;
@@ -17,6 +19,8 @@ import javax.inject.Inject;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
@@ -136,5 +140,25 @@ public class IncidentHelperTest extends TransactionalTests {
         assertEquals(movementTimestamp.plus(65, ChronoUnit.MINUTES), incident.getExpiryDate());
 
         System.clearProperty("MOVEMENT_MOCK_TIMESTAMP");
+    }
+
+    @Test
+    @OperateOnDeployment("incident")
+    public void createJsonStringListTest() {
+        IncidentLogData data = new IncidentLogData();
+        data.setExpiry(Instant.now());
+        data.setUser("Instant.now().toEpochMilli()");
+        data.setFrom(IncidentType.MANUAL_POSITION_MODE.name());
+        data.setErrorMessage("Error message");
+        String json = incidentHelper.createJsonString(data);
+        assertNotNull(json);
+        assertFalse(json.isEmpty());
+
+        assertTrue(json.contains("expiry\":"));
+        assertFalse(json.contains("expiry\":\""));
+        assertTrue(json.contains("user\":\"Instant.now().toEpochMilli()\""));
+        assertTrue(json.contains("from\":\"MANUAL_POSITION_MODE\""));
+        assertTrue(json.contains("errorMessage\":\"Error message\""));
+
     }
 }
