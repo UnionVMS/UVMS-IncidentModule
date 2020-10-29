@@ -380,7 +380,7 @@ public class IncidentServiceBean {
     
     public void addEventToIncident(long incidentId, EventCreationDto eventCreationDto) {
         Incident persisted = incidentDao.findById(incidentId);
-        if(persisted.getStatus().equals(StatusEnum.RESOLVED)){
+        if(persisted.getStatus().equals(StatusEnum.RESOLVED) && !eventCreationDto.getEventType().equals(EventTypeEnum.NOTE_CREATED)){
             throw new IllegalArgumentException("Not allowed to add event to incident " + incidentId + " since it has status 'RESOLVED'");
         }
 
