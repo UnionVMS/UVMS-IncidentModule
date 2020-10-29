@@ -206,6 +206,24 @@ public class IncidentServiceBean {
         String json = incidentHelper.createJsonString(data);
         incidentLogServiceBean.createIncidentLogForStatus(updated, EventTypeEnum.EXPIRY_UPDATED, null, json);
 
+        if(updated.getType().equals(IncidentType.PARKED) || updated.getType().equals(IncidentType.SEASONAL_FISHING)){
+            data = new IncidentLogData();
+            data.setUser(user);
+            if(updated.getStatus().equals(StatusEnum.OVERDUE) && updated.getExpiryDate().isAfter(Instant.now())){
+                updated.setStatus(updated.getType().getValidStatuses().get(0));
+                data.setFrom(StatusEnum.OVERDUE.name());
+                data.setTo(updated.getStatus().name());
+                json = incidentHelper.createJsonString(data);
+                incidentLogServiceBean.createIncidentLogForStatus(updated, EventTypeEnum.INCIDENT_STATUS, null, json);
+            }else if (updated.getExpiryDate().isBefore(Instant.now())){
+                data.setFrom(updated.getStatus().name());
+                updated.setStatus(StatusEnum.OVERDUE);
+                data.setTo(StatusEnum.OVERDUE.name());
+                json = incidentHelper.createJsonString(data);
+                incidentLogServiceBean.createIncidentLogForStatus(updated, EventTypeEnum.INCIDENT_STATUS, null, json);
+            }
+        }
+
         updatedIncident.fire(updated);
         return incidentHelper.incidentEntityToDto(oldIncident);
     }
