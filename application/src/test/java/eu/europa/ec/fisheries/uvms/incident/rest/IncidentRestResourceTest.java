@@ -183,7 +183,7 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
         assertEquals(StatusEnum.INCIDENT_CREATED, createdIncident.getStatus());
 
         UpdateIncidentDto updateDto = new UpdateIncidentDto();
-        Instant expiryDate = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+        Instant expiryDate = Instant.now().plus(1, ChronoUnit.MINUTES).truncatedTo(ChronoUnit.MILLIS);
         updateDto.setExpiryDate(expiryDate);
         updateDto.setType(IncidentType.PARKED);
         updateDto.setIncidentId(createdIncident.getId());
@@ -256,7 +256,7 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
         incidentDto.setStatus(StatusEnum.NOT_RECEIVING_VMS_POSITIONS);
         IncidentDto createdIncident = createIncident(incidentDto);
 
-        Instant expiryDate = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+        Instant expiryDate = Instant.now().plus(1, ChronoUnit.MINUTES).truncatedTo(ChronoUnit.MILLIS);
 
         UpdateIncidentDto updateDto = new UpdateIncidentDto();
         updateDto.setExpiryDate(expiryDate);
@@ -277,6 +277,41 @@ public class IncidentRestResourceTest extends BuildIncidentTestDeployment {
                 .get(new GenericType<Map<Long, IncidentLogDto>>() {});
 
         assertEquals(3, logs.size());
+        assertTrue(logs.values().stream().anyMatch(log -> log.getEventType().equals(EventTypeEnum.INCIDENT_TYPE)));
+        assertTrue(logs.values().stream().anyMatch(log -> log.getEventType().equals(EventTypeEnum.EXPIRY_UPDATED)));
+    }
+
+    @Test
+    @OperateOnDeployment("incident")
+    public void updateIncidentToParkedWithExpiryInThePast() {
+        IncidentDto incidentDto = TicketHelper.createBasicIncidentDto();
+        incidentDto.setType(IncidentType.OWNERSHIP_TRANSFER);
+        incidentDto.setStatus(StatusEnum.NOT_RECEIVING_VMS_POSITIONS);
+        IncidentDto createdIncident = createIncident(incidentDto);
+
+        Instant expiryDate = Instant.now().minus(1, ChronoUnit.MINUTES).truncatedTo(ChronoUnit.MILLIS);
+
+        UpdateIncidentDto updateDto = new UpdateIncidentDto();
+        updateDto.setExpiryDate(expiryDate);
+        updateDto.setType(IncidentType.PARKED);
+        updateDto.setIncidentId(createdIncident.getId());
+        IncidentDto updatedIncident = getWebTarget()
+                .path("incident")
+                .path("updateType")
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .put(Entity.json(updateDto), IncidentDto.class);
+
+        assertEquals(StatusEnum.OVERDUE, updatedIncident.getStatus());
+
+        Map<Long, IncidentLogDto> logs = getWebTarget()
+                .path("incident/incidentLogForIncident")
+                .path(updatedIncident.getId().toString())
+                .request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getToken())
+                .get(new GenericType<Map<Long, IncidentLogDto>>() {});
+
+        assertEquals(4, logs.size());
         assertTrue(logs.values().stream().anyMatch(log -> log.getEventType().equals(EventTypeEnum.INCIDENT_TYPE)));
         assertTrue(logs.values().stream().anyMatch(log -> log.getEventType().equals(EventTypeEnum.EXPIRY_UPDATED)));
     }
