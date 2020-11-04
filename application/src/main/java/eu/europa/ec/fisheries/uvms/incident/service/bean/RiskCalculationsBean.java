@@ -4,7 +4,7 @@ import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
 import eu.europa.ec.fisheries.uvms.incident.model.dto.enums.RiskLevel;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.movement.client.MovementRestClient;
-import eu.europa.ec.fisheries.uvms.movement.client.model.MicroMovement;
+import eu.europa.ec.fisheries.uvms.movement.model.dto.MovementDto;
 import eu.europa.ec.fisheries.uvms.spatial.model.schemas.AreaByLocationSpatialRQ;
 import eu.europa.ec.fisheries.uvms.spatial.model.schemas.AreaExtendedIdentifierType;
 import eu.europa.ec.fisheries.uvms.spatial.model.schemas.AreaType;
@@ -61,7 +61,7 @@ public class RiskCalculationsBean {
         if(incident.getMovementId() == null){
             return null;
         }
-        MicroMovement microMovement = movementClient.getMicroMovementById(incident.getMovementId());
+        MovementDto microMovement = movementClient.getMovementById(incident.getMovementId());
         if(microMovement == null){
           return RiskLevel.HIGH;
         } else if(checkIfPositionIsInPortArea(microMovement)){
@@ -71,7 +71,7 @@ public class RiskCalculationsBean {
         }
     }
 
-    public boolean checkIfPositionIsInPortArea(MicroMovement microMovement){
+    public boolean checkIfPositionIsInPortArea(MovementDto microMovement){
         AreaByLocationSpatialRQ request = new AreaByLocationSpatialRQ();
         request.setPoint(new PointType(microMovement.getLocation().getLongitude(), microMovement.getLocation().getLatitude(), 4326));
 

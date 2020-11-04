@@ -6,7 +6,6 @@ import eu.europa.ec.fisheries.uvms.incident.service.dao.IncidentLogDao;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.IncidentLog;
 import eu.europa.ec.fisheries.uvms.incident.service.helper.IncidentHelper;
-import eu.europa.ec.fisheries.uvms.movement.client.model.MicroMovement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,8 +22,6 @@ public class IncidentLogServiceBean {
 
     @Inject
     private IncidentLogDao incidentLogDao;
-    @Inject
-    private IncidentHelper incidentHelper;
 
 
     public List<IncidentLog> getIncidentLogByIncidentId(long incidentId) {

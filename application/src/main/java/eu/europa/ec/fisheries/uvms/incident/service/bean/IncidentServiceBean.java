@@ -12,7 +12,7 @@ import eu.europa.ec.fisheries.uvms.incident.service.domain.interfaces.IncidentUp
 import eu.europa.ec.fisheries.uvms.incident.service.helper.IncidentHelper;
 import eu.europa.ec.fisheries.uvms.incident.service.helper.IncidentLogData;
 import eu.europa.ec.fisheries.uvms.movement.client.MovementRestClient;
-import eu.europa.ec.fisheries.uvms.movement.client.model.MicroMovement;
+import eu.europa.ec.fisheries.uvms.movement.model.dto.MovementDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -389,7 +389,7 @@ public class IncidentServiceBean {
     }
 
     private void checkAndUpdateIncidentPosition(IncidentTicketDto ticket, Incident persisted) {
-        MicroMovement microMovementById = persisted.getMovementId() != null ? movementRestClient.getMicroMovementById(persisted.getMovementId()) : null;
+        MovementDto microMovementById = persisted.getMovementId() != null ? movementRestClient.getMovementById(persisted.getMovementId()) : null;
         if(microMovementById == null || ticket.getPositionTime().isAfter(microMovementById.getTimestamp())) {
             persisted.setMovementId(UUID.fromString(ticket.getMovementId()));
         }

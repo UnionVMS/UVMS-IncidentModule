@@ -12,7 +12,6 @@ import eu.europa.ec.fisheries.uvms.incident.service.ServiceConstants;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.Incident;
 import eu.europa.ec.fisheries.uvms.incident.service.domain.entities.IncidentLog;
 import eu.europa.ec.fisheries.uvms.movement.client.MovementRestClient;
-import eu.europa.ec.fisheries.uvms.movement.client.model.MicroMovement;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -193,7 +192,7 @@ public class IncidentHelper {
             } else {
                 Instant expiry;
                 if (incident != null && incident.getMovementId() != null) {
-                    MicroMovement microMovementById = movementClient.getMicroMovementById(incident.getMovementId());
+                    eu.europa.ec.fisheries.uvms.movement.model.dto.MovementDto microMovementById = movementClient.getMovementById(incident.getMovementId());
                     StatusEnum status;
                     if (microMovementById != null) {
                         expiry = microMovementById.getTimestamp().plus(ServiceConstants.MAX_DELAY_BETWEEN_MANUAL_POSITIONS_IN_MINUTES, ChronoUnit.MINUTES);

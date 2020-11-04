@@ -4,7 +4,6 @@ import eu.europa.ec.fisheries.schema.movement.v1.MovementPoint;
 import eu.europa.ec.fisheries.schema.movement.v1.MovementSourceType;
 import eu.europa.ec.fisheries.uvms.commons.date.DateUtils;
 import eu.europa.ec.fisheries.uvms.commons.date.JsonBConfigurator;
-import eu.europa.ec.fisheries.uvms.movement.client.model.MicroMovement;
 import eu.europa.ec.fisheries.uvms.movement.model.dto.MovementDto;
 import eu.europa.ec.fisheries.uvms.rest.security.RequiresFeature;
 import eu.europa.ec.fisheries.uvms.rest.security.UnionVMSFeature;
@@ -34,28 +33,6 @@ public class MovementMock {
     }
 
     @GET
-    @Path("getMicroMovement/{id}")
-    public Response getMicroMovement(@PathParam("id") UUID id) {
-        MicroMovement movement = new MicroMovement();
-        if(id != null) {
-            movement.setId(id.toString());
-            MovementPoint point = new MovementPoint();
-            point.setLatitude(123d);
-            point.setLongitude(123d);
-            point.setAltitude(0d);
-            movement.setLocation(point);
-
-            movement.setSource(id.getMostSignificantBits() == 0l ? MovementSourceType.NAF : MovementSourceType.MANUAL);
-            Instant timestamp = DateUtils.stringToDate(System.getProperty("MOVEMENT_MOCK_TIMESTAMP", "" + Instant.now().toEpochMilli()));
-            movement.setTimestamp(timestamp);
-            movement.setSpeed(122d);
-            movement.setHeading(123d);
-        }
-        String response = jsonb.toJson(movement);
-        return Response.ok(response).build();
-    }
-
-    @GET
     @Path("getMovement/{id}")
     public Response getMovement(@PathParam("id") UUID id) {
         MovementDto movement = new MovementDto();
@@ -68,9 +45,10 @@ public class MovementMock {
             movement.setLocation(point);
 
             movement.setSource(id.getMostSignificantBits() == 0l ? MovementSourceType.NAF : MovementSourceType.MANUAL);
-            movement.setTimestamp(Instant.now());
-            movement.setSpeed((float) 122d);
-            movement.setHeading((float) 123d);
+            Instant timestamp = DateUtils.stringToDate(System.getProperty("MOVEMENT_MOCK_TIMESTAMP", "" + Instant.now().toEpochMilli()));
+            movement.setTimestamp(timestamp);
+            movement.setSpeed(122f);
+            movement.setHeading(123f);
         }
         String response = jsonb.toJson(movement);
         return Response.ok(response).build();
@@ -79,7 +57,7 @@ public class MovementMock {
     @POST
     @Path("/getMovementList")
     @RequiresFeature(UnionVMSFeature.manageInternalRest)
-    public Response getMicroMovementByIdList(List<UUID> moveIds) {
+    public Response getMovementByIdList(List<UUID> moveIds) {
         List<MovementDto> responseList = new ArrayList<>();
         for (UUID uuid : moveIds) {
             if(uuid == null){
