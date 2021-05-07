@@ -30,7 +30,7 @@
         <exchange.module>5.3.14-UVMS</exchange.module>
         <spatial.version>2.2.8-UVMS</spatial.version>
         <usm4uvms.version>4.1.5</usm4uvms.version>
-        <uvms.pom>3.4</uvms.pom>
+        <uvms.pom>3.5</uvms.pom>
     </properties>
 
     <dependencies>
