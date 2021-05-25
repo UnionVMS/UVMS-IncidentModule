@@ -422,4 +422,8 @@ public class IncidentServiceBean {
             internalCreateIncident(ticketDto);
         }
     }
+
+    public List<Incident> findOpenByAssetId(UUID assetId) {
+        return incidentDao.findOpenByAsset(assetId);
+    }
 }
