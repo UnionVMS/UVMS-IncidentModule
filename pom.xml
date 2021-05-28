@@ -6,12 +6,12 @@
     <parent>
         <groupId>fish.focus.uvms.maven</groupId>
         <artifactId>uvms-pom</artifactId>
-        <version>3.4</version>
+        <version>3.6</version>
     </parent>
 
     <groupId>eu.europa.ec.fisheries.uvms.incident</groupId>
     <artifactId>incident</artifactId>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
     <packaging>pom</packaging>
     <description>Incident handling module</description>
 
@@ -24,13 +24,13 @@
         <docker.liquibase.db.passwd>incident</docker.liquibase.db.passwd>
 
         <!-- UVMS Libraries -->
-        <uvms.common.version>4.1.8</uvms.common.version>
-        <movement.version>5.6.0-UVMS</movement.version>
-        <asset.version>6.8.0</asset.version>
-        <exchange.module>5.3.13-UVMS</exchange.module>
+        <uvms.common.version>4.1.9</uvms.common.version>
+        <movement.version>5.6.1-UVMS</movement.version>
+        <asset.version>6.8.9</asset.version>
+        <exchange.module>5.3.15-UVMS</exchange.module>
         <spatial.version>2.2.8-UVMS</spatial.version>
-        <usm4uvms.version>4.1.5</usm4uvms.version>
-        <uvms.pom>3.4</uvms.pom>
+        <usm4uvms.version>4.1.6</usm4uvms.version>
+        <uvms.pom>3.6</uvms.pom>
     </properties>
 
     <dependencies>
@@ -100,7 +100,7 @@
             <plugin>
                 <groupId>com.amashchenko.maven.plugin</groupId>
                 <artifactId>gitflow-maven-plugin</artifactId>
-                <version>1.14.0</version>
+                <version>1.16.0</version>
             </plugin>
         </plugins>
     </build>
