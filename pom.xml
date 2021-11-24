@@ -11,7 +11,7 @@
 
     <groupId>eu.europa.ec.fisheries.uvms.incident</groupId>
     <artifactId>incident</artifactId>
-    <version>1.0.9</version>
+    <version>1.0.11</version>
     <packaging>pom</packaging>
     <description>Incident handling module</description>
 
@@ -24,12 +24,12 @@
         <docker.liquibase.db.passwd>incident</docker.liquibase.db.passwd>
 
         <!-- UVMS Libraries -->
-        <uvms.common.version>4.1.9</uvms.common.version>
-        <movement.version>5.6.1-UVMS</movement.version>
-        <asset.version>6.8.9</asset.version>
-        <exchange.module>5.3.15-UVMS</exchange.module>
-        <spatial.version>2.2.8-UVMS</spatial.version>
-        <usm4uvms.version>4.1.6</usm4uvms.version>
+        <uvms.common.version>4.1.11</uvms.common.version>
+        <movement.version>5.6.4-UVMS</movement.version>
+        <asset.version>6.8.15</asset.version>
+        <exchange.module>5.3.19-UVMS</exchange.module>
+        <spatial.version>2.2.9-UVMS</spatial.version>
+        <usm4uvms.version>4.1.9</usm4uvms.version>
         <uvms.pom>3.6</uvms.pom>
     </properties>
 
@@ -90,8 +90,8 @@
     </distributionManagement>
 
     <scm>
-        <connection>scm:git:https://github.com/UnionVMS/UVMS-IncidentModule.git</connection>
-        <developerConnection>scm:git:https://github.com/UnionVMS/UVMS-IncidentModule.git</developerConnection>
+        <connection>scm:git:git@github.com:UnionVMS/UVMS-IncidentModule.git</connection>
+        <developerConnection>scm:git:git@github.com:UnionVMS/UVMS-IncidentModule.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
