@@ -90,8 +90,8 @@
     </distributionManagement>
 
     <scm>
-        <connection>scm:git:https://github.com/UnionVMS/UVMS-IncidentModule.git</connection>
-        <developerConnection>scm:git:https://github.com/UnionVMS/UVMS-IncidentModule.git</developerConnection>
+        <connection>scm:git:git@github.com:UnionVMS/UVMS-IncidentModule.git</connection>
+        <developerConnection>scm:git:git@github.com:UnionVMS/UVMS-IncidentModule.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
