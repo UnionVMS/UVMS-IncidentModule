@@ -67,8 +67,12 @@ pipeline {
               break
           }
         }
-        git branch: 'master', url: "$GIT_URL", credentialsId: 'bae67ea8-994c-429a-8a03-49b6ca0d3392'
-        git branch: 'develop', url: "$GIT_URL", credentialsId: 'bae67ea8-994c-429a-8a03-49b6ca0d3392'
+        withCredentials([usernamePassword(credentialsId: 'github_uvmsci_user', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+          sh "git config credential.username $GIT_USERNAME"
+          sh 'git config credential.helper "!echo password=$GIT_PASSWORD; echo"'
+        }
+        git branch: 'master', url: "$GIT_URL"
+        git branch: 'develop', url: "$GIT_URL"
         sh "mvn -B gitflow:release -DskipTestProject -DversionDigitToIncrement=${digit}"
       }
     }
