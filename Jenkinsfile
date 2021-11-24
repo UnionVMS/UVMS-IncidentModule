@@ -67,7 +67,7 @@ pipeline {
               break
           }
         }
-        withCredentials([usernamePassword(credentialsId: 'github_uvmsci_user', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+        withCredentials([usernamePassword(credentialsId: 'bae67ea8-994c-429a-8a03-49b6ca0d3392', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
           sh "git config credential.username $GIT_USERNAME"
           sh 'git config credential.helper "!echo password=$GIT_PASSWORD; echo"'
         }
