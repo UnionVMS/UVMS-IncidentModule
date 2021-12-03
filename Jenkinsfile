@@ -73,7 +73,7 @@ pipeline {
         }
         git branch: 'master', url: "$GIT_URL"
         git branch: 'develop', url: "$GIT_URL"
-        sh "mvn -B gitflow:release -DskipTestProject -DversionDigitToIncrement=${digit}"
+        sh "mvn -B gitflow:release -DskipTestProject -DversionDigitToIncrement=${digit} -DcommitDevelopmentVersionAtStart=true"
       }
     }
   }
